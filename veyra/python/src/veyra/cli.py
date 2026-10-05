@@ -104,6 +104,66 @@ def cmd_headroom(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_gate1_leaderboard(args: argparse.Namespace) -> int:
+    from collections import defaultdict
+    from pathlib import Path
+    from veyra.analysis.gate1_leaderboard import (
+        calculate_matched_headroom,
+        format_report_markdown,
+        scan_leaderboard_directory,
+    )
+
+    data_dir = Path(args.dir)
+    if args.download:
+        from huggingface_hub import snapshot_download
+
+        print(f"Downloading {args.dataset} (metadata + result.json only) to {data_dir}...")
+        snapshot_download(
+            repo_id=args.dataset,
+            repo_type="dataset",
+            allow_patterns=[
+                "**/result.json",
+                "**/metadata.yaml",
+                "**/metadata.yml",
+                "result.json",
+                "metadata.yaml",
+                "metadata.yml",
+            ],
+            local_dir=str(data_dir),
+        )
+
+    trials = scan_leaderboard_directory(data_dir)
+    print(f"Loaded {len(trials)} valid trial records across qualifying submissions.")
+    if not trials:
+        print("No valid trials found matching submission criteria.")
+        return 1
+
+    by_model: dict[str, dict[str, dict[str, list[bool]]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    cost_by_model: dict[str, dict[str, dict[str, list[float]]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    for t in trials:
+        by_model[t.model][t.agent][t.task].append(t.passed)
+        cost_by_model[t.model][t.agent][t.task].append(t.cost_usd)
+
+    analyses = []
+    for model, agents_dict in sorted(by_model.items()):
+        if args.model and args.model.lower() not in model.lower():
+            continue
+        analysis = calculate_matched_headroom(agents_dict, cost_by_model[model], model=model)
+        if analysis:
+            analyses.append(analysis)
+
+    if not analyses:
+        print("No model groups found with >= 2 qualifying agent harnesses.")
+        return 1
+
+    report = format_report_markdown(analyses)
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(report, encoding="utf-8")
+    print(report)
+    return 0
+
+
 def cmd_targets(_args: argparse.Namespace) -> int:
     from veyra.bench.targets import checklist
 
@@ -335,6 +395,14 @@ def main(argv: list[str] | None = None) -> int:
     p_hr.add_argument("--trials", required=True, help="CSV with columns task,harness,seed,pass,cost")
     p_hr.add_argument("--out", default="out/headroom.md")
     p_hr.set_defaults(func=cmd_headroom)
+
+    p_g1 = sub.add_parser("gate1-leaderboard", help="Gate 1: public Terminal-Bench 2.0 leaderboard evaluation")
+    p_g1.add_argument("--dir", default="data/tb2_leaderboard", help="local directory for leaderboard files")
+    p_g1.add_argument("--download", action="store_true", help="download result.json and metadata.yaml from huggingface")
+    p_g1.add_argument("--dataset", default="harborframework/terminal-bench-2-leaderboard")
+    p_g1.add_argument("--model", default="", help="filter to specific model group (e.g. gpt-5.3-codex, gemini-3.1-pro)")
+    p_g1.add_argument("--out", default="out/gate1_leaderboard.md")
+    p_g1.set_defaults(func=cmd_gate1_leaderboard)
 
     p_targets = sub.add_parser("targets", help="list the public benchmarks this project is aiming at")
     p_targets.set_defaults(func=cmd_targets)

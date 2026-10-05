@@ -122,7 +122,7 @@ def report_markdown(summary: dict) -> str:
         "# Gate 1 headroom",
         "",
         f"tasks: {summary['n_tasks']}  trials: {summary['n_trials']}",
-        f"net headroom (oracle − mean same-harness best-of-k): {summary['net_headroom_mean']:.4f}",
+        f"net headroom (oracle - mean same-harness best-of-k): {summary['net_headroom_mean']:.4f}",
         f"95% CI: [{lo:.4f}, {hi:.4f}]",
         f"net vs best fixed harness: {summary['net_vs_best_fixed_mean']:.4f}  CI [{summary['net_vs_best_fixed_ci95'][0]:.4f}, {summary['net_vs_best_fixed_ci95'][1]:.4f}]",
         f"mean cost per trial: ${summary['mean_cost']:.4f}",

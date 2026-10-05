@@ -1,0 +1,39 @@
+{
+  "version": "1",
+  "task_id": "tb2-task-42",
+  "from_harness": "native",
+  "to_harness": "repair",
+  "shadow": false,
+  "budget": {
+    "usd_spent": 0.425,
+    "usd_remaining": 1.575,
+    "actions": 12
+  },
+  "items": [
+    {
+      "kind": "decision",
+      "text": "switch switch to repair harness after syntax error",
+      "keep_score": 0.95
+    },
+    {
+      "kind": "failed_action",
+      "text": "tool pytest returned non-zero exit status 1",
+      "keep_score": 0.88
+    },
+    {
+      "kind": "open_subgoal",
+      "text": "Fix regex mismatch in parser.py line 45",
+      "keep_score": 0.92
+    },
+    {
+      "kind": "verification",
+      "text": "verify syntax passed, semantic assertion failed",
+      "keep_score": 0.75
+    },
+    {
+      "kind": "observation",
+      "text": "Environment log shows missing package dependency libffi-dev",
+      "keep_score": null
+    }
+  ]
+}

@@ -15,7 +15,7 @@
       "type": "object",
       "properties": {
         "usd_spent": { "type": "number" },
-        "usd_remaining": { "type": "number" },
+        "usd_remaining": { "type": ["number", "null"] },
         "actions": { "type": "integer" }
       }
     },
