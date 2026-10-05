@@ -93,6 +93,10 @@ def normalize_model_name(raw_model: str) -> str:
     for prov in ("openai/", "google/", "anthropic/", "mistralai/"):
         if m.startswith(prov):
             m = m[len(prov):]
+    m = m.replace("claude-opus-4-6", "claude-opus-4.6")
+    m = m.replace("claude-opus-4-7", "claude-opus-4.7")
+    m = m.replace("claude-4.6-opus", "claude-opus-4.6")
+    m = m.replace("claude-4.5-sonnet", "claude-sonnet-4.5")
     return m
 
 
@@ -102,17 +106,30 @@ def parse_result_json(path: Path) -> dict[str, Any]:
     except Exception:
         return {}
 
+    task_name = data.get("task_name") or ""
     passed = False
-    for k in ("passed", "success", "is_resolved", "score"):
-        if k in data:
-            val = data[k]
-            if isinstance(val, bool):
-                passed = val
-            elif isinstance(val, (int, float)):
-                passed = val >= 1.0
-            elif isinstance(val, str):
-                passed = val.strip().lower() in {"1", "true", "yes", "pass", "passed", "resolved"}
-            break
+
+    # Check verifier_result rewards (standard in Terminal-Bench 2.0 leaderboard)
+    if "verifier_result" in data and isinstance(data["verifier_result"], dict):
+        vr = data["verifier_result"]
+        rewards = vr.get("rewards") or {}
+        if isinstance(rewards, dict) and "reward" in rewards:
+            try:
+                passed = float(rewards["reward"]) >= 1.0
+            except (ValueError, TypeError):
+                pass
+
+    if not passed:
+        for k in ("passed", "success", "is_resolved", "score"):
+            if k in data:
+                val = data[k]
+                if isinstance(val, bool):
+                    passed = val
+                elif isinstance(val, (int, float)):
+                    passed = val >= 1.0
+                elif isinstance(val, str):
+                    passed = val.strip().lower() in {"1", "true", "yes", "pass", "passed", "resolved"}
+                break
 
     if not passed and "test_result" in data:
         passed = str(data["test_result"]).strip().lower() == "passed"
@@ -143,8 +160,8 @@ def parse_result_json(path: Path) -> dict[str, Any]:
             except (ValueError, TypeError):
                 pass
 
-    # Check nested agent_context / context
-    for ctx_key in ("context", "agent_context", "metrics"):
+    # Check nested agent_result, agent_context, or metrics
+    for ctx_key in ("agent_result", "context", "agent_context", "metrics"):
         if ctx_key in data and isinstance(data[ctx_key], dict):
             ctx = data[ctx_key]
             if cost == 0.0 and "cost_usd" in ctx and ctx["cost_usd"] is not None:
@@ -163,17 +180,70 @@ def parse_result_json(path: Path) -> dict[str, Any]:
                 except (ValueError, TypeError):
                     pass
 
+    # Check config for overrides
+    cfg = data.get("config") or {}
+    tm = cfg.get("timeout_multiplier", 1.0)
+    agent_cfg = cfg.get("agent") or {}
+    env_cfg = cfg.get("environment") or {}
+    has_overrides = False
+    if agent_cfg.get("override_timeout_sec") is not None:
+        has_overrides = True
+    if any(env_cfg.get(k) is not None for k in ("override_cpus", "override_memory_mb", "override_storage_mb")):
+        has_overrides = True
+
     return {
+        "task_name": task_name,
         "passed": passed,
         "cost_usd": cost,
         "input_tokens": in_tokens,
         "output_tokens": out_tokens,
+        "timeout_multiplier": tm,
+        "has_overrides": has_overrides,
     }
+
+
+def parse_metadata_submission(meta: dict[str, Any], sub_dir_name: str) -> tuple[str, str] | None:
+    """Extract (agent_name, model_name) or None if disqualified (multi-model or invalid)."""
+    # Extract agent name
+    agent = meta.get("agent_display_name") or meta.get("agent") or meta.get("agent_name") or sub_dir_name
+    agent = str(agent).strip()
+
+    # Extract model names
+    raw_models = meta.get("models") or []
+    if isinstance(raw_models, list) and raw_models:
+        model_names = []
+        for m in raw_models:
+            if isinstance(m, dict):
+                model_names.append(m.get("model_name") or m.get("model") or "")
+            else:
+                model_names.append(str(m))
+    elif meta.get("model") or meta.get("model_name"):
+        m = meta.get("model") or meta.get("model_name")
+        model_names = [m] if isinstance(m, str) else [str(x) for x in m]
+    else:
+        # Fallback to sub_dir_name if model is encoded e.g. Agent__Model
+        if "__" in sub_dir_name:
+            parts = sub_dir_name.split("__", 1)
+            agent = parts[0]
+            model_names = [parts[1]]
+        else:
+            return None
+
+    # Drop empty or invalid
+    model_names = [normalize_model_name(m) for m in model_names if m]
+    if not model_names:
+        return None
+
+    # Drop multi-model entries
+    if len(set(model_names)) > 1:
+        return None
+
+    model = model_names[0]
+    return agent, model
 
 
 def is_valid_submission(meta: dict[str, Any]) -> bool:
     """Filter submissions per Gate 1 requirements."""
-    # timeout_multiplier must be 1.0 (or absent/default 1.0)
     tm = meta.get("timeout_multiplier")
     if tm is None:
         bench_meta = meta.get("benchmark") or {}
@@ -184,22 +254,12 @@ def is_valid_submission(meta: dict[str, Any]) -> bool:
     except (ValueError, TypeError):
         return False
 
-    # No timeout or resource overrides
     for key in ("override_setup_timeout_sec", "override_timeout_sec", "resource_limits"):
         if key in meta and meta[key] is not None and meta[key] != {}:
             return False
 
-    # Must have a defined agent and model
-    agent = meta.get("agent") or meta.get("agent_name")
-    model = meta.get("model") or meta.get("model_name")
-    if not agent or not model:
-        return False
-
-    # Drop multi-model entries
-    if isinstance(model, list) and len(set(model)) > 1:
-        return False
-
-    return True
+    parsed = parse_metadata_submission(meta, "")
+    return parsed is not None
 
 
 def scan_leaderboard_directory(root_dir: Path) -> list[LeaderboardTrial]:
@@ -218,34 +278,28 @@ def scan_leaderboard_directory(root_dir: Path) -> list[LeaderboardTrial]:
         except Exception:
             continue
 
-        if not is_valid_submission(meta):
+        parsed_meta = parse_metadata_submission(meta, sub_id)
+        if not parsed_meta:
             continue
 
-        agent = str(meta.get("agent") or meta.get("agent_name")).strip()
-        raw_model = meta.get("model") or meta.get("model_name")
-        model = normalize_model_name(str(raw_model[0] if isinstance(raw_model, list) else raw_model))
+        agent, model = parsed_meta
 
-        # Find result.json files under this submission
-        results = list(sub_dir.glob("**/result.json"))
+        # Find per-task result.json files under this submission (skip top-level run summary result.json)
+        results = [r for r in sub_dir.glob("**/result.json") if len(r.relative_to(sub_dir).parts) > 2]
         if not results:
             continue
 
         # Group by task to verify at least 5 trials per task
         task_results: dict[str, list[tuple[str, Path]]] = defaultdict(list)
         for rpath in results:
-            # Task name is usually parent of trial dir (e.g. <task>/trial-1/result.json or <task>/result.json)
             rel = rpath.relative_to(sub_dir)
             parts = rel.parts
-            if len(parts) >= 2:
-                raw_task = parts[0]
-                seed = parts[1] if len(parts) >= 3 else parts[-2]
-            else:
-                raw_task = rpath.parent.name
-                seed = "1"
+            seed = parts[0]
+            raw_task = parts[1].split("__")[0] if "__" in parts[1] else parts[1]
             task_norm = normalize_task_name(raw_task)
             task_results[task_norm].append((seed, rpath))
 
-        # Verify >= 5 trials per task
+        # Filter: submissions must have at least 5 trials per task
         task_counts = [len(v) for v in task_results.values()]
         if not task_counts or (sum(task_counts) / len(task_counts)) < 4.8:
             continue
@@ -253,11 +307,18 @@ def scan_leaderboard_directory(root_dir: Path) -> list[LeaderboardTrial]:
         for task_norm, rlist in task_results.items():
             for seed_str, rpath in rlist:
                 parsed = parse_result_json(rpath)
+                # Check result-level timeout multiplier and overrides
+                if abs(float(parsed.get("timeout_multiplier", 1.0)) - 1.0) > 1e-6:
+                    continue
+                if parsed.get("has_overrides"):
+                    continue
+
+                canonical_task = normalize_task_name(parsed.get("task_name") or task_norm)
                 trials.append(LeaderboardTrial(
                     submission_id=sub_id,
                     agent=agent,
                     model=model,
-                    task=task_norm,
+                    task=canonical_task,
                     seed=seed_str,
                     passed=parsed["passed"],
                     cost_usd=parsed["cost_usd"],

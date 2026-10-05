@@ -17,7 +17,9 @@ venv/
 # local caches + run data
 .cache/
 runs/
+data/
 out/**
+!out/gate1_leaderboard.md
 !out/dev/
 !out/test/
 out/dev/**
