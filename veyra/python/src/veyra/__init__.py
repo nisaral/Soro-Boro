@@ -1,8 +1,21 @@
-"""Veyra: an adaptive execution runtime.
+"""Veyra: a drop-in tool-boundary reliability layer for AI agents."""
 
-The kernel (Go) owns the loop and the budget. This package owns everything
-that needs a Python ecosystem: harness adapters, decision backends, tools and
-the benchmark.
-"""
+from veyra.boundary import (
+    FailureClassification,
+    FailureKind,
+    MCPToolMiddleware,
+    SafeRetryPolicy,
+    Veyra,
+    VeyraBoundaryError,
+)
 
 __version__ = "0.2.0"
+
+__all__ = [
+    "Veyra",
+    "SafeRetryPolicy",
+    "FailureKind",
+    "FailureClassification",
+    "VeyraBoundaryError",
+    "MCPToolMiddleware",
+]

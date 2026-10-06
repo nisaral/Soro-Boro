@@ -164,6 +164,22 @@ def cmd_gate1_leaderboard(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_audit(args: argparse.Namespace) -> int:
+    from veyra.boundary.audit import audit_from_file
+
+    traces_path = Path(args.traces)
+    if not traces_path.exists():
+        print(f"audit: traces file not found: {traces_path}", file=sys.stderr)
+        return 1
+
+    summary = audit_from_file(traces_path)
+    if args.json:
+        print(json.dumps(summary.to_dict(), indent=2))
+    else:
+        print(summary.to_text())
+    return 0
+
+
 def cmd_targets(_args: argparse.Namespace) -> int:
     from veyra.bench.targets import checklist
 
@@ -340,6 +356,18 @@ def cmd_view(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_audit(args: argparse.Namespace) -> int:
+    from veyra.boundary.audit import audit_from_file
+
+    summary = audit_from_file(args.traces)
+    if args.json:
+        import json
+        print(json.dumps(summary.__dict__, indent=2))
+    else:
+        print(summary.format_text())
+    return 0
+
+
 def cmd_doctor(args: argparse.Namespace) -> int:
     from veyra.harness.registry import HarnessRegistry
 
@@ -403,6 +431,11 @@ def main(argv: list[str] | None = None) -> int:
     p_g1.add_argument("--model", default="", help="filter to specific model group (e.g. gpt-5.3-codex, gemini-3.1-pro)")
     p_g1.add_argument("--out", default="out/gate1_leaderboard.md")
     p_g1.set_defaults(func=cmd_gate1_leaderboard)
+
+    p_audit = sub.add_parser("audit", help="audit tool execution boundary traces")
+    p_audit.add_argument("--traces", default="runs/traces.jsonl", help="path to JSONL trace log")
+    p_audit.add_argument("--json", action="store_true", help="output audit summary as JSON")
+    p_audit.set_defaults(func=cmd_audit)
 
     p_targets = sub.add_parser("targets", help="list the public benchmarks this project is aiming at")
     p_targets.set_defaults(func=cmd_targets)
