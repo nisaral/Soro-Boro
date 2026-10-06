@@ -1,13 +1,13 @@
 """Veyra Tool Boundary Interceptor.
 
 Core abstraction:
-Agent proposes -> Veyra resolves.
+Agent proposes -> Veyra resolves -> Tool executes.
 
 Sits between the agent's proposed tool call and the actual tool:
-1. Intercepts proposed tool call & arguments.
-2. Validates and applies provably safe normalizations.
+1. Validates proposed ExecutableAction & arguments.
+2. Resolves candidates and applies hard constraints & RoutePolicy.
 3. Classifies failures into structured taxonomy.
-4. Safely retries idempotent transient errors.
+4. Safely retries idempotent transient errors via RecoveryPolicy.
 5. Returns structured diagnostic errors when Veyra cannot safely resolve.
 6. Records complete audit trace.
 """
@@ -15,19 +15,20 @@ Sits between the agent's proposed tool call and the actual tool:
 from __future__ import annotations
 
 import functools
-import time
-import uuid
+import inspect
 from typing import Any, Callable
 
 from veyra.boundary.retry import SafeRetryPolicy
-from veyra.boundary.taxonomy import (
-    FailureClassification,
-    FailureKind,
-    VeyraBoundaryError,
-    classify_exception,
-)
-from veyra.boundary.trace import TraceRecord, TraceRecorder
-from veyra.boundary.validator import SchemaValidationError, validate_and_normalize
+from veyra.boundary.trace import TraceRecorder
+from veyra.core.action import ExecutableAction
+from veyra.core.state import ExecutionState
+from veyra.core.trace import TraceSink
+from veyra.execution.engine import ExecutionEngine
+from veyra.policy.base import RoutePolicy
+from veyra.policy.deterministic import DeterministicRoutePolicy
+from veyra.policy.recovery import SafeRecoveryPolicy
+from veyra.registry.resolver import DeterministicCandidateResolver
+from veyra.registry.tool_registry import ToolDefinition, ToolRegistry
 
 
 class Veyra:
@@ -35,11 +36,52 @@ class Veyra:
 
     def __init__(
         self,
-        recorder: TraceRecorder | None = None,
+        recorder: TraceRecorder | TraceSink | None = None,
         retry_policy: SafeRetryPolicy | None = None,
+        route_policy: RoutePolicy | None = None,
+        registry: ToolRegistry | None = None,
     ):
-        self.recorder = recorder or TraceRecorder()
+        self.registry = registry or ToolRegistry()
         self.retry_policy = retry_policy or SafeRetryPolicy()
+        self.route_policy = route_policy or DeterministicRoutePolicy()
+        self.resolver = DeterministicCandidateResolver(self.registry)
+        self.recovery_policy = SafeRecoveryPolicy(self.retry_policy)
+
+        # Support both TraceRecorder and TraceSink
+        if isinstance(recorder, TraceRecorder):
+            self.trace_sink = TraceSink(listener=recorder)
+            self._compat_recorder = recorder
+        elif isinstance(recorder, TraceSink):
+            self.trace_sink = recorder
+            self._compat_recorder = None
+        else:
+            self.trace_sink = TraceSink()
+            self._compat_recorder = None
+
+        self.engine = ExecutionEngine(
+            registry=self.registry,
+            resolver=self.resolver,
+            route_policy=self.route_policy,
+            recovery_policy=self.recovery_policy,
+            trace_sink=self.trace_sink,
+        )
+
+    @property
+    def recorder(self) -> Any:
+        """Compatibility property for access to trace records."""
+        if self._compat_recorder is not None:
+            # Sync traces from engine trace sink
+            self._compat_recorder.traces = list(self.trace_sink.traces)  # type: ignore
+            return self._compat_recorder
+        return self.trace_sink
+
+    def equivalent(self, canonical_name: str, equivalent_names: list[str]) -> None:
+        """Explicitly declare equivalent tools (Section 7).
+
+        Example:
+            veyra.equivalent("get_customer", ["crm.get_customer", "legacy.get_customer"])
+        """
+        self.registry.register_equivalence(canonical_name, equivalent_names)
 
     def tool(
         self,
@@ -47,16 +89,32 @@ class Veyra:
         idempotent: bool = False,
         schema: dict[str, Any] | None = None,
         name: str | None = None,
+        risk_class: str = "low",
+        capabilities: list[str] | None = None,
+        permissions: list[str] | None = None,
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """Decorator to wrap a Python function with Veyra's boundary reliability layer."""
 
         def decorator(fn: Callable[..., Any]) -> Callable[..., Any]:
             tool_name = name or fn.__name__
 
+            # Register in registry
+            self.registry.register(
+                ToolDefinition(
+                    name=tool_name,
+                    schema=schema,
+                    executable=fn,
+                    retryable=retryable,
+                    idempotent=idempotent,
+                    risk_class=risk_class,
+                    capabilities=capabilities or [],
+                    permissions=permissions or [],
+                    protocol="python",
+                )
+            )
+
             @functools.wraps(fn)
             def wrapper(*args: Any, **kwargs: Any) -> Any:
-                # Merge positional arguments into kwargs if possible
-                import inspect
                 sig = inspect.signature(fn)
                 bound = sig.bind_partial(*args, **kwargs)
                 bound.apply_defaults()
@@ -71,7 +129,6 @@ class Veyra:
                     idempotent=idempotent,
                 )
 
-            # Store metadata on wrapper for introspection
             wrapper.__veyra_tool_name__ = tool_name  # type: ignore
             wrapper.__veyra_retryable__ = retryable  # type: ignore
             wrapper.__veyra_idempotent__ = idempotent  # type: ignore
@@ -100,111 +157,19 @@ class Veyra:
         retryable: bool = False,
         idempotent: bool = False,
         agent: str = "default_agent",
+        state: ExecutionState | None = None,
     ) -> Any:
-        """Resolve and execute a proposed tool call through Veyra's boundary."""
-        trace_id = f"trc_{uuid.uuid4().hex[:12]}"
-        start_time = time.perf_counter()
+        """Resolve and execute a proposed tool call through Veyra's execution engine."""
+        action = ExecutableAction(
+            tool=tool_name,
+            arguments=dict(arguments),
+            metadata={
+                "retryable": retryable,
+                "idempotent": idempotent,
+                "schema": schema,
+            },
+            executable=fn,
+        )
 
-        # Step 1: Validate and safely normalize arguments
-        try:
-            resolved_args, corrections = validate_and_normalize(
-                proposed_args=arguments,
-                schema=schema,
-                fn=fn,
-            )
-        except SchemaValidationError as val_err:
-            latency_ms = (time.perf_counter() - start_time) * 1000.0
-            classification = classify_exception(val_err)
-            trace = TraceRecord(
-                trace_id=trace_id,
-                agent=agent,
-                tool_proposed=tool_name,
-                arguments_proposed=arguments,
-                tool_resolved=tool_name,
-                arguments_resolved={},
-                decision="failed_escalated",
-                failure=classification.to_dict(),
-                latency_ms=latency_ms,
-                attempt=1,
-                safe=True,
-                outcome="failure",
-                corrections=[],
-            )
-            self.recorder.record(trace)
-            raise VeyraBoundaryError(classification, original_exc=val_err) from val_err
-
-        # Step 2: Execute with safe retry
-        attempt = 1
-        last_classification: FailureClassification | None = None
-        last_exc: Exception | None = None
-
-        while True:
-            try:
-                # Call underlying function with resolved arguments
-                result = fn(**resolved_args)
-
-                # Tool succeeded
-                latency_ms = (time.perf_counter() - start_time) * 1000.0
-                decision = (
-                    "retried_and_succeeded"
-                    if attempt > 1
-                    else ("corrected_and_executed" if corrections else "direct_execution")
-                )
-                trace = TraceRecord(
-                    trace_id=trace_id,
-                    agent=agent,
-                    tool_proposed=tool_name,
-                    arguments_proposed=arguments,
-                    tool_resolved=tool_name,
-                    arguments_resolved=resolved_args,
-                    decision=decision,
-                    failure=None,
-                    latency_ms=latency_ms,
-                    attempt=attempt,
-                    safe=True,
-                    outcome="success",
-                    corrections=corrections,
-                )
-                self.recorder.record(trace)
-                return result
-
-            except Exception as exc:
-                last_exc = exc
-                classification = classify_exception(
-                    exc,
-                    is_idempotent=idempotent,
-                    is_declared_retryable=retryable,
-                )
-                last_classification = classification
-
-                # Check if safe to retry
-                if self.retry_policy.is_safe_to_retry(
-                    classification=classification,
-                    is_idempotent=idempotent,
-                    is_declared_retryable=retryable,
-                    current_attempt=attempt,
-                ):
-                    delay = self.retry_policy.calculate_delay(classification, attempt)
-                    time.sleep(delay)
-                    attempt += 1
-                    continue
-
-                # Not safe to retry or attempts exhausted -> Escalate structured error
-                latency_ms = (time.perf_counter() - start_time) * 1000.0
-                trace = TraceRecord(
-                    trace_id=trace_id,
-                    agent=agent,
-                    tool_proposed=tool_name,
-                    arguments_proposed=arguments,
-                    tool_resolved=tool_name,
-                    arguments_resolved=resolved_args,
-                    decision="failed_escalated",
-                    failure=classification.to_dict(),
-                    latency_ms=latency_ms,
-                    attempt=attempt,
-                    safe=True,
-                    outcome="failure",
-                    corrections=corrections,
-                )
-                self.recorder.record(trace)
-                raise VeyraBoundaryError(classification, original_exc=exc) from exc
+        exec_state = state or ExecutionState(agent=agent)
+        return self.engine.execute(proposal=action, state=exec_state)
