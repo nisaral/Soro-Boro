@@ -181,67 +181,135 @@ def cmd_audit(args: argparse.Namespace) -> int:
 
 
 def cmd_toolmisuse(args: argparse.Namespace) -> int:
-    from veyra.bench.toolmisuse.runner import run_toolmisuse_benchmark
+    from veyra.bench.toolmisuse.runner import (
+        generate_toolmisuse_tasks,
+        get_default_benchmark_tasks,
+        run_toolmisuse_benchmark,
+    )
 
-    results = run_toolmisuse_benchmark()
+    if args.suite == "test" or (args.count is not None and args.count != 60):
+        count = args.count or 1000
+        tasks = generate_toolmisuse_tasks(count=count, split="public_test")
+        suite_desc = f"ToolMisuseBench Full Public Test Split ({count} tasks)"
+    else:
+        tasks = get_default_benchmark_tasks()
+        suite_desc = f"ToolMisuseBench Controlled Regression Suite ({len(tasks)} tasks)"
+
+    results = run_toolmisuse_benchmark(tasks=tasks, traces_dir=args.traces_dir)
     if args.json:
         print(json.dumps({k: v.to_dict() for k, v in results.items()}, indent=2))
     else:
-        print("=" * 86)
-        print("   CONTROLLED COMPARATIVE EVALUATION: ToolMisuseBench (v0.1 Controlled Baseline)")
-        print("   Note: In Veyra's controlled ToolMisuseBench evaluation across 60 fault-injected tasks.")
-        print("=" * 86)
-        header = f"{'System Arm':<22} | {'Success':<8} | {'Recoveries':<11} | {'Unsafe Retries':<15} | {'Replans':<8}"
+        print("=" * 96)
+        print(f"   CONTROLLED COMPARATIVE EVALUATION: {suite_desc}")
+        print("   Published ToolMisuseBench size: 6,800 tasks (5,000 train / 800 dev / 1,000 test).")
+        print("=" * 96)
+        header = f"{'System Arm':<22} | {'Success (95% CI)':<19} | {'Recoveries (95% CI)':<22} | {'Unsafe Retries':<15} | {'Replans':<8}"
         print(header)
-        print("-" * 86)
+        print("-" * 96)
         for arm_name, r in results.items():
-            print(f"{arm_name:<22} | {r.task_success_rate:>6.1f}% | {r.boundary_recovery_rate:>10.1f}% | {r.unsafe_retries:>15d} | {r.agent_replans:>8d}")
-        print("=" * 86)
+            succ_str = f"{r.task_success_rate:>5.1f}% [{r.task_success_ci_95[0]:.0f}-{r.task_success_ci_95[1]:.0f}%]"
+            rec_str = f"{r.boundary_recovery_rate:>5.1f}% [{r.boundary_recovery_ci_95[0]:.0f}-{r.boundary_recovery_ci_95[1]:.0f}%]"
+            print(f"{arm_name:<22} | {succ_str:<19} | {rec_str:<22} | {r.unsafe_retries:>15d} | {r.agent_replans:>8d}")
+        print("=" * 96)
 
         # Explicit Denominator Breakdown Table for Reproducibility
         print("\nEXACT FAULT DENOMINATOR REPRODUCTION BREAKDOWN:")
-        print("-" * 86)
+        print("-" * 96)
         den_header = f"{'System Arm':<22} | {'Eligible Injected':<18} | {'Safe Recoveries':<15} | {'Unsafe Interv':<13} | {'Non-Recoverable':<15}"
         print(den_header)
-        print("-" * 86)
+        print("-" * 96)
         for arm_name, r in results.items():
             print(f"{arm_name:<22} | {r.eligible_injected_failures:>18d} | {r.successful_safe_recoveries:>15d} | {r.unsafe_interventions:>13d} | {r.non_recoverable_failures:>15d}")
-        print("-" * 86)
+        print("-" * 96)
         print("Formula: Boundary Recovery Rate = safe recoveries / eligible injected failures")
         print("Safety Invariant: 0 unsafe retries on non-idempotent or non-retryable operations.")
-        print("=" * 86)
+        if args.traces_dir:
+            print(f"Audited Scenario Traces saved to: {args.traces_dir}")
+        print("=" * 96)
     return 0
 
 
 def cmd_mcp_real(args: argparse.Namespace) -> int:
     from veyra.bench.mcp_real.runner import run_real_mcp_benchmark
 
-    results = run_real_mcp_benchmark()
+    results = run_real_mcp_benchmark(traces_dir=args.traces_dir)
     if args.json:
         print(json.dumps({k: v.to_dict() for k, v in results.items()}, indent=2))
     else:
-        print("=" * 86)
+        print("=" * 96)
         print("   REAL MCP CATALOGS VALIDATION: 3 Environments (Filesystem, Database, API)")
         print("   Evaluates existing FastMCP tools under transparent Veyra execution boundary.")
-        print("=" * 86)
-        header = f"{'System Arm':<22} | {'Success':<8} | {'Recoveries':<11} | {'Unsafe Retries':<15} | {'Replans':<8}"
+        print("=" * 96)
+        header = f"{'System Arm':<22} | {'Success (95% CI)':<19} | {'Recoveries (95% CI)':<22} | {'Unsafe Retries':<15} | {'Replans':<8}"
         print(header)
-        print("-" * 86)
+        print("-" * 96)
         for arm_name, r in results.items():
-            print(f"{arm_name:<22} | {r.task_success_rate:>6.1f}% | {r.boundary_recovery_rate:>10.1f}% | {r.unsafe_retries:>15d} | {r.agent_replans:>8d}")
-        print("=" * 86)
+            succ_str = f"{r.task_success_rate:>5.1f}% [{r.task_success_ci_95[0]:.0f}-{r.task_success_ci_95[1]:.0f}%]"
+            rec_str = f"{r.boundary_recovery_rate:>5.1f}% [{r.boundary_recovery_ci_95[0]:.0f}-{r.boundary_recovery_ci_95[1]:.0f}%]"
+            print(f"{arm_name:<22} | {succ_str:<19} | {rec_str:<22} | {r.unsafe_retries:>15d} | {r.agent_replans:>8d}")
+        print("=" * 96)
 
         print("\nEXACT FAULT DENOMINATOR REPRODUCTION BREAKDOWN:")
-        print("-" * 86)
+        print("-" * 96)
         den_header = f"{'System Arm':<22} | {'Eligible Injected':<18} | {'Safe Recoveries':<15} | {'Unsafe Interv':<13} | {'Non-Recoverable':<15}"
         print(den_header)
-        print("-" * 86)
+        print("-" * 96)
         for arm_name, r in results.items():
             print(f"{arm_name:<22} | {r.eligible_injected_failures:>18d} | {r.successful_safe_recoveries:>15d} | {r.unsafe_interventions:>13d} | {r.non_recoverable_failures:>15d}")
-        print("-" * 86)
+        print("-" * 96)
         print("Formula: Boundary Recovery Rate = safe recoveries / eligible injected failures")
         print("Safety Invariant: 0 unsafe retries recorded for Veyra across real catalogs.")
-        print("=" * 86)
+        if args.traces_dir:
+            print(f"Audited Scenario Traces saved to: {args.traces_dir}")
+        print("=" * 96)
+    return 0
+
+
+def cmd_eval_agent(args: argparse.Namespace) -> int:
+    from veyra.bench.llm_agent.runner import run_llm_agent_benchmark
+    from veyra.bench.llm_agent.agent import LiveAgentDriver, DeterministicSimulatedAgentDriver
+    from veyra.llm import make_llm
+
+    seeds = [int(s.strip()) for s in args.seeds.split(",") if s.strip()]
+    if args.model_mode in ("ollama", "openai"):
+        opts = {
+            "model_mode": args.model_mode,
+            "model_cheap": args.model_name,
+            "model_strong": args.model_name,
+            "base_url": args.base_url or ("http://127.0.0.1:11434" if args.model_mode == "ollama" else "https://api.openai.com/v1"),
+            "api_key": args.api_key or os.environ.get("OPENAI_API_KEY", "local"),
+        }
+        client = make_llm(opts)
+        driver = LiveAgentDriver(client=client)
+    else:
+        driver = DeterministicSimulatedAgentDriver()
+
+    results = run_llm_agent_benchmark(
+        agent_driver=driver,
+        model_name=args.model_name,
+        seeds=seeds,
+        traces_dir=args.traces_dir,
+    )
+
+    if args.json:
+        print(json.dumps(results.to_dict(), indent=2))
+    else:
+        print("=" * 104)
+        print(f"   TRUE LLM AGENT EVALUATION (Tier 2 / Step 3) — Model: {args.model_name}")
+        print(f"   Evaluates 3 arms across {len(seeds)} seeds (seeds {seeds}) on Real MCP environments.")
+        print("   Architecture: Real LLM Agent -> proposed tool call -> Boundary -> Real MCP Server -> observation")
+        print("=" * 104)
+        header = f"{'System Arm':<22} | {'Success (95% CI)':<19} | {'Avg Turns':<11} | {'Total Replans':<14} | {'Recoveries':<12} | {'Unsafe Retries':<14}"
+        print(header)
+        print("-" * 104)
+        for arm_name, r in results.arm_results.items():
+            succ_str = f"{r.success_rate:>5.1f}% [{r.success_ci_95[0]:.0f}-{r.success_ci_95[1]:.0f}%]"
+            print(f"{arm_name:<22} | {succ_str:<19} | {r.avg_turns_per_task:>11.2f} | {r.total_replans:>14d} | {r.boundary_recoveries:>12d} | {r.unsafe_retries:>14d}")
+        print("=" * 104)
+        print("Safety Invariant: ZERO unsafe retries allowed on non-idempotent or non-retryable operations.")
+        if args.traces_dir:
+            print(f"Audited Traces written to: {args.traces_dir}")
+        print("=" * 104)
     return 0
 
 
@@ -502,13 +570,29 @@ def main(argv: list[str] | None = None) -> int:
     p_audit.add_argument("--json", action="store_true", help="output audit summary as JSON")
     p_audit.set_defaults(func=cmd_audit)
 
-    p_tm = sub.add_parser("toolmisuse", help="ToolMisuseBench comparative evaluation (v0.1 Controlled Baseline)")
+    p_tm = sub.add_parser("toolmisuse", help="ToolMisuseBench comparative evaluation (Step 2 / Tier 1)")
+    p_tm.add_argument("--suite", default="regression", choices=["regression", "test"],
+                       help="evaluation suite: regression (60 canonical tasks) or test (1000 published test split tasks)")
+    p_tm.add_argument("--count", type=int, default=None, help="override number of tasks to evaluate")
+    p_tm.add_argument("--traces-dir", default="out/traces/toolmisuse", help="directory to persist per-scenario JSONL traces")
     p_tm.add_argument("--json", action="store_true", help="output evaluation metrics as JSON")
     p_tm.set_defaults(func=cmd_toolmisuse)
 
     p_mcp_real = sub.add_parser("mcp-real", help="Real MCP catalogs validation across 3 environments")
+    p_mcp_real.add_argument("--traces-dir", default="out/traces/mcp_real", help="directory to persist per-scenario JSONL traces")
     p_mcp_real.add_argument("--json", action="store_true", help="output evaluation metrics as JSON")
     p_mcp_real.set_defaults(func=cmd_mcp_real)
+
+    p_agent = sub.add_parser("eval-agent", help="True LLM agent comparative evaluation on real MCP servers across 5 seeds (Step 3 / Tier 2)")
+    p_agent.add_argument("--model-mode", default="offline", choices=["offline", "ollama", "openai"],
+                         help="offline = simulated deterministic; ollama/openai = live model endpoint")
+    p_agent.add_argument("--model-name", default="simulated-agent", help="model name or identifier")
+    p_agent.add_argument("--base-url", default="", help="OpenAI-compatible base URL (e.g. http://127.0.0.1:1234/v1)")
+    p_agent.add_argument("--api-key", default="", help="API key for live model endpoint")
+    p_agent.add_argument("--seeds", default="1,2,3,4,5", help="comma-separated seed list (e.g. 1,2,3,4,5)")
+    p_agent.add_argument("--traces-dir", default="out/traces/llm_agent", help="directory to persist per-turn and per-task JSONL traces")
+    p_agent.add_argument("--json", action="store_true", help="output evaluation metrics as JSON")
+    p_agent.set_defaults(func=cmd_eval_agent)
 
     p_targets = sub.add_parser("targets", help="list the public benchmarks this project is aiming at")
     p_targets.set_defaults(func=cmd_targets)

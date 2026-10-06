@@ -89,3 +89,31 @@ def test_classify_unknown():
     assert res.kind == FailureKind.UNKNOWN
     assert res.retryable is False
     assert res.safe_to_retry is False
+
+
+def test_classify_tool_implementation_error():
+    # Broken tool implementation bug (like range parameter shadowing Python built-in)
+    exc = TypeError("'str' object is not callable")
+    res = classify_exception(exc)
+
+    assert res.kind == FailureKind.TOOL_IMPLEMENTATION_ERROR
+    assert res.provenance.value == "tool_implementation_error"
+    assert res.requires_agent is True
+    assert res.safe_to_retry is False
+    assert res.status_code == 500
+
+    # AttributeError inside tool code
+    exc_attr = AttributeError("'NoneType' object has no attribute 'get'")
+    res_attr = classify_exception(exc_attr)
+    assert res_attr.kind == FailureKind.TOOL_IMPLEMENTATION_ERROR
+    assert res_attr.provenance.value == "tool_implementation_error"
+
+
+def test_provenance_in_dict_serialization():
+    exc = ValueError("Customer 9928 does not exist: resource not found")
+    res = classify_exception(exc)
+    d = res.to_dict()
+
+    assert "provenance" in d
+    assert d["provenance"] == "precondition_error"
+    assert d["kind"] == "precondition_error"

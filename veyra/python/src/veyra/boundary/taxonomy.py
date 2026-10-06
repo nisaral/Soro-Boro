@@ -12,9 +12,24 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 
+class FailureProvenance(str, enum.Enum):
+    AGENT_ARGUMENT_ERROR = "agent_argument_error"
+    SCHEMA_VALIDATION_ERROR = "schema_validation_error"
+    TOOL_IMPLEMENTATION_ERROR = "tool_implementation_error"
+    NETWORK_ERROR = "network_error"
+    AUTHORIZATION_ERROR = "authorization_error"
+    PRECONDITION_ERROR = "precondition_error"
+    UNKNOWN_STATE = "unknown_state"
+    UNKNOWN = "unknown"
+
+
 class FailureKind(str, enum.Enum):
     SCHEMA_ERROR = "schema_error"
+    AGENT_ARGUMENT_ERROR = "agent_argument_error"
+    SCHEMA_VALIDATION_ERROR = "schema_validation_error"
+    TOOL_IMPLEMENTATION_ERROR = "tool_implementation_error"
     TRANSIENT_ERROR = "transient_error"
+    NETWORK_ERROR = "network_error"
     RATE_LIMIT = "rate_limit"
     PRECONDITION_ERROR = "precondition_error"
     AUTHORIZATION_ERROR = "authorization_error"
@@ -29,6 +44,7 @@ class FailureClassification:
     repairable: bool
     requires_agent: bool
     safe_to_retry: bool
+    provenance: FailureProvenance = FailureProvenance.UNKNOWN
     message: str = ""
     status_code: int | None = None
     retry_after_sec: float | None = None
@@ -37,6 +53,7 @@ class FailureClassification:
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d["kind"] = self.kind.value
+        d["provenance"] = self.provenance.value
         return d
 
 
@@ -58,7 +75,36 @@ def classify_exception(
     msg = str(exc).strip()
     exc_type = type(exc).__name__
 
-    # 1. Authorization Errors (401, 403, PermissionError, Scope)
+    # 1. Tool Implementation Errors (Range shadowing, AttributeError, NameError, internal callable bugs)
+    # A broken tool is NOT an agent misuse event.
+    if isinstance(exc, (AttributeError, NameError, UnboundLocalError, IndexError, ZeroDivisionError)) or (
+        isinstance(exc, TypeError)
+        and any(
+            term in msg.lower()
+            for term in (
+                "object is not callable",
+                "cannot unpack",
+                "unsupported operand type",
+                "takes no arguments",
+                "takes 0 positional arguments",
+                "takes from",
+                "positional argument following keyword",
+            )
+        )
+    ):
+        return FailureClassification(
+            kind=FailureKind.TOOL_IMPLEMENTATION_ERROR,
+            provenance=FailureProvenance.TOOL_IMPLEMENTATION_ERROR,
+            retryable=False,
+            repairable=False,
+            requires_agent=True,
+            safe_to_retry=False,
+            message=msg or "Internal tool implementation error",
+            status_code=500,
+            details={"exception_type": exc_type},
+        )
+
+    # 2. Authorization Errors (401, 403, PermissionError, Scope)
     # Never retry, never guess.
     if isinstance(exc, PermissionError) or any(
         term in msg.lower() for term in ("unauthorized", "forbidden", "permission denied", "access denied", "invalid token", "401", "403")
@@ -66,6 +112,7 @@ def classify_exception(
         status = 403 if "403" in msg or "forbidden" in msg.lower() else 401
         return FailureClassification(
             kind=FailureKind.AUTHORIZATION_ERROR,
+            provenance=FailureProvenance.AUTHORIZATION_ERROR,
             retryable=False,
             repairable=False,
             requires_agent=True,
@@ -75,9 +122,8 @@ def classify_exception(
             details={"exception_type": exc_type},
         )
 
-    # 2. Rate Limit (429, Quota exceeded, Too Many Requests)
+    # 3. Rate Limit (429, Quota exceeded, Too Many Requests)
     if any(term in msg.lower() for term in ("rate limit", "too many requests", "429", "quota exceeded")):
-        # Extract retry-after if present
         retry_after = None
         match = re.search(r"retry[-_ ]after[:= ]*([0-9.]+)", msg, re.IGNORECASE)
         if match:
@@ -86,10 +132,10 @@ def classify_exception(
             except ValueError:
                 pass
 
-        # Rate limit is safe to retry only if idempotent OR read-only
         safe = is_idempotent
         return FailureClassification(
             kind=FailureKind.RATE_LIMIT,
+            provenance=FailureProvenance.NETWORK_ERROR,
             retryable=True,
             repairable=True,
             requires_agent=False,
@@ -100,10 +146,11 @@ def classify_exception(
             details={"exception_type": exc_type},
         )
 
-    # 3. Unknown State (Write operation timed out without confirmation, unconfirmed transaction)
+    # 4. Unknown State (Write operation timed out without confirmation, unconfirmed transaction)
     if any(term in msg.lower() for term in ("unknown state", "in doubt", "unconfirmed transaction")):
         return FailureClassification(
             kind=FailureKind.UNKNOWN_STATE,
+            provenance=FailureProvenance.UNKNOWN_STATE,
             retryable=False,
             repairable=False,
             requires_agent=True,
@@ -112,7 +159,7 @@ def classify_exception(
             details={"exception_type": exc_type},
         )
 
-    # 4. Precondition Errors (404, Not Found, Does not exist, Resource Locked, State conflict 409, 412, FileNotFoundError)
+    # 5. Precondition Errors (404, Not Found, Does not exist, Resource Locked, State conflict 409, 412, FileNotFoundError)
     if isinstance(exc, FileNotFoundError) or any(
         term in msg.lower() for term in (
             "not found", "does not exist", "already exists", "precondition failed",
@@ -122,6 +169,7 @@ def classify_exception(
         status = 404 if "not found" in msg.lower() or "404" in msg or "does not exist" in msg.lower() else 409
         return FailureClassification(
             kind=FailureKind.PRECONDITION_ERROR,
+            provenance=FailureProvenance.PRECONDITION_ERROR,
             retryable=False,
             repairable=False,
             requires_agent=True,
@@ -131,14 +179,14 @@ def classify_exception(
             details={"exception_type": exc_type},
         )
 
-    # 5. Transient Network / Server Errors (Timeout, ConnectionReset, 502, 503, 504)
+    # 6. Transient Network / Server Errors (Timeout, ConnectionReset, 502, 503, 504)
     if isinstance(exc, (TimeoutError, ConnectionError)) or any(
         term in msg.lower() for term in ("timeout", "timed out", "connection reset", "connection refused", "502", "503", "504", "service unavailable", "bad gateway")
     ):
-        # Crucial invariant: Transient errors are safe to retry ONLY when tool is idempotent AND declared retryable!
         safe = is_idempotent and is_declared_retryable
         return FailureClassification(
             kind=FailureKind.TRANSIENT_ERROR,
+            provenance=FailureProvenance.NETWORK_ERROR,
             retryable=True,
             repairable=True,
             requires_agent=False,
@@ -148,12 +196,13 @@ def classify_exception(
             details={"exception_type": exc_type},
         )
 
-    # 6. Schema & Validation Errors (TypeError, ValueError, KeyError, JSONDecodeError)
+    # 7. Agent Argument & Schema Validation Errors (TypeError, ValueError, KeyError, JSONDecodeError)
     if isinstance(exc, (TypeError, ValueError, KeyError)) or any(
         term in msg.lower() for term in ("schema", "validation error", "missing argument", "required property", "invalid type", "expected type", "unknown property")
     ):
         return FailureClassification(
             kind=FailureKind.SCHEMA_ERROR,
+            provenance=FailureProvenance.AGENT_ARGUMENT_ERROR,
             retryable=False,
             repairable=True,
             requires_agent=False,
@@ -163,9 +212,10 @@ def classify_exception(
             details={"exception_type": exc_type},
         )
 
-    # 7. Default: UNKNOWN
+    # 8. Default: UNKNOWN
     return FailureClassification(
         kind=FailureKind.UNKNOWN,
+        provenance=FailureProvenance.UNKNOWN,
         retryable=False,
         repairable=False,
         requires_agent=True,

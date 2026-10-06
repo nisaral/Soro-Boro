@@ -39,13 +39,18 @@ class TestRealMCPCatalogsBenchmark:
 
         assert RealMCPArm.RAW_AGENT.value in results
         assert RealMCPArm.NAIVE_RETRY.value in results
+        assert RealMCPArm.COMPETENT_BASELINE.value in results
         assert RealMCPArm.STRUCTURED_FEEDBACK.value in results
         assert RealMCPArm.VEYRA.value in results
 
         raw = results[RealMCPArm.RAW_AGENT.value]
         naive = results[RealMCPArm.NAIVE_RETRY.value]
+        competent = results[RealMCPArm.COMPETENT_BASELINE.value]
         feedback = results[RealMCPArm.STRUCTURED_FEEDBACK.value]
         veyra = results[RealMCPArm.VEYRA.value]
+
+        # Competent baseline and Veyra both observe 0 unsafe retries
+        assert competent.unsafe_retries == 0
 
         # Veyra beats raw agent substantially
         assert veyra.task_success_rate > raw.task_success_rate

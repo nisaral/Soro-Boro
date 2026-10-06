@@ -31,6 +31,25 @@ def sanitize_payload(payload: Any) -> Any:
 
 
 @dataclass
+class ReplanEvent:
+    """Explicit measured event when an agent must re-plan due to an unhandled or unrecoverable error."""
+
+    task_id: str
+    replan_index: int
+    trigger_reason: str
+    provenance: str
+    failure_kind: str
+    error_message: str
+    tool_name: str
+    turn_index: int = 1
+    timestamp_utc: str = ""
+    payload: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class ExecutionTrace:
     """Rich execution trace captured for every Veyra boundary call."""
 

@@ -14,6 +14,7 @@ from veyra.core import (
     ExecutableAction,
     ExecutionState,
     ExecutionTrace,
+    ReplanEvent,
     RecoveryDecision,
     RecoveryDecisionKind,
     TraceSink,
@@ -47,6 +48,7 @@ __all__ = [
     "RecoveryDecision",
     "RecoveryDecisionKind",
     "ExecutionTrace",
+    "ReplanEvent",
     "TraceSink",
     # Runtime & Policies
     "ExecutionEngine",

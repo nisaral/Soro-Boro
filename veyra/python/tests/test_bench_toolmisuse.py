@@ -9,6 +9,7 @@ def test_toolmisuse_comparative_benchmark():
 
     assert SystemArm.RAW_AGENT.value in results
     assert SystemArm.NAIVE_RETRY.value in results
+    assert SystemArm.COMPETENT_BASELINE.value in results
     assert SystemArm.STRUCTURED_FEEDBACK.value in results
     assert SystemArm.VEYRA.value in results
 

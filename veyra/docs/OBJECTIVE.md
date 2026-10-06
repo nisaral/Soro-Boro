@@ -92,13 +92,14 @@ Keep it very small.
 
 ---
 
-## 4. Core Failure Taxonomy
+## 4. Core Failure Taxonomy & Failure Provenance
 
-Every tool failure becomes a structured object:
+Every tool failure becomes a structured object tracking both failure kind and **failure provenance** (distinguishing tool implementation crashes from agent argument errors):
 
 ```json
 {
   "kind": "schema_error",
+  "provenance": "agent_argument_error",
   "retryable": false,
   "repairable": true,
   "requires_agent": false,
@@ -108,29 +109,31 @@ Every tool failure becomes a structured object:
 }
 ```
 
-### Taxonomy Classes:
-1. **`SCHEMA_ERROR`**:
+### Failure Provenance Classes:
+1. **`TOOL_IMPLEMENTATION_ERROR`**:
+   - Internal bug in tool code itself (e.g. parameter shadowing built-ins like `range`, unhandled `AttributeError`/`IndexError`/`NameError`).
+   - *Resolution*: Escalated with crash diagnostics. Never blamed on the agent or treated as agent misuse.
+2. **`AGENT_ARGUMENT_ERROR` / `SCHEMA_VALIDATION_ERROR`**:
    - Wrong type, missing required argument, invalid enum, malformed date, unknown property.
    - *Provably safe normalization only*: `"42"` $\to$ `42`, `"2026-10-06"` $\to$ normalized ISO date, `"ACTIVE"` $\to$ `"active"` (unique case match).
-   - No semantic guessing.
-2. **`TRANSIENT_ERROR`**:
+   - No semantic guessing. Unrecoverable arguments escalate with structured feedback.
+3. **`NETWORK_ERROR` / `TRANSIENT_ERROR`**:
    - Timeout, connection reset, temporary 5xx, service unavailable.
-   - *Retry only when*: Tool is explicitly declared retryable **AND** operation is idempotent (or idempotency key supplied).
-3. **`RATE_LIMIT`**:
+   - *Retry only when*: Tool is explicitly declared retryable **AND** operation is idempotent.
+4. **`RATE_LIMIT`**:
    - HTTP 429, quota exceeded.
-   - *Resolution*: Exponential backoff + `retry-after` header obedience. Never hammer the endpoint.
-4. **`PRECONDITION_ERROR`**:
-   - Resource locked, order must exist, customer missing.
-   - *Resolution*: Return structured diagnostic information to the agent. Do not invent the missing action.
-5. **`AUTHORIZATION_ERROR`**:
-   - 401 / 403, permission denied, wrong scope.
-   - *Resolution*: No retry, no guessing. Immediate escalation.
-6. **`UNKNOWN_STATE`**:
+   - *Resolution*: Exponential backoff + `retry-after` header obedience.
+5. **`PRECONDITION_ERROR`**:
+   - Resource locked, order missing, database not found in provider registry.
+   - *Resolution*: Return structured diagnostic to the agent. Do not invent the missing resource.
+6. **`AUTHORIZATION_ERROR`**:
+   - 401 / 403, permission denied, missing credentials in secret store.
+   - *Resolution*: Immediate escalation. 0 retries.
+7. **`UNKNOWN_STATE`**:
    - Write request $\to$ timeout $\to$ state unknown.
    - *Resolution*: Never retry unless idempotency is strictly guaranteed.
-7. **`UNKNOWN`**:
-   - Unclassified failure.
-   - *Resolution*: Do not intervene. Return diagnostic structured error.
+8. **`UNKNOWN`**:
+   - Unclassified failure. Return diagnostic structured error.
 
 ---
 
@@ -152,15 +155,18 @@ Agent → bad tool call → VEYRA → safe correction / safe retry → tool succ
 - **Tier 0 — Unit / Synthetic (Engineering Validation):**
   - 100–500 hand-built cases covering schema, enum, type coercion, dates, timeouts, rate limits, 403s, unknown state, safe vs unsafe retries.
   - Target: `false_intervention = 0`, `unsafe_retry = 0`, `classification_accuracy ≈ 100%`.
-- **Tier 1 — ToolMisuseBench (Primary v0.1 Benchmark):**
-  - Deterministic and replayable CRUD/retrieval faults across 8,100 tasks.
-  - Compare 4 systems: (A) Raw agent, (B) Raw agent + naive retry, (C) Raw agent + structured error feedback, (D) Raw agent + Veyra.
-  - Metric: Task success, safety (invalid calls, policy violations, harmful interventions), efficiency, and Boundary Recovery:
+- **Tier 1 — ToolMisuseBench (Primary Recovery Benchmark):**
+  - Published benchmark reports 6,800 tasks (5,000 train + 800 dev + 1,000 public test) evaluating deterministic fault injection and budgeted recovery.
+  - Veyra's internal fast regression harness runs a 60-scenario controlled subset across CRUD, retrieval, and rate limits.
+  - Compare 5 systems: (A) Raw agent, (B) Naive retry, (C) Competent boundary baseline, (D) Structured error feedback, (E) Veyra.
+  - Metric: Task success (with 95% Wilson CI), safety (invalid calls, policy violations, harmful interventions, unsafe retries), efficiency, and Boundary Recovery:
     $$\text{BoundaryRecovery} = \frac{\text{failures resolved without agent planning}}{\text{failures eligible for boundary resolution (from fault metadata)}}$$
-- **Tier 2 — Real MCP Environment:** MCP-Universe.
-- **Tier 3 — MCPMark:** Real heterogeneous applications (filesystem, GitHub, Notion, Playwright, Postgres).
-- **Tier 4 — ComplexMCP:** 300 stateful interdependent tools (stress test).
-- **Tier 5 — ToolSandbox:** State-dependent workflows.
+- **Tier 2 — Real MCP Agent Evaluation:** MCP-Universe (Real LLM agent $\to$ Veyra $\to$ real MCP server).
+- **Tier 3 — MCPMark:** 127 expert-curated tasks with programmatic verification (filesystem, GitHub, Notion, Playwright, Postgres).
+- **Tier 4 — MCP-Atlas:** Multi-server workflows across 36 servers and 220 tools.
+- **Tier 5 — ComplexMCP:** 300 stateful interdependent tools (stress test).
+- **Tier 6 — ToolSandbox:** State-dependent workflows & canonicalization.
+- **Tier 7 — Recovery-Bench:** Corrupted environment replaying & trajectory recovery.
 
 ### Exact Decision Gates
 - **Gate 0 (Correctness):** 0 unauthorized executions, 0 unsafe retries, 0 silent semantic repairs.
