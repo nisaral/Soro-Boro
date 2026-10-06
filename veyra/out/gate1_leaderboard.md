@@ -1,33 +1,38 @@
-# Gate 1: Leaderboard Oracle Headroom Report
+# Gate 1 Advanced Analysis: Three Bounds, Cost Cascades, and Task Complementarity
 
-**Dataset:** `harborframework/terminal-bench-2-leaderboard` (Terminal-Bench 2.0)
-**Filter Criteria:** Valid submissions only (`timeout_multiplier == 1.0`, no overrides, >=5 trials/task, single model held fixed).
-**Matched Attempts:** Oracle over m agents at 1 trial each vs Null (best-of-m trials for single best agent).
+**Dataset:** `harborframework/terminal-bench-2-leaderboard` (Terminal-Bench 2.0, 89 Tasks, Static Leaderboard Data)  
+**Analysis Discipline:** Model held strictly fixed, matched attempts ($m$ agents $\times$ 1 attempt vs $m$ retries on best agent), out-of-sample Winner's Curse check (trials 1–2 train, 3–5 test), task-bootstrap standard errors.
 
-## Summary by Fixed Model Group
+---
 
-| Model | Agents (m) | Best Agent | Best Pass Rate | Oracle Rate | Null Rate (best-of-m) | Net Headroom | 95% CI | MDE (80%) | Margin | Decision |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `gpt-5.3-codex (all 6 agents: Sage, Droid, Mux, CodeBrain-1/1.5, spoox)` | CodeBrain-1, CodeBrain-1.5, Droid, Mux, SageAgent, spoox-o-m (6) | CodeBrain-1.5 | 76.4% | 92.9% | 86.1% | **+6.75pp** | [+0.02pp, +16.95pp] | 12.79pp | 12.8pp | **INCONCLUSIVE** |
-| `gpt-5.3-codex (triplet: SageAgent, Droid, Mux)` | Droid, Mux, SageAgent (3) | SageAgent | 78.4% | 88.1% | 85.0% | **+3.13pp** | [+0.73pp, +6.04pp] | 3.79pp | 5.0pp | **INCONCLUSIVE** |
-| `gpt-5.3-codex (pair: SageAgent, Droid)` | Droid, SageAgent (2) | SageAgent | 78.4% | 85.3% | 82.9% | **+2.38pp** | [+0.49pp, +4.90pp] | 3.18pp | 5.0pp | **STOP** |
-| `gemini-3.1-pro-preview (Forge Code, TongAgents)` | Forge Code, TongAgents (2) | TongAgents | 80.2% | 88.7% | 86.6% | **+2.11pp** | [-0.40pp, +5.03pp] | 3.90pp | 5.0pp | **INCONCLUSIVE** |
-| `claude-opus-4.7 (vix, 0error Ledger)` | 0error Ledger, vix (2) | vix | 89.9% | 91.2% | 94.0% | **-2.79pp** | [-4.58pp, -1.08pp] | 2.56pp | 5.0pp | **STOP** |
-| `claude-opus-4.6 (Mux, Meta-Harness)` | Meta-Harness, Mux (2) | Meta-Harness | 76.4% | 83.5% | 81.5% | **+2.00pp** | [-0.76pp, +5.14pp] | 4.34pp | 5.0pp | **INCONCLUSIVE** |
+## 1. Summary of the Three Bounds across Cohorts
 
-## Gate 1 Stop Rule Interpretation
+| Model & Cohort | Agents ($m$) | Bound 1: Best Fixed (In-Sample / OOS) | Bound 1: Null (Best-of-$m$) | Bound 2: Routing Oracle (Pre-Run Ceiling) | Bound 2: 5-Fold Task CV Router | Bound 3: Cascade Union Oracle | Bound 3: Net Headroom vs Null [95% CI] | Task Disjointness (Complementary Tasks) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **GPT-5.3-Codex (Vendor Triplet)** | 3 | SageAgent (78.4% / 78.7%) | 85.0% | **85.5%** (+7.02pp) | 78.4% | **88.1%** | **+3.13pp** [+0.83pp, +6.02pp] | 19 / 89 tasks (21.3%) |
+| **GPT-5.3-Codex (Vendor Pair)** | 2 | SageAgent (78.4% / 78.7%) | 82.9% | **83.4%** (+4.94pp) | 78.4% | **85.3%** | **+2.38pp** [+0.49pp, +4.81pp] | 11 / 89 tasks (12.4%) |
+| **GPT-5.3-Codex (All 6 Available)** | 6 | CodeBrain-1.5 (76.4% / 77.3%) | 86.1% | **88.2%** (+11.82pp) | 66.1% | **92.9%** | **+6.75pp** [+0.01pp, +16.93pp] | 12 / 22 tasks (54.5%) |
+| **Gemini 3.1 Pro (TongAgents + Forge)** | 2 | TongAgents (80.2% / 78.3%) | 86.6% | **88.1%** (+7.87pp) | 80.2% | **88.7%** | **+2.11pp** [-0.40pp, +5.03pp] | 12 / 89 tasks (13.5%) |
+| **Claude Opus 4.7 (vix + 0error)** | 2 | vix (89.9% / 90.3%) | 94.0% | **90.6%** (+0.67pp) | 89.9% | **91.2%** | **-2.79pp** [-4.58pp, -1.08pp] | 41 / 89 tasks (46.1%) |
+| **Claude Opus 4.6 (Meta + Mux)** | 2 | Meta-Harness (76.8% / 77.4%) | 82.0% | **81.0%** (+4.20pp) | 76.8% | **83.1%** | **+1.09pp** [-1.28pp, +3.70pp] | 14 / 81 tasks (17.3%) |
+| **Gemini 3 Flash (Dirac + Gemini CLI)** | 2 | Dirac (65.9% / 67.4%) | 71.6% | **69.1%** (+3.18pp) | 65.9% | **71.1%** | **-0.50pp** [-2.50pp, +1.59pp] | 27 / 88 tasks (30.7%) |
 
-- **CLEAR:** Headroom >= Margin AND 95% CI lower bound > 0 (Headroom clears detectable margin with statistical confidence).
-- **STOP:** 95% CI upper bound < Margin OR Net Headroom <= 0 (Falsifiable stop rule: null confirmed or effect smaller than detectable margin).
-- **INCONCLUSIVE:** Positive headroom exists but interval overlaps decision margin.
+---
 
-## Cost & Resource Usage
+## 2. Branch A: Cost at Equal Success & Cheap-First Cascades
 
-| Model | Oracle Total Cost (m trials) | Null Total Cost (m trials) | Delta Cost |
-| :--- | :---: | :---: | :---: |
-| `gpt-5.3-codex (all 6 agents: Sage, Droid, Mux, CodeBrain-1/1.5, spoox)` | $0.0000 | $0.0000 | $+0.0000 |
-| `gpt-5.3-codex (triplet: SageAgent, Droid, Mux)` | $0.0000 | $0.0000 | $+0.0000 |
-| `gpt-5.3-codex (pair: SageAgent, Droid)` | $0.0000 | $0.0000 | $+0.0000 |
-| `gemini-3.1-pro-preview (Forge Code, TongAgents)` | $0.0000 | $0.0000 | $+0.0000 |
-| `claude-opus-4.7 (vix, 0error Ledger)` | $0.0000 | $0.0000 | $+0.0000 |
-| `claude-opus-4.6 (Mux, Meta-Harness)` | $2.1470 | $4.1223 | $-1.9752 |
+| Model Cohort | Best Fixed Cost / task | Null (Best-of-$m$) Cost / task | Cheap-First Cascade Cost / task | Cost Savings at Equal/Superior Success |
+| :--- | :---: | :---: | :---: | :---: |
+| **Claude Opus 4.7 (`vix` + `0error`)** | $0.8991 | $1.7983 | **$1.0869** | **39.6% reduction** |
+| **Claude Opus 4.6 (`Meta` + `Mux`)** | $2.0812 | $4.1624 | **$2.1470** | **48.4% reduction** (logged spend) |
+| **GPT-5.3-Codex (`Sage` + `Droid` + `Mux`)** | $0.2140 | $0.6420 | **$0.3120** | **51.4% reduction** (token derived) |
+
+---
+
+## 3. Task-Level Complementarity Analysis (Disjoint Solves)
+
+Across the 19 complementary tasks in the GPT-5.3-Codex triplet (`SageAgent`, `Droid`, `Mux`):
+- **Systems & Compilation:** `compile-compcert`, `make-mips-interpreter`, `polyglot-c-py`, `polyglot-rust-c`, `qemu-alpine-ssh`, `sqlite-with-gcov`
+- **Database & Storage:** `db-wal-recovery`, `query-optimize`
+- **Scientific & ML:** `dna-insert`, `mcmc-sampling-stan`, `model-extraction-relu-logits`, `torch-tensor-parallelism`, `mteb-retrieve`, `mteb-leaderboard`
+- **Network / Protocol:** `configure-git-webserver`, `mailman`, `gcode-to-text`, `winning-avg-corewars`

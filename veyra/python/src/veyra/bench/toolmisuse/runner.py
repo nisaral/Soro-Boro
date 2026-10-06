@@ -78,6 +78,19 @@ class ArmResult:
     latency_ms_total: float = 0.0
     boundary_recoveries: int = 0
     eligible_failures_denominator: int = 0
+    non_recoverable_failures: int = 0
+
+    @property
+    def eligible_injected_failures(self) -> int:
+        return self.eligible_failures_denominator
+
+    @property
+    def successful_safe_recoveries(self) -> int:
+        return self.boundary_recoveries
+
+    @property
+    def unsafe_interventions(self) -> int:
+        return self.unsafe_retries + self.harmful_interventions
 
     @property
     def task_success_rate(self) -> float:
@@ -104,6 +117,10 @@ class ArmResult:
             "total_tool_calls": self.total_tool_calls,
             "retry_count": self.retry_count,
             "agent_replans": self.agent_replans,
+            "eligible_injected_failures": self.eligible_injected_failures,
+            "successful_safe_recoveries": self.successful_safe_recoveries,
+            "unsafe_interventions": self.unsafe_interventions,
+            "non_recoverable_failures": self.non_recoverable_failures,
             "boundary_recovery_rate": f"{self.boundary_recovery_rate:.1f}%",
             "avg_latency_ms": f"{self.avg_latency_ms:.2f}ms",
         }
@@ -210,10 +227,13 @@ def run_toolmisuse_benchmark(tasks: list[ToolMisuseTask] | None = None) -> dict[
     for arm in (SystemArm.RAW_AGENT, SystemArm.NAIVE_RETRY, SystemArm.STRUCTURED_FEEDBACK, SystemArm.VEYRA):
         res = ArmResult(arm=arm, tasks_count=len(task_suite))
 
-        # Count eligible failures from benchmark metadata
+        # Count eligible and non-recoverable failures from benchmark metadata
         for t in task_suite:
-            if t.injected_fault and t.injected_fault.eligible_for_boundary_recovery:
-                res.eligible_failures_denominator += 1
+            if t.injected_fault:
+                if t.injected_fault.eligible_for_boundary_recovery:
+                    res.eligible_failures_denominator += 1
+                else:
+                    res.non_recoverable_failures += 1
 
         for task in task_suite:
             t0 = time.perf_counter()

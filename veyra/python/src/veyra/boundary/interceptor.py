@@ -119,6 +119,11 @@ class Veyra:
                 bound = sig.bind_partial(*args, **kwargs)
                 bound.apply_defaults()
                 proposed_args = dict(bound.arguments)
+                for p_name, p in sig.parameters.items():
+                    if p.kind == inspect.Parameter.VAR_KEYWORD and p_name in proposed_args:
+                        var_kwargs = proposed_args.pop(p_name)
+                        if isinstance(var_kwargs, dict):
+                            proposed_args.update(var_kwargs)
 
                 return self.call(
                     tool_name=tool_name,
