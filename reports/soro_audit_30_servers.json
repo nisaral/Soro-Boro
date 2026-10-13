@@ -1,0 +1,2532 @@
+{
+  "benchmark_title": "Soro Audit: 30 Real Stdio MCP Servers Benchmark Dataset",
+  "date_executed": "2026-10-11",
+  "total_servers": 30,
+  "total_tools": 106,
+  "total_exercised_tools": 106,
+  "overall_exercise_rate": 1.0,
+  "total_missing_hints": 27,
+  "missing_hint_rate": 0.2547,
+  "total_discrepancies": 0,
+  "total_red_flags": 13,
+  "servers": [
+    {
+      "server_id": "npm-server-memory",
+      "name": "@modelcontextprotocol/server-memory",
+      "category": "knowledge_graph",
+      "runtime": "node",
+      "total_tools": 9,
+      "exercised_tools": 9,
+      "exercise_rate": 1.0,
+      "missing_hints": 9,
+      "discrepancies": 0,
+      "red_flags": 3,
+      "elapsed_seconds": 3.737,
+      "tools": [
+        {
+          "name": "create_entities",
+          "description": "Create multiple new entities in the knowledge graph. An entity whose name already exists, or repeats an earlier entity in the same call, is skipped and its observations are not added; the result lists the skipped names in `skipped`. Use add_observations to add observations to an existing entity.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "create_relations",
+          "description": "Create multiple new relations between entities in the knowledge graph. Relations should be in active voice",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "add_observations",
+          "description": "Add new observations to existing entities in the knowledge graph",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "delete_entities",
+          "description": "Delete multiple entities and their associated relations from the knowledge graph",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [
+            "Caution: description mentions destructive action (delete) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "delete_observations",
+          "description": "Delete specific observations from entities in the knowledge graph",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [
+            "Caution: description mentions destructive action (delete) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "delete_relations",
+          "description": "Delete multiple relations from the knowledge graph",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [
+            "Caution: description mentions destructive action (delete) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "read_graph",
+          "description": "Read the entire knowledge graph",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "search_nodes",
+          "description": "Search for nodes in the knowledge graph based on a query",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "open_nodes",
+          "description": "Open specific nodes in the knowledge graph by their names",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "npm-server-filesystem",
+      "name": "@modelcontextprotocol/server-filesystem",
+      "category": "filesystem",
+      "runtime": "node",
+      "total_tools": 14,
+      "exercised_tools": 14,
+      "exercise_rate": 1.0,
+      "missing_hints": 14,
+      "discrepancies": 0,
+      "red_flags": 3,
+      "elapsed_seconds": 4.191,
+      "tools": [
+        {
+          "name": "read_file",
+          "description": "Read the complete contents of a file as text. DEPRECATED: Use read_text_file instead.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "read_text_file",
+          "description": "Read the complete contents of a file from the file system as text. Handles various text encodings and provides detailed error messages if the file cannot be read. Use this tool when you need to examine the contents of a single file. Use the 'head' parameter to read only the first N lines of a file, or the 'tail' parameter to read only the last N lines of a file. Operates on the file as text regardless of extension. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "read_media_file",
+          "description": "Read a file and return it as a base64-encoded content block with its MIME type. Image and audio files are returned as image/audio content; any other file type is returned as an embedded resource. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "read_multiple_files",
+          "description": "Read the contents of multiple files simultaneously. This is more efficient than reading files one by one when you need to analyze or compare multiple files. Each file's content is returned with its path as a reference. Failed reads for individual files won't stop the entire operation. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "write_file",
+          "description": "Create a new file or completely overwrite an existing file with new content. Use with caution as it will overwrite existing files without warning. Handles text content with proper encoding. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [
+            "Caution: description mentions destructive action (overwrite) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "edit_file",
+          "description": "Make line-based edits to a text file. Each edit replaces exact line sequences with new content. Returns a git-style diff showing the changes made. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "create_directory",
+          "description": "Create a new directory or ensure a directory exists. Can create multiple nested directories in one operation. If the directory already exists, this operation will succeed silently. Perfect for setting up directory structures for projects or ensuring required paths exist. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "list_directory",
+          "description": "Get a detailed listing of all files and directories in a specified path. Results clearly distinguish between files and directories with [FILE] and [DIR] prefixes. This tool is essential for understanding directory structure and finding specific files within a directory. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "list_directory_with_sizes",
+          "description": "Get a detailed listing of all files and directories in a specified path, including sizes. Results clearly distinguish between files and directories with [FILE] and [DIR] prefixes. This tool is useful for understanding directory structure and finding specific files within a directory. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "directory_tree",
+          "description": "Get a recursive tree view of files and directories as a JSON structure. Each entry includes 'name', 'type' (file/directory), and 'children' for directories. Files have no children array, while directories always have a children array (which may be empty). The output is formatted with 2-space indentation for readability. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [
+            "Caution: description mentions destructive action (format) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "move_file",
+          "description": "Move or rename files and directories. Can move files between directories and rename them in a single operation. If the destination exists, the operation will fail. Works across different directories and can be used for simple renaming within the same directory. Both source and destination must be within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "search_files",
+          "description": "Recursively search for files and directories matching a pattern. The patterns should be glob-style patterns that match paths relative to the working directory. Use pattern like '*.ext' to match files in current directory, and '**/*.ext' to match files in all subdirectories. Returns full paths to all matching items. Great for finding files when you don't know their exact location. Only searches within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "get_file_info",
+          "description": "Retrieve detailed metadata about a file or directory. Returns comprehensive information including size, creation time, last modified time, permissions, and type. This tool is perfect for understanding file characteristics without reading the actual content. Only works within allowed directories.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [
+            "Caution: description mentions destructive action (format) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "list_allowed_directories",
+          "description": "Returns the list of directories that this server is allowed to access. Subdirectories within these allowed directories are also accessible. Use this to understand which directories and their nested paths are available before trying to access files.",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "sqlite-mcp",
+      "name": "SQLite Database MCP Server",
+      "category": "database",
+      "runtime": "python",
+      "total_tools": 4,
+      "exercised_tools": 4,
+      "exercise_rate": 1.0,
+      "missing_hints": 1,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.259,
+      "tools": [
+        {
+          "name": "query_read",
+          "description": "Execute a SELECT query against SQLite database",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "get_table_schema",
+          "description": "Describe schema of a table",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "upsert_row",
+          "description": "Idempotently insert or update record",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "insert_log_row",
+          "description": "Insert a mutating audit log record",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "non_idempotent_mutation",
+          "discrepancy": null,
+          "suggested_patch": null
+        }
+      ]
+    },
+    {
+      "server_id": "git-mcp",
+      "name": "Git Repository MCP Server",
+      "category": "vcs",
+      "runtime": "python",
+      "total_tools": 4,
+      "exercised_tools": 4,
+      "exercise_rate": 1.0,
+      "missing_hints": 1,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.224,
+      "tools": [
+        {
+          "name": "git_status",
+          "description": "Read current git working tree status",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "git_log",
+          "description": "Read commit history",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "git_tag_force",
+          "description": "Force tag a commit ref",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "git_commit_change",
+          "description": "Commit changes to git repository",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "non_idempotent_mutation",
+          "discrepancy": null,
+          "suggested_patch": null
+        }
+      ]
+    },
+    {
+      "server_id": "calculator-mcp",
+      "name": "Math & Calculator MCP Server",
+      "category": "computation",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.35,
+      "tools": [
+        {
+          "name": "calculate_expr",
+          "description": "Evaluate math expression safely",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "sqrt_val",
+          "description": "Compute square root of a number",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "prime_factors",
+          "description": "Compute prime factors of an integer",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "time-mcp",
+      "name": "System & Timezone MCP Server",
+      "category": "utilities",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.37,
+      "tools": [
+        {
+          "name": "get_current_time",
+          "description": "Read system current timestamp",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "format_epoch",
+          "description": "Format unix timestamp into ISO string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Contradiction: description mentions destructive action (format) but readOnlyHint is true"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "diff_timestamps",
+          "description": "Calculate difference between two timestamps",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "markdown-mcp",
+      "name": "Markdown Parser & Converter MCP Server",
+      "category": "document",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.269,
+      "tools": [
+        {
+          "name": "markdown_to_html",
+          "description": "Render markdown string into HTML",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "extract_headings",
+          "description": "Extract table of contents headings",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "extract_links",
+          "description": "Extract all URLs referenced in markdown",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "json-mcp",
+      "name": "JSON Schema & Query MCP Server",
+      "category": "data_manipulation",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.281,
+      "tools": [
+        {
+          "name": "validate_json",
+          "description": "Validate JSON object against schema",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "format_json",
+          "description": "Format or pretty print JSON string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Contradiction: description mentions destructive action (format) but readOnlyHint is true"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "diff_json_objects",
+          "description": "Compute structural diff between two JSON objects",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "uuid-mcp",
+      "name": "UUID & Identifiers MCP Server",
+      "category": "identifiers",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 1,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.378,
+      "tools": [
+        {
+          "name": "generate_uuid4",
+          "description": "Generate a new random UUID v4",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "non_idempotent_mutation",
+          "discrepancy": null,
+          "suggested_patch": null
+        },
+        {
+          "name": "validate_uuid",
+          "description": "Check if string is a valid UUID",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "generate_uuid5",
+          "description": "Deterministic namespace UUID v5",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "crypto-mcp",
+      "name": "Cryptographic Hashes MCP Server",
+      "category": "security",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.254,
+      "tools": [
+        {
+          "name": "sha256_hash",
+          "description": "Compute SHA-256 digest of input",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "md5_hash",
+          "description": "Compute MD5 checksum",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "hmac_digest",
+          "description": "Generate HMAC digest with secret key",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "regex-mcp",
+      "name": "Regular Expression MCP Server",
+      "category": "text_processing",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.237,
+      "tools": [
+        {
+          "name": "match_regex",
+          "description": "Test if pattern matches text",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "find_all_regex",
+          "description": "Extract all pattern matches",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "replace_regex",
+          "description": "Substitute pattern matches in text",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "base64-mcp",
+      "name": "Base64 & Encoding MCP Server",
+      "category": "encoding",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.252,
+      "tools": [
+        {
+          "name": "base64_encode",
+          "description": "Encode string into base64",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "base64_decode",
+          "description": "Decode base64 string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "urlsafe_b64encode",
+          "description": "Encode string to URL-safe base64",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "text-stats-mcp",
+      "name": "Text Statistics & Metrics MCP Server",
+      "category": "nlp",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.256,
+      "tools": [
+        {
+          "name": "word_count",
+          "description": "Count words and sentences in text",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "reading_time",
+          "description": "Estimate reading time in minutes",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "flesch_reading_ease",
+          "description": "Compute readability score",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "units-mcp",
+      "name": "Unit Conversion MCP Server",
+      "category": "utilities",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.304,
+      "tools": [
+        {
+          "name": "convert_length",
+          "description": "Convert meters to feet/inches",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "convert_temperature",
+          "description": "Convert Celsius to Fahrenheit",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "convert_bytes",
+          "description": "Format raw bytes into human readable MB/GB",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Contradiction: description mentions destructive action (format) but readOnlyHint is true"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "semver-mcp",
+      "name": "Semantic Versioning MCP Server",
+      "category": "dev_tools",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.285,
+      "tools": [
+        {
+          "name": "parse_semver",
+          "description": "Parse semver into major/minor/patch",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "compare_versions",
+          "description": "Compare two semver strings",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "bump_version",
+          "description": "Compute next semver version string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "csv-mcp",
+      "name": "CSV Inspector MCP Server",
+      "category": "data_manipulation",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.302,
+      "tools": [
+        {
+          "name": "get_csv_headers",
+          "description": "Extract column headers from CSV",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "count_csv_rows",
+          "description": "Count total rows in CSV",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "csv_to_json",
+          "description": "Convert CSV table into JSON objects",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "xml-mcp",
+      "name": "XML Parser & XPath MCP Server",
+      "category": "data_manipulation",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.372,
+      "tools": [
+        {
+          "name": "validate_xml",
+          "description": "Check if XML string is well-formed",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "format_xml",
+          "description": "Format and indent XML content",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Contradiction: description mentions destructive action (format) but readOnlyHint is true"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true,
+            "destructiveHint": true
+          }
+        },
+        {
+          "name": "xpath_query",
+          "description": "Evaluate XPath expression against XML",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "yaml-mcp",
+      "name": "YAML Parser MCP Server",
+      "category": "data_manipulation",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.415,
+      "tools": [
+        {
+          "name": "validate_yaml",
+          "description": "Check if YAML is valid",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "yaml_to_json",
+          "description": "Convert YAML into JSON object",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "json_to_yaml",
+          "description": "Convert JSON object into YAML string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "cron-mcp",
+      "name": "Cron Schedule Parser MCP Server",
+      "category": "utilities",
+      "runtime": "python",
+      "total_tools": 2,
+      "exercised_tools": 2,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.308,
+      "tools": [
+        {
+          "name": "parse_cron",
+          "description": "Validate and explain cron expression",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "next_runs",
+          "description": "Calculate next 5 run times for cron expression",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "colors-mcp",
+      "name": "Color Spaces & Palette MCP Server",
+      "category": "design",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.327,
+      "tools": [
+        {
+          "name": "hex_to_rgb",
+          "description": "Convert hex color to RGB tuple",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "rgb_to_hsl",
+          "description": "Convert RGB to HSL values",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "calculate_contrast",
+          "description": "Calculate WCAG contrast ratio between two colors",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "url-mcp",
+      "name": "URL Parser & Normalizer MCP Server",
+      "category": "web",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.39,
+      "tools": [
+        {
+          "name": "parse_url",
+          "description": "Parse URL into protocol, host, port, path",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "extract_query_params",
+          "description": "Extract query string key-values",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "normalize_url",
+          "description": "Normalize URL with canonical casing and sorting",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "jwt-mcp",
+      "name": "JWT Token Inspector MCP Server",
+      "category": "security",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.26,
+      "tools": [
+        {
+          "name": "decode_jwt_header",
+          "description": "Decode JOSE header from JWT",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "decode_jwt_claims",
+          "description": "Decode unverified payload claims from JWT",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "check_token_expiration",
+          "description": "Check if exp claim is in past",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "diff-mcp",
+      "name": "Text & Unified Diff MCP Server",
+      "category": "dev_tools",
+      "runtime": "python",
+      "total_tools": 2,
+      "exercised_tools": 2,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.347,
+      "tools": [
+        {
+          "name": "create_unified_diff",
+          "description": "Generate unified diff between two text files",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "apply_patch",
+          "description": "Apply diff patch to base text",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "echo-mcp",
+      "name": "Echo & String Transformation MCP Server",
+      "category": "utilities",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.309,
+      "tools": [
+        {
+          "name": "echo_string",
+          "description": "Echo input text unchanged",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "reverse_string",
+          "description": "Reverse input string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "uppercase_string",
+          "description": "Convert string to uppercase",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "counter-mcp",
+      "name": "Stateful Counter MCP Server",
+      "category": "stateful",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 1,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.527,
+      "tools": [
+        {
+          "name": "read_count",
+          "description": "Read current counter value",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "increment_count",
+          "description": "Increment counter by delta",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": false,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "non_idempotent_mutation",
+          "discrepancy": null,
+          "suggested_patch": null
+        },
+        {
+          "name": "set_count",
+          "description": "Set counter to specific value",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "set-store-mcp",
+      "name": "Set Deduplication MCP Server",
+      "category": "stateful",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.235,
+      "tools": [
+        {
+          "name": "list_elements",
+          "description": "List all members of set",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "add_element",
+          "description": "Add element to set (idempotent set deduplication)",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "remove_element",
+          "description": "Remove element from set",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Caution: description mentions destructive action (remove) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "destructiveHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "kv-store-mcp",
+      "name": "Key-Value Store MCP Server",
+      "category": "stateful",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.284,
+      "tools": [
+        {
+          "name": "get_val",
+          "description": "Retrieve value by key",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "put_val",
+          "description": "Store key-value pair idempotently",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "delete_val",
+          "description": "Delete key from store",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Caution: description mentions destructive action (delete) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "destructiveHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "ttl-cache-mcp",
+      "name": "In-Memory TTL Cache MCP Server",
+      "category": "cache",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 1,
+      "elapsed_seconds": 0.269,
+      "tools": [
+        {
+          "name": "cache_get",
+          "description": "Get cached item if present",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "cache_set",
+          "description": "Store item in cache with TTL",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "cache_purge",
+          "description": "Purge all expired items from cache",
+          "declared_hints": {
+            "readOnlyHint": null,
+            "idempotentHint": true,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [
+            "Caution: description mentions destructive action (purge) but tool omits destructiveHint/readOnlyHint"
+          ],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "readOnlyHint": true,
+            "destructiveHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "env-inspector-mcp",
+      "name": "Environment Inspector MCP Server",
+      "category": "system",
+      "runtime": "python",
+      "total_tools": 2,
+      "exercised_tools": 2,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.306,
+      "tools": [
+        {
+          "name": "check_env_var",
+          "description": "Check if safe environment variable is defined",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "get_platform_info",
+          "description": "Read operating system and architecture info",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    },
+    {
+      "server_id": "ip-mcp",
+      "name": "IP Address & CIDR MCP Server",
+      "category": "networking",
+      "runtime": "python",
+      "total_tools": 3,
+      "exercised_tools": 3,
+      "exercise_rate": 1.0,
+      "missing_hints": 0,
+      "discrepancies": 0,
+      "red_flags": 0,
+      "elapsed_seconds": 0.485,
+      "tools": [
+        {
+          "name": "validate_ip_address",
+          "description": "Validate IPv4 or IPv6 address string",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "is_private_ip",
+          "description": "Check if IP address belongs to RFC 1918 private range",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        },
+        {
+          "name": "check_cidr_contains",
+          "description": "Check if IP is contained in CIDR block",
+          "declared_hints": {
+            "readOnlyHint": true,
+            "idempotentHint": null,
+            "destructiveHint": null,
+            "openWorldHint": null
+          },
+          "has_explicit_hints": true,
+          "red_flags": [],
+          "behavior_status": "exercised",
+          "skip_reason": null,
+          "observed_class": "idempotent_or_read_only",
+          "discrepancy": null,
+          "suggested_patch": {
+            "idempotentHint": true
+          }
+        }
+      ]
+    }
+  ]
+}

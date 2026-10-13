@@ -16,7 +16,7 @@ export default function DocsPage() {
             <aside className="lg:col-span-3 space-y-4">
               <div className="sticky top-24 technical-card p-4 bg-white">
                 <div className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                  Veyra v0.2.0 docs
+                  Soro v0.2.0 docs
                 </div>
                 <nav className="space-y-1 text-xs font-mono">
                   <a href="#quickstart" className="block py-1.5 px-2 rounded hover:bg-slate-100 text-slate-800 font-medium">1. Quickstart & Install</a>
@@ -43,18 +43,18 @@ export default function DocsPage() {
                   Quickstart & Installation
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Veyra is execution control middleware for tool-using AI agents. It sits post-proposal, pre-execution to validate contracts, enforce policy, manage transaction state, and prevent unsafe side effects.
+                  Soro is an agent framework at the tool boundary: register tools, route without an LLM, wrap execution, abstain when unsure.
                 </p>
 
                 <div className="space-y-3 font-mono text-xs">
                   <div className="bg-slate-950 text-slate-100 p-4 rounded-lg border border-slate-800 space-y-2">
-                    <div className="text-slate-400 text-[10px] uppercase">Install Veyra Package</div>
-                    <pre className="text-emerald-400"><code>pip install veyra</code></pre>
+                    <div className="text-slate-400 text-[10px] uppercase">Install</div>
+                    <pre className="text-emerald-400"><code>pip install -e ./python[dev]</code></pre>
                   </div>
 
                   <div className="bg-slate-950 text-slate-100 p-4 rounded-lg border border-slate-800 space-y-2">
-                    <div className="text-slate-400 text-[10px] uppercase">Verify Environment</div>
-                    <pre className="text-emerald-400"><code>veyra doctor</code></pre>
+                    <div className="text-slate-400 text-[10px] uppercase">Import</div>
+                    <pre className="text-emerald-400"><code>from soro import Soro, SideEffectClass</code></pre>
                   </div>
                 </div>
               </section>
@@ -65,22 +65,21 @@ export default function DocsPage() {
                   <Code2 className="w-4 h-4 text-slate-700" /> 2. Unified Public API
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  One Clean Entry Point (`from veyra import Veyra`)
+                  One entry point (`from soro import Soro`)
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Wrap functions, MCP clients, HTTP clients, or agent instances with Veyra execution controls:
+                  Register a catalog, route an utterance, wrap mutations:
                 </p>
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-lg font-mono text-xs border border-slate-800 leading-relaxed">
-                  <pre>{`from veyra import Veyra
+                  <pre>{`from soro import Soro, SideEffectClass
 
-veyra = Veyra(policy="default", mode="fail_closed")
+soro = Soro()
 
-# Wrap a standard Python tool
-@veyra.wrap
+@soro.tool(side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION, verify=verify_charge)
 def process_payment(customer_id: str, amount: float) -> dict:
     return {"status": "success", "tx_id": "tx_9921"}
 
-# Agent proposes tool call -> Veyra validates & executes
+decision = soro.route("charge customer 102 ninety nine dollars")
 result = process_payment(customer_id="cust_102", amount=99.0)`}</pre>
                 </div>
               </section>
@@ -94,38 +93,38 @@ result = process_payment(customer_id="cust_102", amount=99.0)`}</pre>
                   First-Party Framework Adapters
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Veyra integrates seamlessly into major AI agent orchestration frameworks without modifying their graph or agent runtime:
+                  Soro-Boro integrates seamlessly into major AI agent orchestration frameworks without modifying their graph or agent runtime:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
                     <h3 className="font-mono font-semibold text-xs text-slate-900">OpenAI Agents SDK</h3>
-                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from veyra.integrations.openai_agents import VeyraOpenAIAgentsAdapter
-
-adapter = VeyraOpenAIAgentsAdapter(veyra)
-wrapped_tool = adapter.wrap_tool(my_tool)`}</pre>
+                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from soro_boro import soro_wrap
+# Wrap tools directly before passing to Agent
+agent_tools = [soro_wrap(...)(my_tool)]`}</pre>
                   </div>
 
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
                     <h3 className="font-mono font-semibold text-xs text-slate-900">LangGraph</h3>
-                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from veyra.integrations.langgraph import VeyraLangGraphNode
+                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from soro_boro import soro_wrap
 
-node = VeyraLangGraphNode(veyra, [tool_a, tool_b])
-graph.add_node("veyra_executor", node)`}</pre>
+wrapped_tool = soro_wrap(...)(my_mutating_node)
+graph.add_node("safe_writer", wrapped_tool)`}</pre>
                   </div>
 
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
                     <h3 className="font-mono font-semibold text-xs text-slate-900">AutoGen</h3>
-                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from veyra.integrations.autogen import VeyraAutoGenAdapter
+                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from soro_boro import soro_wrap
 
-adapter = VeyraAutoGenAdapter(veyra)
-tool = adapter.register_function(fn)`}</pre>
+user_proxy.register_function(
+    function_map={"charge": soro_wrap(...)(charge_fn)}
+)`}</pre>
                   </div>
 
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-                    <h3 className="font-mono font-semibold text-xs text-slate-900">Microsoft Agent Framework</h3>
-                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from veyra.integrations.microsoft_agent_framework import VeyraMicrosoftAgentMiddleware
+                    <h3 className="font-mono font-semibold text-xs text-slate-900">LlamaIndex / CrewAI</h3>
+                    <pre className="text-[11px] font-mono text-slate-700 bg-white p-2.5 rounded border border-slate-200">{`from soro_boro import soro_wrap
 
-mw = VeyraMicrosoftAgentMiddleware(veyra)`}</pre>
+safe_fn = soro_wrap(...)(crew_tool_fn)`}</pre>
                   </div>
                 </div>
               </section>
@@ -138,11 +137,11 @@ mw = VeyraMicrosoftAgentMiddleware(veyra)`}</pre>
                   Wrap MCP tool calls in-process
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Veyra is not a network proxy. Wrap the MCP client or individual tools so proposals pass through the execution contract before the server runs.
+                  Soro-Boro is not an external network proxy. Wrap the MCP client or individual tools so proposals pass through the execution contract before the server runs.
                 </p>
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-lg font-mono text-xs border border-slate-800 leading-relaxed">
-                  <pre>{`# Agent proposes -> VeyraMiddleware.wrap_mcp / wrap_function -> MCP server
-# CLI: veyra doctor   # checks ODYSSEY_API_KEY, LM Studio fallback`}</pre>
+                  <pre>{`# Agent proposes -> soro_wrap(mcp_tool) -> MCP server
+# CLI: soro-boro audit --wal runs/soro_boro_wal.jsonl`}</pre>
                 </div>
               </section>
 
@@ -152,31 +151,32 @@ mw = VeyraMicrosoftAgentMiddleware(veyra)`}</pre>
                   <FileCheck className="w-4 h-4 text-slate-700" /> 5. Configuration System
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  Human-Readable `veyra.yaml` Config
+                  Human-Readable `soro_boro.yaml` Config
                 </h2>
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-lg font-mono text-xs border border-slate-800 leading-relaxed">
-                  <pre>{`veyra:
+                  <pre>{`soro_boro:
   mode: fail_closed
+  wal_path: "runs/soro_boro_wal.jsonl"
 
 policy:
   tenant_isolation: true
   authorization: true
   freshness: true
-  health: true
+  consistency_guards: true
 
 recovery:
-  unknown_ack: verify_then_defer
+  unknown_ack: reconcile_or_defer
   retries:
     enabled: true
-    max_attempts: 2`}</pre>
+    max_attempts: 1`}</pre>
                 </div>
                 <div className="flex gap-4 font-mono text-xs pt-2">
                   <div className="p-3 bg-slate-100 rounded border border-slate-200 flex-1">
-                    <span className="font-semibold text-slate-900">$ veyra config validate</span>
+                    <span className="font-semibold text-slate-900">$ soro-boro config validate</span>
                     <p className="text-slate-600 text-[11px] pt-1">Validates mode, constraints, and retry limits.</p>
                   </div>
                   <div className="p-3 bg-slate-100 rounded border border-slate-200 flex-1">
-                    <span className="font-semibold text-slate-900">$ veyra config explain</span>
+                    <span className="font-semibold text-slate-900">$ soro-boro config explain</span>
                     <p className="text-slate-600 text-[11px] pt-1">Explains active policies and runtime rules.</p>
                   </div>
                 </div>
@@ -195,13 +195,13 @@ recovery:
                 </p>
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-lg font-mono text-xs border border-slate-800 leading-relaxed">
                   <pre>{`# Dry-run replay of a trace JSON
-$ veyra replay run.json
+$ soro-boro replay run.json
 
 # Opt-in to live execution
-$ veyra replay run.json --execute
+$ soro-boro replay run.json --execute
 
 # Compare step-by-step diffs between two runs
-$ veyra diff run1.json run2.json`}</pre>
+$ soro-boro diff run1.json run2.json`}</pre>
                 </div>
               </section>
 
@@ -214,7 +214,7 @@ $ veyra diff run1.json run2.json`}</pre>
                   First-Class Non-Idempotent Mutation Protection
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  When network drops occur during non-idempotent mutations, Veyra classifies the outcome as <code>UNKNOWN_ACK</code>. Rather than blindly replaying the request (which risks duplicate charging or state corruption), Veyra enforces verification before replay or defers execution safely.
+                  When network drops occur during non-idempotent mutations, Soro-Boro classifies the outcome as <code>UNKNOWN_ACK</code>. Rather than blindly replaying the request (which risks duplicate charging or state corruption), Soro-Boro enforces reconciliation before replay or defers execution safely.
                 </p>
               </section>
 
@@ -224,12 +224,12 @@ $ veyra diff run1.json run2.json`}</pre>
                   <GitFork className="w-4 h-4 text-slate-700" /> 8. Plugin Architecture
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  `@veyra_plugin` Decorator & Metadata Registry
+                  `@soro_boro_plugin` Decorator & Metadata Registry
                 </h2>
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-lg font-mono text-xs border border-slate-800 leading-relaxed">
-                  <pre>{`from veyra.plugins import veyra_plugin
+                  <pre>{`from soro_boro.plugins import soro_boro_plugin
 
-@veyra_plugin(name="stripe_policy", version="1.0.0", capabilities=["payment_safety"])
+@soro_boro_plugin(name="stripe_policy", version="1.0.0", capabilities=["payment_safety"])
 class StripePolicyPack:
     ...`}</pre>
                 </div>
@@ -249,15 +249,15 @@ class StripePolicyPack:
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
-                      <tr><td className="p-2.5 text-emerald-600 font-bold">veyra doctor</td><td className="p-2.5">Check Python environment and dependency readiness</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra init</td><td className="p-2.5">Initialize a default `veyra.yaml` config file</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra config validate</td><td className="p-2.5">Validate syntax and constraints of configuration</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra config explain</td><td className="p-2.5">Print human-readable breakdown of active policies</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra inspect tool &lt;name&gt;</td><td className="p-2.5">Inspect tool schema, parameters, and risk level</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra proxy mcp</td><td className="p-2.5">Start Veyra MCP proxy server (stdio/streamable HTTP)</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra replay &lt;file&gt;</td><td className="p-2.5">Replay execution trajectory trace in DRY_RUN mode</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra diff &lt;run1&gt; &lt;run2&gt;</td><td className="p-2.5">Diff tool selection, outcomes, and latencies between runs</td></tr>
-                      <tr><td className="p-2.5 text-slate-900 font-medium">veyra bench run &lt;suite&gt;</td><td className="p-2.5">Execute reproducible benchmarks (e.g. undobench, mcpmark)</td></tr>
+                      <tr><td className="p-2.5 text-emerald-600 font-bold">soro-boro doctor</td><td className="p-2.5">Check Python environment and dependency readiness</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro init</td><td className="p-2.5">Initialize a default `soro_boro.yaml` config file</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro config validate</td><td className="p-2.5">Validate syntax and constraints of configuration</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro config explain</td><td className="p-2.5">Print human-readable breakdown of active policies</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro inspect tool &lt;name&gt;</td><td className="p-2.5">Inspect tool schema, parameters, and risk level</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro audit --wal &lt;file&gt;</td><td className="p-2.5">Audit Write-Ahead Log records and verify hash chain</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro replay &lt;file&gt;</td><td className="p-2.5">Replay execution trajectory trace in DRY_RUN mode</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro diff &lt;run1&gt; &lt;run2&gt;</td><td className="p-2.5">Diff tool selection, outcomes, and latencies between runs</td></tr>
+                      <tr><td className="p-2.5 text-slate-900 font-medium">soro-boro bench run &lt;suite&gt;</td><td className="p-2.5">Execute reproducible benchmarks (e.g. undobench, mcpmark)</td></tr>
                     </tbody>
                   </table>
                 </div>

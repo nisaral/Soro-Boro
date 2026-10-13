@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from veyra.core.execution_contract import SideEffectClass
-from veyra.production.production_layer import VeyraMiddleware
+from soro import SideEffectClass, Soro
 
 
 class _Ledger:
@@ -21,12 +20,12 @@ class _Ledger:
 
 def test_five_minute_wrap_unknown_ack_verify():
     ledger = _Ledger()
-    mw = VeyraMiddleware()
-    charge = mw.wrap_function(
+    mw = Soro()
+    charge = mw.wrap(
         ledger.charge,
         name="charge",
         side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION,
-        verification_fn=ledger.verify_charge,
+        verify=ledger.verify_charge,
     )
     result = charge(transfer_id="tx_5min", amount=42.0)
     assert result["status"] == "VERIFIED_COMMITTED"

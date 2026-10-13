@@ -1,0 +1,45 @@
+{
+  "dataset_provenance": {
+    "source": "automatelab/mcp-servers-tool-catalog",
+    "last_extracted": "2026-10-01",
+    "license": "CC-BY-4.0"
+  },
+  "servers": {
+    "total_servers": 922,
+    "servers_with_any_hints": 0,
+    "servers_completely_unannotated": 285,
+    "unannotated_server_rate": 0.3091,
+    "unannotated_server_95_ci": [
+      0.2801,
+      0.3397
+    ]
+  },
+  "tools": {
+    "total_tools": 9922,
+    "tools_with_any_hints": 0,
+    "tools_completely_unannotated": 9922,
+    "unannotated_tool_rate": 1.0,
+    "unannotated_tool_95_ci": [
+      0.9996,
+      1.0
+    ],
+    "hints_breakdown": {
+      "readOnlyHint_count": 0,
+      "idempotentHint_count": 0,
+      "destructiveHint_count": 0,
+      "openWorldHint_count": 0
+    }
+  },
+  "spec_defaults_risk_analysis": {
+    "query_tools_total": 0,
+    "query_tools_unannotated_rate": 0.0,
+    "query_tools_unannotated_count": 0,
+    "query_tools_unannotated_95_ci": [
+      0.0,
+      0.0
+    ],
+    "destructive_tools_total": 0,
+    "destructive_tools_explicitly_annotated": 0,
+    "destructive_tools_omitted_count": 0
+  }
+}

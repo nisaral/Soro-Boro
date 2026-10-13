@@ -1,0 +1,14 @@
+{
+  "total_servers": 210,
+  "unweighted_unannotated_rate": 0.5381,
+  "unweighted_cluster_ci": [
+    0.4714,
+    0.6048
+  ],
+  "download_weighted_unannotated_rate": 0.5639,
+  "download_weighted_cluster_ci": [
+    0.033,
+    0.9704
+  ],
+  "total_weekly_downloads": 12677937
+}

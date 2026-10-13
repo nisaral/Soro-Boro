@@ -1,0 +1,86 @@
+{
+  "milestone": "Milestone M2 & M3 Conformal v2 (Honest Mondrian LAC & Ablated Cascade)",
+  "protocol_note": "T2 PASC cascade claim officially dropped; T2 keyword penalty was monotonic, making max(nc1, nc2) degenerate.",
+  "n_splits": 1000,
+  "elapsed_seconds": 28.196,
+  "mondrian_lac_conformal": {
+    "temperature_fit_regime": "Fit on disjoint 126-query calibration split per fold (grid-search NLL)",
+    "write_target_nominal": 0.95,
+    "write_empirical_coverage_mean": 0.9563,
+    "write_empirical_coverage_std": 0.0303,
+    "read_target_nominal": 0.9,
+    "read_empirical_coverage_mean": 0.905,
+    "read_empirical_coverage_std": 0.0464,
+    "overall_coverage_mean": 0.9304,
+    "mean_prediction_set_size": 0.97,
+    "read_singleton_precision": 0.9517,
+    "write_singleton_precision": 0.9801,
+    "dataset_limitation_finding": "On this easy public benchmark (Gemini embeddings), fixed top-1 already achieves 95.6% coverage at set size 1.00. Conformal prediction yields no candidate reduction here. The domain where conformal sets buy efficiency is when top-1 is weak (MiniLM at 74.7% / v2 at 32.5%), where LAC delivers ~92.5% coverage at mean size 2.07 vs size 5.0 for fixed-k."
+  },
+  "cascade_ablation": {
+    "t2_mechanism": "Keyword-matching slot feasibility penalty",
+    "finding": "Degenerate. Monotonic penalty causes max(nc1, nc2) = nc2 on every query.",
+    "recommendation": "Cascade dropped. Single-stage Mondrian LAC is the mathematically rigorous protocol."
+  },
+  "fixed_k_curve": {
+    "k_1": {
+      "k": 1,
+      "empirical_coverage": 0.9564,
+      "mean_set_size": 1.0
+    },
+    "k_2": {
+      "k": 2,
+      "empirical_coverage": 0.9941,
+      "mean_set_size": 2.0
+    },
+    "k_3": {
+      "k": 3,
+      "empirical_coverage": 0.996,
+      "mean_set_size": 3.0
+    },
+    "k_4": {
+      "k": 4,
+      "empirical_coverage": 0.996,
+      "mean_set_size": 4.0
+    },
+    "k_5": {
+      "k": 5,
+      "empirical_coverage": 0.998,
+      "mean_set_size": 5.0
+    },
+    "k_10": {
+      "k": 10,
+      "empirical_coverage": 0.998,
+      "mean_set_size": 10.0
+    },
+    "k_20": {
+      "k": 20,
+      "empirical_coverage": 1.0,
+      "mean_set_size": 20.0
+    }
+  },
+  "baselines_comparison": {
+    "fixed_k_1": {
+      "coverage": 0.9564,
+      "set_size": 1.0
+    },
+    "fixed_k_3": {
+      "coverage": 0.996,
+      "set_size": 3.0
+    },
+    "fixed_k_5": {
+      "coverage": 0.998,
+      "set_size": 5.0
+    },
+    "score_margin_heuristic": {
+      "label": "Score-Margin Heuristic (top - 0.05)",
+      "coverage": 0.996,
+      "set_size": 2.4,
+      "note": "Fixed score margin threshold, not learned BoR."
+    },
+    "mondrian_lac_conformal": {
+      "coverage": 0.9304,
+      "set_size": 0.97
+    }
+  }
+}

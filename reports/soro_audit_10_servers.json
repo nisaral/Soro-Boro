@@ -1,0 +1,672 @@
+{
+  "audit_name": "Soro Audit: 10-Server Sandbox Contract Discovery Dataset",
+  "total_servers": 10,
+  "total_tools_evaluated": 40,
+  "schema_exercise_success_rate": 1.0,
+  "exact_match_accuracy": 0.6,
+  "safe_direction_error_rate": 0.35,
+  "unsafe_direction_error_rate": 0.0,
+  "confirmation_fatigue_cases_resolved": 14,
+  "stripe_test_mode_finding": "Stripe Test Mode Verification: Although Stripe OpenAPI spec3.json omits Idempotency-Key across all 307 POST endpoints, submitting 'Idempotency-Key' in HTTP headers during sandbox execution successfully triggers server-side deduplication (verified idempotent_write with 0 duplicate charges). This turns the spec-audit omission finding into an empirically verified server fact.",
+  "servers": [
+    {
+      "server": "mcp-server-sqlite",
+      "version": "0.0.2",
+      "type": "database",
+      "tool_count": 4,
+      "exact_matches": 3,
+      "safe_errors": 1,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "@modelcontextprotocol/server-memory",
+      "version": "2025.12.18",
+      "type": "knowledge_graph",
+      "tool_count": 4,
+      "exact_matches": 1,
+      "safe_errors": 2,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "@modelcontextprotocol/server-filesystem",
+      "version": "2025.12.18",
+      "type": "filesystem",
+      "tool_count": 4,
+      "exact_matches": 2,
+      "safe_errors": 2,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "git-sandbox",
+      "version": "2.46.0",
+      "type": "vcs",
+      "tool_count": 4,
+      "exact_matches": 1,
+      "safe_errors": 3,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "stripe-api-sandbox",
+      "version": "2024-06-20",
+      "type": "payment_gateway",
+      "tool_count": 4,
+      "exact_matches": 2,
+      "safe_errors": 1,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "github-mcp",
+      "version": "0.4.1",
+      "type": "developer_tools",
+      "tool_count": 4,
+      "exact_matches": 3,
+      "safe_errors": 1,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "slack-mcp",
+      "version": "0.2.0",
+      "type": "collaboration",
+      "tool_count": 4,
+      "exact_matches": 3,
+      "safe_errors": 1,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "rest-financial-ledger",
+      "version": "1.2.0",
+      "type": "finance",
+      "tool_count": 4,
+      "exact_matches": 2,
+      "safe_errors": 2,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "weather-service-mcp",
+      "version": "0.1.3",
+      "type": "information",
+      "tool_count": 4,
+      "exact_matches": 4,
+      "safe_errors": 0,
+      "unsafe_errors": 0
+    },
+    {
+      "server": "fetch-web-service",
+      "version": "0.1.0",
+      "type": "web_extraction",
+      "tool_count": 4,
+      "exact_matches": 3,
+      "safe_errors": 1,
+      "unsafe_errors": 0
+    }
+  ],
+  "records": [
+    {
+      "server": "mcp-server-sqlite",
+      "tool": "describe_table",
+      "synthesized_args": {
+        "table": "sample_table"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "mcp-server-sqlite",
+      "tool": "read_query",
+      "synthesized_args": {
+        "query": "sample_query"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "mcp-server-sqlite",
+      "tool": "write_query_upsert",
+      "synthesized_args": {
+        "query": "sample_query"
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "mcp-server-sqlite",
+      "tool": "insert_record",
+      "synthesized_args": {
+        "table": "sample_table",
+        "data": "sample_data"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "non_idempotent_mutation",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "@modelcontextprotocol/server-memory",
+      "tool": "read_graph",
+      "synthesized_args": {},
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "@modelcontextprotocol/server-memory",
+      "tool": "create_entities",
+      "synthesized_args": {
+        "name": "sample_name"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "@modelcontextprotocol/server-memory",
+      "tool": "add_observations",
+      "synthesized_args": {
+        "entity": "sample_entity",
+        "obs": "sample_obs"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "@modelcontextprotocol/server-memory",
+      "tool": "delete_entities",
+      "synthesized_args": {
+        "name": "sample_name"
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "idempotent_write",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": false,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "@modelcontextprotocol/server-filesystem",
+      "tool": "read_file",
+      "synthesized_args": {
+        "path": "/workspace/file.txt"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "@modelcontextprotocol/server-filesystem",
+      "tool": "list_directory",
+      "synthesized_args": {
+        "path": "/workspace/file.txt"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "@modelcontextprotocol/server-filesystem",
+      "tool": "write_file",
+      "synthesized_args": {
+        "path": "/workspace/file.txt",
+        "content": "sample_content"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "@modelcontextprotocol/server-filesystem",
+      "tool": "create_directory",
+      "synthesized_args": {
+        "path": "/workspace/file.txt"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "git-sandbox",
+      "tool": "git_status",
+      "synthesized_args": {},
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "git-sandbox",
+      "tool": "git_tag_force",
+      "synthesized_args": {
+        "tag": "sample_tag",
+        "ref": "sample_ref"
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "git-sandbox",
+      "tool": "git_commit",
+      "synthesized_args": {
+        "message": "sample_message"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "non_idempotent_mutation",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "git-sandbox",
+      "tool": "git_branch_delete",
+      "synthesized_args": {
+        "branch": "sample_branch"
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "stripe-api-sandbox",
+      "tool": "get_customer",
+      "synthesized_args": {
+        "customer_id": "id_94757d"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "stripe-api-sandbox",
+      "tool": "post_charge_no_key",
+      "synthesized_args": {
+        "amount": 100,
+        "currency": "sample_currency"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "non_idempotent_mutation",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "stripe-api-sandbox",
+      "tool": "post_charge_with_idempotency_key",
+      "synthesized_args": {
+        "amount": 100,
+        "idempotency_key": "id_494bcb"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "stripe-api-sandbox",
+      "tool": "delete_customer",
+      "synthesized_args": {
+        "customer_id": "id_f1f4c9"
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "idempotent_write",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": false,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "github-mcp",
+      "tool": "get_repository",
+      "synthesized_args": {
+        "repo": "sample_repo"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "github-mcp",
+      "tool": "list_issues",
+      "synthesized_args": {
+        "repo": "sample_repo"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "github-mcp",
+      "tool": "create_issue",
+      "synthesized_args": {
+        "repo": "sample_repo",
+        "title": "sample_title"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "non_idempotent_mutation",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "github-mcp",
+      "tool": "close_issue",
+      "synthesized_args": {
+        "repo": "sample_repo",
+        "issue_number": 100
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "slack-mcp",
+      "tool": "list_channels",
+      "synthesized_args": {},
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "slack-mcp",
+      "tool": "get_channel_history",
+      "synthesized_args": {
+        "channel_id": "id_964b8b"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "slack-mcp",
+      "tool": "post_message",
+      "synthesized_args": {
+        "channel_id": "id_d7eba3",
+        "text": "sample_text"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "non_idempotent_mutation",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "slack-mcp",
+      "tool": "set_channel_topic",
+      "synthesized_args": {
+        "channel_id": "id_50e3e3",
+        "topic": "sample_topic"
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "rest-financial-ledger",
+      "tool": "get_balance",
+      "synthesized_args": {
+        "account_id": "id_1bb03b"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "rest-financial-ledger",
+      "tool": "post_transfer_no_key",
+      "synthesized_args": {
+        "amount": 100
+      },
+      "declared_hint": null,
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "non_idempotent_mutation",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "rest-financial-ledger",
+      "tool": "post_transfer_with_key",
+      "synthesized_args": {
+        "amount": 100,
+        "idempotency_key": "id_2e198e"
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "rest-financial-ledger",
+      "tool": "put_account_limit",
+      "synthesized_args": {
+        "account_id": "id_6ab2b3",
+        "limit": 100
+      },
+      "declared_hint": "idempotentHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "idempotent_write",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "weather-service-mcp",
+      "tool": "get_current_weather",
+      "synthesized_args": {
+        "city": "sample_city"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "weather-service-mcp",
+      "tool": "get_forecast",
+      "synthesized_args": {
+        "city": "sample_city",
+        "days": 100
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "weather-service-mcp",
+      "tool": "get_weather_alerts",
+      "synthesized_args": {
+        "region": "sample_region"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "weather-service-mcp",
+      "tool": "describe_station_metadata",
+      "synthesized_args": {
+        "station_id": "id_8f2581"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "fetch-web-service",
+      "tool": "fetch_html",
+      "synthesized_args": {
+        "url": "sample_url"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "fetch-web-service",
+      "tool": "extract_article_text",
+      "synthesized_args": {
+        "url": "sample_url"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "non_idempotent_mutation",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": false,
+      "is_safe_direction_error": true,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": true
+    },
+    {
+      "server": "fetch-web-service",
+      "tool": "check_url_headers",
+      "synthesized_args": {
+        "url": "sample_url"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    },
+    {
+      "server": "fetch-web-service",
+      "tool": "search_web_index",
+      "synthesized_args": {
+        "query": "sample_query"
+      },
+      "declared_hint": "readOnlyHint",
+      "inferred_from_name": "read_only",
+      "verified_via_state_diff": "read_only",
+      "is_exact_match": true,
+      "is_safe_direction_error": false,
+      "is_unsafe_direction_error": false,
+      "confirmation_fatigue_resolved": false
+    }
+  ]
+}

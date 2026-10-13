@@ -1,0 +1,117 @@
+{
+  "validation_experiment": "Live stdio tools/list ground truth vs Phase A static tarball detector",
+  "evaluated_at": "2026-10-12T05:50:00Z",
+  "sample_size": 8,
+  "confusion_matrix": {
+    "true_positives": 4,
+    "false_positives": 1,
+    "true_negatives": 1,
+    "false_negatives": 2,
+    "precision": 0.8,
+    "recall": 0.6667,
+    "specificity": 0.5,
+    "accuracy": 0.625,
+    "f1_score": 0.7273
+  },
+  "error_analysis": {
+    "false_positive_cases": [
+      {
+        "package": "@modelcontextprotocol/server-everything",
+        "static_prediction": "ANNOTATED",
+        "live_tools_count": 0,
+        "live_annotated_count": 0,
+        "reason": "Static detector matched hint strings present in fixture code / prompt templates, but server exposes 0 tools at runtime."
+      }
+    ],
+    "false_negative_cases": [
+      {
+        "package": "@playwright/mcp",
+        "static_prediction": "UNANNOTATED",
+        "live_tools_count": 25,
+        "live_annotated_count": 25,
+        "reason": "Tools are bundled via build step or registered dynamically, causing simple tarball regex to miss explicit annotations."
+      },
+      {
+        "package": "@cyanheads/git-mcp-server",
+        "static_prediction": "UNANNOTATED",
+        "live_tools_count": 28,
+        "live_annotated_count": 28,
+        "reason": "Tool schemas and annotations are imported from external schema definitions, missing direct keyword match in entrypoint."
+      }
+    ]
+  },
+  "evaluated_servers": [
+    {
+      "package": "@modelcontextprotocol/server-filesystem",
+      "command": "npx -y @modelcontextprotocol/server-filesystem {SANDBOX}",
+      "live_tools": 14,
+      "live_annotated": 14,
+      "static_predicted": "ANNOTATED",
+      "classification": "TP"
+    },
+    {
+      "package": "@modelcontextprotocol/server-memory",
+      "command": "npx -y @modelcontextprotocol/server-memory",
+      "live_tools": 9,
+      "live_annotated": 9,
+      "static_predicted": "ANNOTATED",
+      "classification": "TP"
+    },
+    {
+      "package": "@modelcontextprotocol/server-sequential-thinking",
+      "command": "npx -y @modelcontextprotocol/server-sequential-thinking",
+      "live_tools": 1,
+      "live_annotated": 1,
+      "static_predicted": "ANNOTATED",
+      "classification": "TP"
+    },
+    {
+      "package": "chrome-devtools-mcp",
+      "command": "npx -y chrome-devtools-mcp",
+      "live_tools": 30,
+      "live_annotated": 30,
+      "static_predicted": "ANNOTATED",
+      "classification": "TP"
+    },
+    {
+      "package": "@modelcontextprotocol/server-everything",
+      "command": "npx -y @modelcontextprotocol/server-everything",
+      "live_tools": 0,
+      "live_annotated": 0,
+      "static_predicted": "ANNOTATED",
+      "classification": "FP"
+    },
+    {
+      "package": "mcp-server-docker",
+      "command": "npx -y mcp-server-docker",
+      "live_tools": 1,
+      "live_annotated": 0,
+      "static_predicted": "UNANNOTATED",
+      "classification": "TN"
+    },
+    {
+      "package": "@playwright/mcp",
+      "command": "npx -y @playwright/mcp",
+      "live_tools": 25,
+      "live_annotated": 25,
+      "static_predicted": "UNANNOTATED",
+      "classification": "FN"
+    },
+    {
+      "package": "@cyanheads/git-mcp-server",
+      "command": "npx -y @cyanheads/git-mcp-server",
+      "live_tools": 28,
+      "live_annotated": 28,
+      "static_predicted": "UNANNOTATED",
+      "classification": "FN"
+    }
+  ],
+  "cluster_bootstrap_longtail": {
+    "total_servers": 210,
+    "unweighted_rate": 0.5381,
+    "unweighted_cluster_ci": [0.4714, 0.6048],
+    "download_weighted_rate": 0.5639,
+    "download_weighted_cluster_ci": [0.033, 0.9704],
+    "total_weekly_downloads": 12677937
+  }
+}

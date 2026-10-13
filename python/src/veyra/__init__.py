@@ -1,12 +1,4 @@
-"""Veyra: Vendor-Neutral Tool-Boundary Reliability and Resolution Layer for AI Agents.
-
-Core Thesis:
-Agent proposes -> Veyra resolves -> Tool executes.
-
-Veyra provides execution-resolution, safe schema coercion, parameter alias remapping,
-and declared fallback continuity when the agent's proposed tool path fails.
-Deterministic by default with ZERO LLM dependency.
-"""
+"""Deprecated package path. Prefer `import soro`."""
 
 from veyra.boundary import (
     FailureClassification,
@@ -35,14 +27,7 @@ from veyra.core import (
     TraceSink,
     TrajectoryRecord,
 )
-from veyra.core.recovery_controller import (
-    ConstrainedBeliefStateRecoveryController,
-    HiddenExecutionState,
-    BeliefDistribution,
-    ControllerDecision,
-)
 from veyra.execution import ExecutionEngine
-
 from veyra.export import StructuredTraceExporter
 from veyra.plugins import PolicyPluginRegistry, default_plugins
 from veyra.policy import (
@@ -67,17 +52,25 @@ from veyra.registry import (
     ToolRegistry,
 )
 
+try:
+    from soro import Soro, wrap
+except ImportError:
+    Soro = VeyraMiddleware  # type: ignore[misc, assignment]
+
+    def wrap(fn, **kwargs):
+        return VeyraMiddleware().wrap_function(fn, **kwargs)
+
 __version__ = "0.2.0"
 
 __all__ = [
-    # Top-level boundary middleware
+    "Soro",
+    "wrap",
     "Veyra",
     "VeyraMiddleware",
     "ProductionConfig",
     "Mode",
     "MCPToolMiddleware",
     "VeyraBoundaryError",
-    # Core abstractions
     "ExecutableAction",
     "ExecutionContract",
     "ResolutionContract",
@@ -93,18 +86,14 @@ __all__ = [
     "ReplanEvent",
     "TrajectoryRecord",
     "TraceSink",
-    # Failure taxonomy & provenance
     "FailureKind",
     "FailureClassification",
     "FailureProvenance",
-    # Tool Registry & Candidate Resolution
     "ToolRegistry",
     "ToolDefinition",
     "CandidateResolver",
     "DeterministicCandidateResolver",
-    # Execution Engine
     "ExecutionEngine",
-    # Routing & Recovery Policies
     "RoutePolicy",
     "DeterministicRoutePolicy",
     "RecoveryPolicy",
@@ -116,16 +105,12 @@ __all__ = [
     "ReliabilityAwareRoutePolicy",
     "CalibratedUncertaintyEstimator",
     "SelectiveResolutionPolicy",
-    # Declarative Configuration
     "EquivalenceConfig",
     "CapabilityConfig",
     "load_equivalence_config",
-    # Structured Trace Export
     "StructuredTraceExporter",
-    # Plugins
     "PolicyPluginRegistry",
     "default_plugins",
-    # Risk Classification
     "RiskLevel",
     "classify_risk",
 ]

@@ -1,0 +1,1063 @@
+[
+  {
+    "id": "createCharge",
+    "source": "checkout.yaml",
+    "http_verb": "POST",
+    "path": "/v1/charges",
+    "description": "Create customer charge",
+    "params": [
+      "Idempotency-Key"
+    ]
+  },
+  {
+    "id": "getCharge",
+    "source": "checkout.yaml",
+    "http_verb": "GET",
+    "path": "/v1/charges/{charge_id}",
+    "description": "Retrieve charge status",
+    "params": [
+      "charge_id"
+    ]
+  },
+  {
+    "id": "createRefund",
+    "source": "checkout.yaml",
+    "http_verb": "POST",
+    "path": "/v1/refunds",
+    "description": "Issue refund",
+    "params": [
+      "Idempotency-Key"
+    ]
+  },
+  {
+    "id": "listPets",
+    "source": "petstore.yaml",
+    "http_verb": "GET",
+    "path": "/pets",
+    "description": "List all pets",
+    "params": []
+  },
+  {
+    "id": "createPet",
+    "source": "petstore.yaml",
+    "http_verb": "POST",
+    "path": "/pets",
+    "description": "Create a pet",
+    "params": []
+  },
+  {
+    "id": "showPetById",
+    "source": "petstore.yaml",
+    "http_verb": "GET",
+    "path": "/pets/{petId}",
+    "description": "Info for a specific pet",
+    "params": [
+      "petId"
+    ]
+  },
+  {
+    "id": "deletePet",
+    "source": "petstore.yaml",
+    "http_verb": "DELETE",
+    "path": "/pets/{petId}",
+    "description": "Delete a pet",
+    "params": [
+      "petId"
+    ]
+  },
+  {
+    "id": "read_file",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Read and return the contents of an existing file from a provided filesystem path. Use when the user wants to open, inspect, view, retrieve, or read file contents.",
+    "params": [
+      "path"
+    ]
+  },
+  {
+    "id": "write_file",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Write supplied content to a file, creating the file if necessary or replacing its current contents.",
+    "params": [
+      "path",
+      "content"
+    ]
+  },
+  {
+    "id": "append_file",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Add new content to the end of an existing file without replacing its current contents.",
+    "params": [
+      "path",
+      "content"
+    ]
+  },
+  {
+    "id": "copy_file",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Duplicate an existing file from one filesystem location to another while preserving the original.",
+    "params": [
+      "source_path",
+      "destination_path"
+    ]
+  },
+  {
+    "id": "move_file",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Move or rename an existing file from one filesystem location to another.",
+    "params": [
+      "source_path",
+      "destination_path"
+    ]
+  },
+  {
+    "id": "delete_file",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Delete an existing file from the filesystem.",
+    "params": [
+      "path"
+    ]
+  },
+  {
+    "id": "list_directory",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Return the files and subdirectories contained within a specified directory.",
+    "params": [
+      "path"
+    ]
+  },
+  {
+    "id": "get_file_metadata",
+    "source": "mcp_benchmark:filesystem_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve metadata for a file including size, timestamps, extension, and path information.",
+    "params": [
+      "path"
+    ]
+  },
+  {
+    "id": "extract_pdf_text",
+    "source": "mcp_benchmark:document_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Extract readable textual content from a PDF document while preserving basic page ordering.",
+    "params": [
+      "path"
+    ]
+  },
+  {
+    "id": "extract_docx_text",
+    "source": "mcp_benchmark:document_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Extract paragraphs and textual content from a Microsoft Word DOCX document.",
+    "params": [
+      "path"
+    ]
+  },
+  {
+    "id": "summarize_document",
+    "source": "mcp_benchmark:document_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Produce a concise summary of a supplied document while preserving its major arguments, findings, and conclusions.",
+    "params": [
+      "document"
+    ]
+  },
+  {
+    "id": "search_document",
+    "source": "mcp_benchmark:document_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Search within the contents of a document for passages relevant to a natural-language query.",
+    "params": [
+      "document",
+      "query"
+    ]
+  },
+  {
+    "id": "extract_document_section",
+    "source": "mcp_benchmark:document_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve a particular heading, section, chapter, or named portion of a document.",
+    "params": [
+      "document",
+      "section"
+    ]
+  },
+  {
+    "id": "execute_sql_query",
+    "source": "mcp_benchmark:database_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Execute a read-only SQL query against a relational database and return matching rows.",
+    "params": [
+      "query"
+    ]
+  },
+  {
+    "id": "inspect_database_schema",
+    "source": "mcp_benchmark:database_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Return information about database tables, columns, types, keys, and relationships.",
+    "params": []
+  },
+  {
+    "id": "insert_database_record",
+    "source": "mcp_benchmark:database_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Insert a new record into a database table.",
+    "params": [
+      "table",
+      "data"
+    ]
+  },
+  {
+    "id": "update_database_record",
+    "source": "mcp_benchmark:database_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Modify existing records in a database based on supplied conditions.",
+    "params": [
+      "table",
+      "conditions",
+      "data"
+    ]
+  },
+  {
+    "id": "delete_database_record",
+    "source": "mcp_benchmark:database_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Remove records from a database table that match supplied conditions.",
+    "params": [
+      "table",
+      "conditions"
+    ]
+  },
+  {
+    "id": "aggregate_database_data",
+    "source": "mcp_benchmark:database_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Compute grouped database statistics such as counts, sums, averages, minima, and maxima.",
+    "params": [
+      "table",
+      "aggregation"
+    ]
+  },
+  {
+    "id": "fetch_web_page",
+    "source": "mcp_benchmark:web_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve the raw or rendered content of a web page from a supplied URL.",
+    "params": [
+      "url"
+    ]
+  },
+  {
+    "id": "extract_web_text",
+    "source": "mcp_benchmark:web_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Extract the main readable textual content from a web page while removing layout and navigation noise.",
+    "params": [
+      "url"
+    ]
+  },
+  {
+    "id": "extract_web_links",
+    "source": "mcp_benchmark:web_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Extract hyperlinks and associated anchor text from a web page.",
+    "params": [
+      "url"
+    ]
+  },
+  {
+    "id": "extract_web_metadata",
+    "source": "mcp_benchmark:web_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve page metadata such as title, description, canonical URL, headers, and publication information.",
+    "params": [
+      "url"
+    ]
+  },
+  {
+    "id": "extract_structured_web_data",
+    "source": "mcp_benchmark:web_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Extract specified structured fields such as product names, prices, dates, entities, or table rows from a webpage.",
+    "params": [
+      "url",
+      "fields"
+    ]
+  },
+  {
+    "id": "search_web",
+    "source": "mcp_benchmark:web_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Search an indexed synthetic web corpus using a natural-language query and return ranked web results.",
+    "params": [
+      "query"
+    ]
+  },
+  {
+    "id": "search_research_papers",
+    "source": "mcp_benchmark:research_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Find research papers relevant to a scientific or technical natural-language query.",
+    "params": [
+      "query"
+    ]
+  },
+  {
+    "id": "get_paper_metadata",
+    "source": "mcp_benchmark:research_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve metadata for a research paper including title, authors, year, venue, abstract, and identifier.",
+    "params": [
+      "paper_id"
+    ]
+  },
+  {
+    "id": "get_paper_citations",
+    "source": "mcp_benchmark:research_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve research papers cited by or citing a selected paper.",
+    "params": [
+      "paper_id"
+    ]
+  },
+  {
+    "id": "summarize_research_paper",
+    "source": "mcp_benchmark:research_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Summarize the objective, methodology, experiments, results, and limitations of a research paper.",
+    "params": [
+      "paper"
+    ]
+  },
+  {
+    "id": "compare_research_papers",
+    "source": "mcp_benchmark:research_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Compare multiple research papers based on methods, claims, datasets, experiments, results, or conclusions.",
+    "params": [
+      "papers"
+    ]
+  },
+  {
+    "id": "send_email",
+    "source": "mcp_benchmark:email_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Send a new email message to one or more recipients with a subject and message body.",
+    "params": [
+      "to",
+      "subject",
+      "body"
+    ]
+  },
+  {
+    "id": "search_email",
+    "source": "mcp_benchmark:email_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Search stored email messages using keywords, senders, subjects, dates, recipients, or natural-language criteria.",
+    "params": [
+      "query"
+    ]
+  },
+  {
+    "id": "read_email",
+    "source": "mcp_benchmark:email_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve the full body and metadata of a specific stored email message.",
+    "params": [
+      "message_id"
+    ]
+  },
+  {
+    "id": "reply_email",
+    "source": "mcp_benchmark:email_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Send a reply within an existing email conversation.",
+    "params": [
+      "message_id",
+      "body"
+    ]
+  },
+  {
+    "id": "create_email_draft",
+    "source": "mcp_benchmark:email_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Create and save an email draft without sending it.",
+    "params": [
+      "to",
+      "subject",
+      "body"
+    ]
+  },
+  {
+    "id": "archive_email",
+    "source": "mcp_benchmark:email_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Remove an email from the active inbox while retaining the message in stored mail.",
+    "params": [
+      "message_id"
+    ]
+  },
+  {
+    "id": "create_calendar_event",
+    "source": "mcp_benchmark:calendar_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Create a new calendar event for a specified date, time, duration, location, and optional attendees.",
+    "params": [
+      "title",
+      "start_time",
+      "end_time"
+    ]
+  },
+  {
+    "id": "search_calendar_events",
+    "source": "mcp_benchmark:calendar_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Find existing calendar events matching a date range, title, participant, location, or query.",
+    "params": []
+  },
+  {
+    "id": "update_calendar_event",
+    "source": "mcp_benchmark:calendar_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Modify an existing calendar event's title, time, attendees, location, or description.",
+    "params": [
+      "event_id",
+      "updates"
+    ]
+  },
+  {
+    "id": "delete_calendar_event",
+    "source": "mcp_benchmark:calendar_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Cancel or remove an existing calendar event.",
+    "params": [
+      "event_id"
+    ]
+  },
+  {
+    "id": "check_calendar_availability",
+    "source": "mcp_benchmark:calendar_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Determine open and occupied time intervals within a requested date or time range.",
+    "params": [
+      "start_time",
+      "end_time"
+    ]
+  },
+  {
+    "id": "send_channel_message",
+    "source": "mcp_benchmark:messaging_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Send a new message to a specified team communication channel.",
+    "params": [
+      "channel",
+      "message"
+    ]
+  },
+  {
+    "id": "search_messages",
+    "source": "mcp_benchmark:messaging_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Search historical team messages across channels and conversations.",
+    "params": [
+      "query"
+    ]
+  },
+  {
+    "id": "reply_to_thread",
+    "source": "mcp_benchmark:messaging_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Post a response within an existing threaded team conversation.",
+    "params": [
+      "thread_id",
+      "message"
+    ]
+  },
+  {
+    "id": "list_channels",
+    "source": "mcp_benchmark:messaging_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Return available communication channels in the synthetic messaging workspace.",
+    "params": []
+  },
+  {
+    "id": "get_channel_history",
+    "source": "mcp_benchmark:messaging_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve recent messages posted to a selected messaging channel.",
+    "params": [
+      "channel"
+    ]
+  },
+  {
+    "id": "get_git_status",
+    "source": "mcp_benchmark:git_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Return the current working-tree and staging status of a Git repository.",
+    "params": [
+      "repo_path"
+    ]
+  },
+  {
+    "id": "get_git_diff",
+    "source": "mcp_benchmark:git_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Show line-level differences between repository states, commits, branches, or working files.",
+    "params": [
+      "repo_path"
+    ]
+  },
+  {
+    "id": "get_commit_history",
+    "source": "mcp_benchmark:git_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Retrieve recent commits and associated metadata from a Git repository.",
+    "params": [
+      "repo_path"
+    ]
+  },
+  {
+    "id": "list_git_branches",
+    "source": "mcp_benchmark:git_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "List local and remote branches available in a Git repository.",
+    "params": [
+      "repo_path"
+    ]
+  },
+  {
+    "id": "create_git_branch",
+    "source": "mcp_benchmark:git_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Create a new Git branch from the specified revision or current repository state.",
+    "params": [
+      "repo_path",
+      "branch_name"
+    ]
+  },
+  {
+    "id": "create_git_commit",
+    "source": "mcp_benchmark:git_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Create a new Git commit containing staged repository changes.",
+    "params": [
+      "repo_path",
+      "message"
+    ]
+  },
+  {
+    "id": "search_issues",
+    "source": "mcp_benchmark:issue_tracker_mcp",
+    "http_verb": null,
+    "path": null,
+    "description": "Search software issues using keywords, labels, states, repositories, or natural-language descriptions.",
+    "params": [
+      "query"
+    ]
+  },
+  {
+    "id": "airline.book_reservation",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Book a reservation.",
+    "params": [
+      "user_id",
+      "origin",
+      "destination",
+      "flight_type",
+      "cabin",
+      "flights",
+      "passengers",
+      "payment_methods",
+      "total_baggages",
+      "nonfree_baggages",
+      "insurance"
+    ]
+  },
+  {
+    "id": "airline.calculate",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Calculate the result of a mathematical expression.",
+    "params": [
+      "expression"
+    ]
+  },
+  {
+    "id": "airline.cancel_reservation",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Cancel the whole reservation.",
+    "params": [
+      "reservation_id"
+    ]
+  },
+  {
+    "id": "airline.get_reservation_details",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the details of a reservation.",
+    "params": [
+      "reservation_id"
+    ]
+  },
+  {
+    "id": "airline.get_user_details",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the details of a user, including their reservations.",
+    "params": [
+      "user_id"
+    ]
+  },
+  {
+    "id": "airline.list_all_airports",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Returns a list of all available airports.",
+    "params": []
+  },
+  {
+    "id": "airline.search_direct_flight",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Search for direct flights between two cities on a specific date.",
+    "params": [
+      "origin",
+      "destination",
+      "date"
+    ]
+  },
+  {
+    "id": "airline.search_onestop_flight",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Search for one-stop flights between two cities on a specific date.",
+    "params": [
+      "origin",
+      "destination",
+      "date"
+    ]
+  },
+  {
+    "id": "airline.send_certificate",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Send a certificate to a user. Be careful!",
+    "params": [
+      "user_id",
+      "amount"
+    ]
+  },
+  {
+    "id": "airline.transfer_to_human_agents",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Transfer the user to a human agent, with a summary of the user's issue.",
+    "params": [
+      "summary"
+    ]
+  },
+  {
+    "id": "airline.update_reservation_baggages",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Update the baggage information of a reservation.",
+    "params": [
+      "reservation_id",
+      "total_baggages",
+      "nonfree_baggages",
+      "payment_id"
+    ]
+  },
+  {
+    "id": "airline.update_reservation_flights",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Update the flight information of a reservation.",
+    "params": [
+      "reservation_id",
+      "cabin",
+      "flights",
+      "payment_id"
+    ]
+  },
+  {
+    "id": "airline.update_reservation_passengers",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Update the passenger information of a reservation.",
+    "params": [
+      "reservation_id",
+      "passengers"
+    ]
+  },
+  {
+    "id": "airline.get_flight_status",
+    "source": "tau2:airline",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the status of a flight.",
+    "params": [
+      "flight_number",
+      "date"
+    ]
+  },
+  {
+    "id": "banking_knowledge.parse_discoverable_tool_docstring",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Parse a discoverable tool's docstring into description and parameters.",
+    "params": [
+      "func"
+    ]
+  },
+  {
+    "id": "banking_knowledge.format_discoverable_tool_for_agent",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Format a discoverable tool's info for display to the agent.",
+    "params": [
+      "tool_info"
+    ]
+  },
+  {
+    "id": "banking_knowledge.set_read_log_allowlist",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Replace the read-call DB-logging allowlist.",
+    "params": [
+      "allowlist"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_user_discoverable_tools_state",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the current state of user discoverable tools (for sharing with user tools).",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.get_agent_discoverable_tools_state",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the current state of agent discoverable tools.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.transfer_to_human_agents",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Transfer the user to a human agent.",
+    "params": [
+      "summary",
+      "reason"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_current_time",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the current time. Use this to get the current timestamp for logging verification records.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.get_user_information_by_id",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the information (date of birth, email, phone number, address) for a user by their user id.",
+    "params": [
+      "user_id"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_user_information_by_name",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the information (date of birth, email, phone number, address) for a user by their name. Case Sensitive.",
+    "params": [
+      "customer_name"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_user_information_by_email",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get the information (date of birth, email, phone number, address) for a user by their email.",
+    "params": [
+      "email"
+    ]
+  },
+  {
+    "id": "banking_knowledge.change_user_email",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Change the email address for a user.",
+    "params": [
+      "user_id",
+      "new_email"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_referrals_by_user",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get all referrals made by a user.",
+    "params": [
+      "user_id"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_credit_card_transactions_by_user",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get all credit card transactions for a user.",
+    "params": [
+      "user_id"
+    ]
+  },
+  {
+    "id": "banking_knowledge.get_credit_card_accounts_by_user",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Get all credit card accounts for a user.",
+    "params": [
+      "user_id"
+    ]
+  },
+  {
+    "id": "banking_knowledge.log_verification",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Log a verification record after successfully verifying a user's identity.",
+    "params": [
+      "name",
+      "user_id",
+      "address",
+      "email",
+      "phone_number",
+      "date_of_birth",
+      "time_verified"
+    ]
+  },
+  {
+    "id": "banking_knowledge.give_discoverable_user_tool",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Pass a tool to the user so they can execute it themselves.",
+    "params": [
+      "discoverable_tool_name",
+      "arguments"
+    ]
+  },
+  {
+    "id": "banking_knowledge.unlock_discoverable_agent_tool",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Unlock an agent discoverable tool that was found in the knowledge base.",
+    "params": [
+      "agent_tool_name"
+    ]
+  },
+  {
+    "id": "banking_knowledge.call_discoverable_agent_tool",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Call an agent discoverable tool that you have previously unlocked.",
+    "params": [
+      "agent_tool_name",
+      "arguments"
+    ]
+  },
+  {
+    "id": "banking_knowledge.list_discoverable_agent_tools",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "List all agent discoverable tools that you have called.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.example_agent_tool_0000",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "An example agent discoverable tool placeholder.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.update_transaction_rewards_3847",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Update the rewards_earned field on a credit card transaction.",
+    "params": [
+      "transaction_id",
+      "new_rewards_earned"
+    ]
+  },
+  {
+    "id": "banking_knowledge.initial_transfer_to_human_agent_0218",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Initiate a transfer request to a human agent. This is used as part of a special transfer protocol for certain situations.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.initial_transfer_to_human_agent_1822",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Initiate a transfer request to a human agent. This is used as part of a special transfer protocol for certain situations.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.emergency_credit_bureau_incident_transfer_1114",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "Emergency escalation tool for the 11/14 credit bureau reporting incident. Logs the case for priority handling by the credit bureau correction team.",
+    "params": []
+  },
+  {
+    "id": "banking_knowledge.file_credit_card_transaction_dispute_4829",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "File a formal dispute for a credit card transaction.",
+    "params": [
+      "transaction_id",
+      "card_action",
+      "card_last_4_digits",
+      "full_name",
+      "user_id",
+      "phone",
+      "email",
+      "address",
+      "contacted_merchant",
+      "purchase_date",
+      "issue_noticed_date",
+      "dispute_reason",
+      "resolution_requested",
+      "eligible_for_provisional_credit",
+      "partial_refund_amount"
+    ]
+  },
+  {
+    "id": "banking_knowledge.file_debit_card_transaction_dispute_6281",
+    "source": "tau2:banking_knowledge",
+    "http_verb": null,
+    "path": null,
+    "description": "File a formal dispute for a debit card transaction under Regulation E. Debit card disputes affect actual bank funds and have different liability rules based on reporting timing.",
+    "params": [
+      "transaction_id",
+      "account_id",
+      "card_id",
+      "user_id",
+      "dispute_category",
+      "transaction_date",
+      "discovery_date",
+      "disputed_amount",
+      "transaction_type",
+      "card_in_possession",
+      "pin_compromised",
+      "contacted_merchant",
+      "police_report_filed",
+      "written_statement_provided",
+      "provisional_credit_eligible",
+      "customer_max_liability_amount",
+      "card_action"
+    ]
+  }
+]

@@ -616,3 +616,29 @@ class VeyraMiddleware:
             state=state,
         )
 
+    def wrap(
+        self,
+        fn: Callable[..., Any],
+        *,
+        name: str | None = None,
+        capability: str | None = None,
+        side_effect_class: SideEffectClass | str = SideEffectClass.READ_ONLY,
+        required_permissions: list[str] | None = None,
+        fallback_candidates: list[ExecutableAction | Callable[..., Any]] | None = None,
+        state: ExecutionState | None = None,
+        contract: ExecutionContract | None = None,
+        verify: Callable[..., Any] | None = None,
+        verification_fn: Callable[..., Any] | None = None,
+    ) -> Callable[..., Any]:
+        return self.wrap_function(
+            fn,
+            name=name,
+            capability=capability,
+            side_effect_class=side_effect_class,
+            required_permissions=required_permissions,
+            fallback_candidates=fallback_candidates,
+            state=state,
+            contract=contract,
+            verification_fn=verify if verify is not None else verification_fn,
+        )
+

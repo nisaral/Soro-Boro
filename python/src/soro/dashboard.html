@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Veyra</title>
+<style>
+  :root {
+    --bg: #fafaf8;
+    --panel: #ffffff;
+    --ink: #111110;
+    --muted: #6f6e69;
+    --line: #ebebe6;
+    --hover: #f4f4f0;
+    --ok: #1b7f4e;
+    --bad: #b42318;
+    --rail: #111110;
+    --rail-ink: #f5f5f2;
+    --rail-dim: #a3a29d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    letter-spacing: -0.011em;
+  }
+  .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100%; }
+  aside {
+    background: var(--rail);
+    color: var(--rail-ink);
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand { font-size: 17px; font-weight: 560; letter-spacing: -0.03em; }
+  .brand small { display: block; margin-top: 6px; color: var(--rail-dim); font-size: 12px; font-weight: 400; letter-spacing: 0; }
+  nav { margin-top: 36px; display: flex; flex-direction: column; gap: 4px; }
+  nav button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--rail-dim);
+    text-align: left;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+  }
+  nav button:hover { color: var(--rail-ink); background: rgba(255,255,255,.06); }
+  nav button.on { color: var(--rail-ink); background: rgba(255,255,255,.1); }
+  main { padding: 40px 48px 80px; max-width: 980px; }
+  h1 { font-size: 32px; font-weight: 520; letter-spacing: -0.04em; margin: 0 0 10px; }
+  .lede { color: var(--muted); margin: 0 0 28px; max-width: 56ch; font-size: 16px; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .metric {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .metric span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .metric strong { display: block; margin-top: 8px; font-size: 28px; font-weight: 520; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  th { color: var(--muted); font-size: 11px; font-weight: 550; text-transform: uppercase; letter-spacing: .06em; background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  tr.click { cursor: pointer; }
+  tr.click:hover td { background: var(--hover); }
+  .ok { color: var(--ok); }
+  .bad { color: var(--bad); }
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .k { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+  pre {
+    margin: 0;
+    padding: 18px 20px;
+    background: #111110;
+    color: #ecece8;
+    border-radius: 12px;
+    font: 13px/1.5 ui-monospace, "SF Mono", Consolas, monospace;
+    overflow: auto;
+  }
+  code { font: 13px/1.4 ui-monospace, Consolas, monospace; background: var(--hover); padding: 1px 5px; border-radius: 4px; }
+  ul.quiet { color: var(--muted); padding-left: 18px; }
+  @media (max-width: 840px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { flex-direction: row; align-items: center; justify-content: space-between; padding: 16px 18px; }
+    nav { margin: 0; flex-direction: row; flex-wrap: wrap; }
+    .metrics { grid-template-columns: 1fr; }
+    main { padding: 24px 18px 56px; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <div class="brand">Veyra<small id="version">controller</small></div>
+    <nav>
+      <button id="tab-overview" class="on">Overview</button>
+      <button id="tab-runs">Runs</button>
+      <button id="tab-decision">Decisions</button>
+      <button id="tab-benchmarks">Evaluation</button>
+      <button id="tab-install">Install</button>
+    </nav>
+  </aside>
+  <main>
+    <section id="view-overview"></section>
+    <section id="view-runs" hidden></section>
+    <section id="view-decision" hidden></section>
+    <section id="view-benchmarks" hidden></section>
+    <section id="view-install" hidden></section>
+  </main>
+</div>
+<script>
+const tabs = ["overview","runs","decision","benchmarks","install"];
+const state = { runs: [], comparison: "", targets: [], version: "", current: null, detail: null };
+tabs.forEach(name => {
+  document.getElementById("tab-"+name).onclick = () => show(name);
+});
+function show(name) {
+  tabs.forEach(n => {
+    document.getElementById("view-"+n).hidden = n !== name;
+    document.getElementById("tab-"+n).classList.toggle("on", n === name);
+  });
+}
+function money(n) { return "$" + Number(n || 0).toFixed(4); }
+function esc(s) {
+  return String(s ?? "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+async function boot() {
+  const res = await fetch("/api/overview");
+  const data = await res.json();
+  state.runs = data.runs || [];
+  state.comparison = data.comparison || "";
+  state.targets = data.targets || [];
+  state.version = data.version || "";
+  document.getElementById("version").textContent = state.version ? "v" + state.version : "controller";
+  renderOverview();
+  renderRuns();
+  renderBenchmarks();
+  renderInstall();
+  renderDecision();
+}
+function renderOverview() {
+  const succeeded = state.runs.filter(r => String(r.status).includes("SUCCEED")).length;
+  const publicDone = state.targets.filter(t => t.status === "measured").length;
+  document.getElementById("view-overview").innerHTML = `
+    <h1>Traces</h1>
+    <p class="lede">Replay of the run directory you opened. The policy is the only actor. Harbor and Terminal-Bench have not been scored from this screen.</p>
+    <div class="metrics">
+      <div class="metric"><span>Runs</span><strong>${state.runs.length}</strong></div>
+      <div class="metric"><span>Succeeded</span><strong>${succeeded}</strong></div>
+      <div class="metric"><span>Public scores</span><strong>${publicDone}</strong></div>
+    </div>
+    <div class="card"><div class="k">Next</div><p>Open a run to inspect candidates the policy allowed and dropped. Evaluation lists the Harbor-first target order.</p></div>`;
+}
+function renderRuns() {
+  const rows = state.runs.map(r => {
+    const ok = String(r.status).includes("SUCCEED");
+    return `<tr class="click" data-id="${esc(r.id)}">
+      <td>${esc(r.task)}</td><td>${esc(r.policy)}</td><td>${esc(r.harness)}</td>
+      <td class="${ok ? "ok" : "bad"}">${esc(r.status)}</td>
+      <td>${money(r.usd)}</td><td>${r.actions}</td><td>${r.switches}</td>
+      <td>${esc((r.backends||[]).join(", "))}</td></tr>`;
+  }).join("");
+  document.getElementById("view-runs").innerHTML = `
+    <h1>Runs</h1>
+    <p class="lede">Charged dollars come from the kernel ledger.</p>
+    <div class="panel"><table>
+      <thead><tr><th>Task</th><th>Policy</th><th>Harness</th><th>Status</th><th>Cost</th><th>Actions</th><th>Switches</th><th>Backend</th></tr></thead>
+      <tbody>${rows || "<tr><td colspan='8'>No runs in this directory.</td></tr>"}</tbody>
+    </table></div>`;
+  document.querySelectorAll("#view-runs tr.click").forEach(tr => {
+    tr.onclick = () => openRun(tr.dataset.id);
+  });
+}
+async function openRun(id) {
+  state.current = id;
+  const res = await fetch("/api/run?id=" + encodeURIComponent(id));
+  state.detail = await res.json();
+  renderDecision();
+  show("decision");
+}
+function renderDecision() {
+  const steps = ((state.detail && state.detail.steps) || []).filter(s =>
+    s.kind === "decision" || s.kind === "decision_rejected" || s.kind === "decision_fallback");
+  const blocks = steps.map(s => {
+    const cands = (s.candidates || []).map(c =>
+      `<li><code>${esc(c.id)}</code> · p ${esc(c.expected_success)} · ${esc(c.est_cost_usd)} · risk ${esc(c.risk)}</li>`).join("");
+    const dropped = Object.entries(s.dropped || {}).map(([id, why]) =>
+      `<li class="bad"><code>${esc(id)}</code> · ${esc(why)}</li>`).join("");
+    return `<div class="card">
+      <div class="k">${esc(s.kind)} ${esc(s.seq)} · ${esc(s.backend)}</div>
+      <p><strong>${esc(s.chosen || "—")}</strong> ${esc(s.rationale || "")}</p>
+      <div class="k">Allowed</div><ul class="quiet">${cands || "<li>none</li>"}</ul>
+      <div class="k">Dropped</div><ul class="quiet">${dropped || "<li>none</li>"}</ul>
+    </div>`;
+  }).join("");
+  document.getElementById("view-decision").innerHTML = `
+    <h1>Decisions</h1>
+    <p class="lede">${state.current ? esc(state.current) : "Select a run."}</p>
+    <div class="stack">${blocks || "<div class='card'>No decision events.</div>"}</div>`;
+}
+function renderBenchmarks() {
+  const rows = state.targets.map(t =>
+    `<tr><td>${esc(t.id)}</td><td>${esc(t.role)}</td><td>${esc(t.status)}</td><td>${esc(t.upstream)}</td></tr>`).join("");
+  document.getElementById("view-benchmarks").innerHTML = `
+    <h1>Evaluation</h1>
+    <p class="lede">Harbor public trials first. Terminal-Bench 2.0 is the first paid run. Files next to these runs may be synthetic.</p>
+    <div class="panel"><table>
+      <thead><tr><th>Target</th><th>Role</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <h1 style="font-size:20px;margin:32px 0 12px">Comparison file</h1>
+    <pre>${esc(state.comparison || "No comparison.md in this directory.")}</pre>`;
+}
+function renderInstall() {
+  document.getElementById("view-install").innerHTML = `
+    <h1>Install</h1>
+    <p class="lede">The product is the <code>veyra</code> CLI. A Harbor custom-agent adapter is not registered yet.</p>
+    <pre>pip install -e "./python[dev]"
+cd go && go build -o ../dist/soro.exe ./cmd/veyra && cd ..
+veyra doctor
+veyra compare --spawn --split dev --out out/dev
+veyra dashboard --runs out/dev
+veyra headroom --trials trials.csv --out out/headroom.md</pre>`;
+}
+boot();
+</script>
+</body>
+</html>

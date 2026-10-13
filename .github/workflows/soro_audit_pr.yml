@@ -1,0 +1,52 @@
+name: "Soro MCP Audit PR Check"
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mcp-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Soro CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./python
+
+      - name: Run Soro Audit (Reference Filesystem Server)
+        id: audit
+        run: |
+          python -m soro.cli_audit \
+            --stdio "npx -y @modelcontextprotocol/server-filesystem ." \
+            --dry-run \
+            --json audit_report.json \
+            --markdown audit_summary.md
+
+          if [ -f audit_summary.md ]; then
+            cat audit_summary.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Audit Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-audit-summary
+          path: |
+            audit_summary.md
+            audit_report.json
+          retention-days: 7

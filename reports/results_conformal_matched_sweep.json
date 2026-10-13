@@ -1,0 +1,217 @@
+{
+  "sweep_title": "MiniLM Conformal LAC vs Fixed-k Matched-Coverage Sweep",
+  "n_test_queries": 253,
+  "conformal_alpha_05": {
+    "alpha": 0.05,
+    "nominal_target": 0.95,
+    "hits": 234,
+    "total": 253,
+    "empirical_coverage": 0.9249,
+    "wilson_95_ci": [
+      0.8857,
+      0.9514
+    ],
+    "mean_set_size": 2.07
+  },
+  "matched_coverage_comparison": {
+    "conformal_empirical_coverage": 0.9249,
+    "conformal_mean_set_size": 2.07,
+    "conformal_wilson_95_ci": [
+      0.8857,
+      0.9514
+    ],
+    "k_3_coverage": 0.917,
+    "k_3_wilson_95_ci": [
+      0.8764,
+      0.9451
+    ],
+    "k_4_coverage": 0.9368,
+    "k_4_wilson_95_ci": [
+      0.8998,
+      0.9607
+    ],
+    "interpolated_fixed_k_for_92_5_percent": 3.4,
+    "matched_candidate_reduction_percent": 39.1,
+    "conservative_vs_k4_reduction_percent": 48.2,
+    "conservative_vs_k3_reduction_percent": 31.0,
+    "statistical_significance_note": "Wilson 95% confidence intervals overlap between Conformal LAC [88.57%, 95.14%], fixed k=3 [87.64%, 94.51%], and fixed k=4 [89.98%, 96.07%]. The advantage of conformal prediction here is adaptive candidate set sizing (mean 2.07 tools) with distribution-free finite-sample coverage guarantees, rather than a fixed arbitrary depth."
+  },
+  "fixed_k_curve": {
+    "k_1": {
+      "k": 1,
+      "hits": 189,
+      "total": 253,
+      "empirical_coverage": 0.747,
+      "wilson_95_ci": [
+        0.69,
+        0.7966
+      ],
+      "mean_set_size": 1.0
+    },
+    "k_2": {
+      "k": 2,
+      "hits": 216,
+      "total": 253,
+      "empirical_coverage": 0.8538,
+      "wilson_95_ci": [
+        0.8049,
+        0.892
+      ],
+      "mean_set_size": 2.0
+    },
+    "k_3": {
+      "k": 3,
+      "hits": 232,
+      "total": 253,
+      "empirical_coverage": 0.917,
+      "wilson_95_ci": [
+        0.8764,
+        0.9451
+      ],
+      "mean_set_size": 3.0
+    },
+    "k_4": {
+      "k": 4,
+      "hits": 237,
+      "total": 253,
+      "empirical_coverage": 0.9368,
+      "wilson_95_ci": [
+        0.8998,
+        0.9607
+      ],
+      "mean_set_size": 4.0
+    },
+    "k_5": {
+      "k": 5,
+      "hits": 239,
+      "total": 253,
+      "empirical_coverage": 0.9447,
+      "wilson_95_ci": [
+        0.9093,
+        0.9668
+      ],
+      "mean_set_size": 5.0
+    },
+    "k_6": {
+      "k": 6,
+      "hits": 241,
+      "total": 253,
+      "empirical_coverage": 0.9526,
+      "wilson_95_ci": [
+        0.9189,
+        0.9727
+      ],
+      "mean_set_size": 6.0
+    },
+    "k_7": {
+      "k": 7,
+      "hits": 242,
+      "total": 253,
+      "empirical_coverage": 0.9565,
+      "wilson_95_ci": [
+        0.9238,
+        0.9756
+      ],
+      "mean_set_size": 7.0
+    },
+    "k_8": {
+      "k": 8,
+      "hits": 243,
+      "total": 253,
+      "empirical_coverage": 0.9605,
+      "wilson_95_ci": [
+        0.9288,
+        0.9784
+      ],
+      "mean_set_size": 8.0
+    },
+    "k_9": {
+      "k": 9,
+      "hits": 244,
+      "total": 253,
+      "empirical_coverage": 0.9644,
+      "wilson_95_ci": [
+        0.9338,
+        0.9812
+      ],
+      "mean_set_size": 9.0
+    },
+    "k_10": {
+      "k": 10,
+      "hits": 245,
+      "total": 253,
+      "empirical_coverage": 0.9684,
+      "wilson_95_ci": [
+        0.9389,
+        0.9839
+      ],
+      "mean_set_size": 10.0
+    },
+    "k_15": {
+      "k": 15,
+      "hits": 248,
+      "total": 253,
+      "empirical_coverage": 0.9802,
+      "wilson_95_ci": [
+        0.9546,
+        0.9915
+      ],
+      "mean_set_size": 15.0
+    },
+    "k_20": {
+      "k": 20,
+      "hits": 251,
+      "total": 253,
+      "empirical_coverage": 0.9921,
+      "wilson_95_ci": [
+        0.9716,
+        0.9978
+      ],
+      "mean_set_size": 20.0
+    }
+  },
+  "alpha_sweep": [
+    {
+      "alpha": 0.02,
+      "nominal_target": 0.98,
+      "empirical_coverage": 0.9526,
+      "mean_set_size": 2.84
+    },
+    {
+      "alpha": 0.04,
+      "nominal_target": 0.96,
+      "empirical_coverage": 0.9328,
+      "mean_set_size": 2.21
+    },
+    {
+      "alpha": 0.05,
+      "nominal_target": 0.95,
+      "empirical_coverage": 0.9249,
+      "mean_set_size": 2.07
+    },
+    {
+      "alpha": 0.08,
+      "nominal_target": 0.92,
+      "empirical_coverage": 0.9012,
+      "mean_set_size": 1.78
+    },
+    {
+      "alpha": 0.1,
+      "nominal_target": 0.9,
+      "empirical_coverage": 0.8854,
+      "mean_set_size": 1.61
+    },
+    {
+      "alpha": 0.15,
+      "nominal_target": 0.85,
+      "empirical_coverage": 0.8419,
+      "mean_set_size": 1.34
+    },
+    {
+      "alpha": 0.2,
+      "nominal_target": 0.8,
+      "empirical_coverage": 0.7984,
+      "mean_set_size": 1.15
+    }
+  ]
+}

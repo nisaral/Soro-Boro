@@ -1,0 +1,59 @@
+diff --git a/src/index.ts b/src/index.ts
+index fa0b44f..e20b3d4 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -242,6 +242,12 @@ const WEB_SEARCH_TOOL = {
+     },
+     required: ["query"],
+   },
++  annotations: {
++    readOnlyHint: true,
++    destructiveHint: false,
++    idempotentHint: true,
++    openWorldHint: true,
++  },
+ };
+ 
+ const NEWS_SEARCH_TOOL = {
+@@ -284,6 +290,12 @@ const NEWS_SEARCH_TOOL = {
+     },
+     required: ["query"],
+   },
++  annotations: {
++    readOnlyHint: true,
++    destructiveHint: false,
++    idempotentHint: true,
++    openWorldHint: true,
++  },
+ };
+ 
+ // ============================================================================
+diff --git a/test/server.test.js b/test/server.test.js
+index 21f82a1..4889541 100644
+--- a/test/server.test.js
++++ b/test/server.test.js
+@@ -94,12 +94,24 @@ describe("DuckDuckGo MCP Server", () => {
+       assert.ok(webTool.inputSchema.properties.query);
+       assert.ok(webTool.inputSchema.properties.region, "Web search should support region");
+       assert.ok(webTool.inputSchema.properties.time, "Web search should support time filter");
++      assert.deepStrictEqual(webTool.annotations, {
++        readOnlyHint: true,
++        destructiveHint: false,
++        idempotentHint: true,
++        openWorldHint: true,
++      });
+ 
+       // Check news search tool
+       const newsTool = response.result.tools.find((t) => t.name === "duckduckgo_news_search");
+       assert.ok(newsTool, "Should have news search tool");
+       assert.ok(newsTool.inputSchema.properties.query);
+       assert.ok(newsTool.inputSchema.properties.time, "News search should support time filter");
++      assert.deepStrictEqual(newsTool.annotations, {
++        readOnlyHint: true,
++        destructiveHint: false,
++        idempotentHint: true,
++        openWorldHint: true,
++      });
+     } finally {
+       server.kill();
+     }

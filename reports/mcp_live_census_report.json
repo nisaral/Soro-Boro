@@ -1,0 +1,175 @@
+{
+  "census_name": "Soro Live stdio MCP Census (Top 50 + Stratified Tail)",
+  "conducted_at": "2026-10-12T06:06:33Z",
+  "sample_size": 15,
+  "breakdown": {
+    "total_attempted": 15,
+    "annotated_servers": 0,
+    "unannotated_servers": 0,
+    "could_not_start": 15,
+    "total_started": 0,
+    "start_success_rate": 0.0,
+    "unannotated_share_of_started": 0.0,
+    "unannotated_percent_of_started": 0.0
+  },
+  "tools_breakdown": {
+    "tools_in_annotated_servers": 0,
+    "tools_in_unannotated_servers": 0,
+    "total_live_tools_exercised": 0
+  },
+  "top_tier_census": [
+    {
+      "package": "@azure/mcp",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 133513,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@azure-devops/mcp",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 107219,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@currents/mcp",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 105426,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@azure/mcp-linux-x64",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 66576,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@azure/mcp-win32-x64",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 49739,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@cap-js/mcp-server",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 48825,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@google-cloud/observability-mcp",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 44150,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@aikidosec/mcp",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 42449,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@apify/actors-mcp-server",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 31361,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@browserstack/mcp-server",
+      "stratum": "TOP_TIER",
+      "weekly_downloads": 23704,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    }
+  ],
+  "tail_sample": [
+    {
+      "package": "@dokploy/mcp",
+      "stratum": "TAIL_SAMPLE",
+      "weekly_downloads": 0,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@zapier/zapier-sdk-mcp",
+      "stratum": "TAIL_SAMPLE",
+      "weekly_downloads": 0,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@metamask/device-mcp",
+      "stratum": "TAIL_SAMPLE",
+      "weekly_downloads": 0,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@sap/mdk-mcp-server",
+      "stratum": "TAIL_SAMPLE",
+      "weekly_downloads": 0,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    },
+    {
+      "package": "@ehrocks/fe-mcp-server",
+      "stratum": "TAIL_SAMPLE",
+      "weekly_downloads": 0,
+      "category": "COULD_NOT_START",
+      "total_tools": 0,
+      "annotated_tools": 0,
+      "status_message": "Initialize handshake timed out or failed",
+      "tools_summary": []
+    }
+  ],
+  "elapsed_seconds": 287.58
+}

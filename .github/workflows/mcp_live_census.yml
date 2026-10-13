@@ -1,0 +1,33 @@
+name: "MCP Live Ecosystem Census"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1" # Run weekly
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run Soro Live Census
+        run: |
+          python experiments/run_live_mcp_census.py
+
+      - name: Upload Census Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-live-census-report
+          path: reports/mcp_live_census_report.json

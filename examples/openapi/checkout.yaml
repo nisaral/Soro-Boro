@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: Payment Checkout API
+  version: 2.1.0
+paths:
+  /v1/charges:
+    post:
+      summary: Create customer charge
+      operationId: createCharge
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - currency
+              properties:
+                amount:
+                  type: integer
+                currency:
+                  type: string
+                customer_id:
+                  type: string
+      responses:
+        '200':
+          description: Charge processed
+  /v1/charges/{charge_id}:
+    get:
+      summary: Retrieve charge status
+      operationId: getCharge
+      parameters:
+        - name: charge_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Charge details
+  /v1/refunds:
+    post:
+      summary: Issue refund
+      operationId: createRefund
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - charge_id
+              properties:
+                charge_id:
+                  type: string
+                amount:
+                  type: integer
+      responses:
+        '200':
+          description: Refund created

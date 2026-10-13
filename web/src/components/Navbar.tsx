@@ -23,17 +23,17 @@ export default function Navbar() {
         {/* Brand Logo & Title */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white font-mono font-bold text-sm shadow-sm group-hover:bg-slate-800 transition-colors">
-              V
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white font-mono font-bold text-sm shadow-sm group-hover:bg-emerald-500 transition-colors">
+              SB
             </div>
             <div className="flex flex-col">
               <span className="font-semibold text-slate-900 tracking-tight text-base group-hover:text-slate-700 transition-colors">
-                Veyra
+                Soro-Boro
               </span>
             </div>
           </Link>
-          <span className="hidden sm:inline-block px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-[11px] font-mono text-slate-600">
-            v0.2.0 · Apache-2.0
+          <span className="hidden sm:inline-block px-2 py-0.5 rounded border border-emerald-200 bg-emerald-50 text-[11px] font-mono text-emerald-800">
+            Execution Boundary · Apache-2.0
           </span>
         </div>
 

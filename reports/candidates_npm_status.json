@@ -1,0 +1,42 @@
+{
+  "@cyanheads/git-mcp-server": {
+    "exists": true,
+    "deprecated": null,
+    "repo_url": "git+https://github.com/cyanheads/git-mcp-server.git",
+    "version": "2.15.3"
+  },
+  "@modelcontextprotocol/server-memory": {
+    "exists": true,
+    "deprecated": null,
+    "repo_url": "git+https://github.com/modelcontextprotocol/servers.git",
+    "version": "1.0.0"
+  },
+  "@modelcontextprotocol/server-brave-search": {
+    "exists": true,
+    "deprecated": null,
+    "repo_url": null,
+    "version": "0.6.2"
+  },
+  "@modelcontextprotocol/server-filesystem": {
+    "exists": true,
+    "deprecated": null,
+    "repo_url": "git+https://github.com/modelcontextprotocol/servers.git",
+    "version": "1.0.0"
+  },
+  "chrome-devtools-mcp": {
+    "exists": true,
+    "deprecated": null,
+    "repo_url": "git+https://github.com/ChromeDevTools/chrome-devtools-mcp.git",
+    "version": "1.10.1"
+  },
+  "@modelcontextprotocol/server-fetch": {
+    "exists": false,
+    "error": "HTTP Error 404: Not Found"
+  },
+  "mcp-server-fetch": {
+    "exists": true,
+    "deprecated": null,
+    "repo_url": "npm/security-holder",
+    "version": "0.0.1-security"
+  }
+}

@@ -43,6 +43,10 @@ jobs:
       - name: headroom unit test on synthetic data
         run: |
           python -m veyra.cli headroom --trials python/tests/data/synthetic_trials.csv --out out/ci_headroom.md
+      - name: verify claims ledger
+        run: |
+          python scripts/verify_claims_ledger.py
+
 
   wire-format:
     runs-on: ubuntu-latest

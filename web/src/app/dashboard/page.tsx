@@ -47,11 +47,11 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-200/80">
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Veyra Execution Console</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Soro-Boro Execution Console</h1>
                 <span className="badge-demo">DEMO RUN</span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Synthetic DEMO playback. For real traces use the CLI: veyra dashboard --runs out/dev
+                Simulated execution playback. For real WAL traces use: python -m soro_boro.cli audit --wal runs/soro_boro_wal.jsonl
               </p>
             </div>
 
@@ -318,7 +318,7 @@ export default function DashboardPage() {
 
                     <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 mt-4">
                       <span>Cost Delta: <strong className="text-emerald-400">${selectedEvent.cost_delta.toFixed(3)}</strong></span>
-                      <span>Veyra Event Logger</span>
+                      <span>Soro-Boro Event Logger</span>
                     </div>
                   </div>
                 ) : (

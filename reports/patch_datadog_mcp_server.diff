@@ -1,0 +1,353 @@
+diff --git a/src/tools/dashboards/tool.ts b/src/tools/dashboards/tool.ts
+index 98e6016..3c1ac59 100644
+--- a/src/tools/dashboards/tool.ts
++++ b/src/tools/dashboards/tool.ts
+@@ -11,11 +11,23 @@ export const DASHBOARDS_TOOLS: DashboardsTool[] = [
+     ListDashboardsZodSchema,
+     'list_dashboards',
+     'Get list of dashboards from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetDashboardZodSchema,
+     'get_dashboard',
+     'Get a dashboard from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/downtimes/tool.ts b/src/tools/downtimes/tool.ts
+index 57b99f0..d00b4ce 100644
+--- a/src/tools/downtimes/tool.ts
++++ b/src/tools/downtimes/tool.ts
+@@ -18,16 +18,34 @@ export const DOWNTIMES_TOOLS: DowntimesTool[] = [
+     ListDowntimesZodSchema,
+     'list_downtimes',
+     'List scheduled downtimes from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     ScheduleDowntimeZodSchema,
+     'schedule_downtime',
+     'Schedule a downtime in Datadog',
++    {
++      readOnlyHint: false,
++      destructiveHint: false,
++      idempotentHint: false,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     CancelDowntimeZodSchema,
+     'cancel_downtime',
+     'Cancel a scheduled downtime in Datadog',
++    {
++      readOnlyHint: false,
++      destructiveHint: true,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/hosts/tool.ts b/src/tools/hosts/tool.ts
+index 8c72fb6..b290b3a 100644
+--- a/src/tools/hosts/tool.ts
++++ b/src/tools/hosts/tool.ts
+@@ -27,21 +27,49 @@ type HostsTool = ExtendedTool<HostsToolName>
+  * Each tool is created with a schema for input validation and includes a description.
+  */
+ export const HOSTS_TOOLS: HostsTool[] = [
+-  createToolSchema(MuteHostZodSchema, 'mute_host', 'Mute a host in Datadog'),
++  createToolSchema(
++    MuteHostZodSchema,
++    'mute_host',
++    'Mute a host in Datadog',
++    {
++      readOnlyHint: false,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
++  ),
+   createToolSchema(
+     UnmuteHostZodSchema,
+     'unmute_host',
+     'Unmute a host in Datadog',
++    {
++      readOnlyHint: false,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     ListHostsZodSchema,
+     'list_hosts',
+     'Get list of hosts from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetActiveHostsCountZodSchema,
+     'get_active_hosts_count',
+     'Get the total number of active hosts in Datadog (defaults to last 5 minutes)',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/incident/tool.ts b/src/tools/incident/tool.ts
+index 0a98e02..0514d32 100644
+--- a/src/tools/incident/tool.ts
++++ b/src/tools/incident/tool.ts
+@@ -11,11 +11,23 @@ export const INCIDENT_TOOLS: IncidentTool[] = [
+     ListIncidentsZodSchema,
+     'list_incidents',
+     'Get incidents from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetIncidentZodSchema,
+     'get_incident',
+     'Get an incident from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/logs/tool.ts b/src/tools/logs/tool.ts
+index 706a70f..2d2716b 100644
+--- a/src/tools/logs/tool.ts
++++ b/src/tools/logs/tool.ts
+@@ -36,11 +36,23 @@ export const LOGS_TOOLS: LogsTool[] = [
+     GetLogsZodSchema,
+     'get_logs',
+     'Search and retrieve logs from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetAllServicesZodSchema,
+     'get_all_services',
+     'Extract all unique service names from logs',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/metrics/tool.ts b/src/tools/metrics/tool.ts
+index 401c585..209aefc 100644
+--- a/src/tools/metrics/tool.ts
++++ b/src/tools/metrics/tool.ts
+@@ -11,6 +11,12 @@ export const METRICS_TOOLS: MetricsTool[] = [
+     QueryMetricsZodSchema,
+     'query_metrics',
+     'Query timeseries points of metrics from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/monitors/tool.ts b/src/tools/monitors/tool.ts
+index 59fd468..a994e90 100644
+--- a/src/tools/monitors/tool.ts
++++ b/src/tools/monitors/tool.ts
+@@ -13,6 +13,12 @@ export const MONITORS_TOOLS: MonitorsTool[] = [
+     GetMonitorsZodSchema,
+     'get_monitors',
+     'Get monitors status from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/rum/tool.ts b/src/tools/rum/tool.ts
+index 6949029..c5e23b8 100644
+--- a/src/tools/rum/tool.ts
++++ b/src/tools/rum/tool.ts
+@@ -22,26 +22,56 @@ export const RUM_TOOLS: RumTool[] = [
+     GetRumApplicationsZodSchema,
+     'get_rum_applications',
+     'Get all RUM applications in the organization',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetRumEventsZodSchema,
+     'get_rum_events',
+     'Search and retrieve RUM events from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetRumGroupedEventCountZodSchema,
+     'get_rum_grouped_event_count',
+     'Search, group and count RUM events by a specified dimension',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetRumPagePerformanceZodSchema,
+     'get_rum_page_performance',
+     'Get page (view) performance metrics from RUM data',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+   createToolSchema(
+     GetRumPageWaterfallZodSchema,
+     'get_rum_page_waterfall',
+     'Retrieve RUM page (view) waterfall data filtered by application name and session ID',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/tools/traces/tool.ts b/src/tools/traces/tool.ts
+index 00249e5..9a35591 100644
+--- a/src/tools/traces/tool.ts
++++ b/src/tools/traces/tool.ts
+@@ -11,6 +11,12 @@ export const TRACES_TOOLS: TracesTool[] = [
+     ListTracesZodSchema,
+     'list_traces',
+     'Get APM traces from Datadog',
++    {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    },
+   ),
+ ] as const
+ 
+diff --git a/src/utils/tool.ts b/src/utils/tool.ts
+index 6e7278b..97c5712 100644
+--- a/src/utils/tool.ts
++++ b/src/utils/tool.ts
+@@ -1,4 +1,4 @@
+-import { Tool } from '@modelcontextprotocol/sdk/types.js'
++import { Tool, ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
+ import { ZodSchema } from 'zod'
+ import zodToJsonSchema from 'zod-to-json-schema'
+ 
+@@ -33,12 +33,14 @@ function pickRootObjectProperty(
+  * @param schema - The Zod schema representing the tool's parameters.
+  * @param name - The name of the tool and the key used to extract the corresponding schema definition, and the tool's name in the Model Context Protocol.
+  * @param description - A brief description of the tool's functionality.
++ * @param annotations - Optional Model Context Protocol tool annotations (readOnlyHint, idempotentHint, destructiveHint).
+  * @returns A tool object containing the name, description, and input JSON Schema.
+  */
+ export function createToolSchema<T extends string>(
+   schema: ZodSchema<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+   name: T,
+   description: string,
++  annotations?: ToolAnnotations,
+ ): Tool & { name: T } {
+   return {
+     name,
+@@ -47,5 +49,6 @@ export function createToolSchema<T extends string>(
+       zodToJsonSchema(schema, { name }),
+       name,
+     ),
++    ...(annotations ? { annotations } : {}),
+   }
+ }
+diff --git a/tests/utils/tool.test.ts b/tests/utils/tool.test.ts
+index 2f6a06e..39ffd67 100644
+--- a/tests/utils/tool.test.ts
++++ b/tests/utils/tool.test.ts
+@@ -55,4 +55,26 @@ describe('createToolSchema', () => {
+     // Verify the returned tool object matches expected structure
+     expect(gotTool).toEqual(expectedInputSchema)
+   })
++
++  it('should include annotations when provided', () => {
++    const dummySchema = z.object({
++      foo: z.string().describe('foo description'),
++    })
++
++    const annotations = {
++      readOnlyHint: true,
++      destructiveHint: false,
++      idempotentHint: true,
++      openWorldHint: true,
++    }
++
++    const gotTool = createToolSchema(
++      dummySchema,
++      'test_annotated',
++      'annotated tool description',
++      annotations,
++    )
++
++    expect(gotTool.annotations).toEqual(annotations)
++  })
+ })

@@ -15,15 +15,15 @@ export default function ArchitecturePage() {
       subtitle: "ExecutableAction Abstraction",
       role: "Boundary Input",
       description: "Captures the agent's proposed tool invocation as a transport-agnostic ExecutableAction with tool name, arguments, and declared metadata.",
-      codePath: "python/src/veyra/core/action.py",
+      codePath: "python/src/soro_boro/identity.py",
     },
     {
       id: "resolver",
       title: "Candidate Resolver",
       subtitle: "ToolRegistry & Declared Equivalents",
       role: "Candidate Generation",
-      description: "Resolves candidate tools using normalized registry metadata and explicit developer equivalence ('veyra.equivalent'). Zero automatic semantic guessing.",
-      codePath: "python/src/veyra/registry/resolver.py",
+      description: "Resolves candidate tools using normalized registry metadata and explicit developer equivalence ('soro_boro.equivalent'). Zero automatic semantic guessing.",
+      codePath: "python/src/soro_boro/identity.py",
     },
     {
       id: "constraints",
@@ -31,15 +31,15 @@ export default function ArchitecturePage() {
       subtitle: "Permissions, Risk & Health",
       role: "Policy Invariant",
       description: "Strictly filters candidate actions against caller permissions, maximum risk tier, and tool health. Critical Invariant: Router never widens the allowed action space.",
-      codePath: "python/src/veyra/registry/resolver.py",
+      codePath: "python/src/soro_boro/boundary.py",
     },
     {
       id: "router",
-      title: "RoutePolicy Engine",
-      subtitle: "DeterministicRoutePolicy (v0.1)",
+      title: "DeterministicRouter",
+      subtitle: "Filter → dense shortlist → execute | ask | abstain",
       role: "Action Selection",
-      description: "Selects among valid candidates using explicit priority and deterministic fallback ordering. Extensible interface for future research policies (TAGE, Process graph, LTR).",
-      codePath: "python/src/veyra/policy/deterministic.py",
+      description: "Contract filter, then hashed dense vectors. No LLM. Confused top-1 becomes ASK. Below threshold becomes ABSTAIN.",
+      codePath: "python/src/soro_boro/boundary.py",
     },
     {
       id: "normalizer",
@@ -47,7 +47,7 @@ export default function ArchitecturePage() {
       subtitle: "Semantics-Preserving Coercion",
       role: "Argument Normalization",
       description: "Safely coerces scalar types ('42' -> 42, 'true' -> True), unique enum casing, and ISO dates. Strictly raises SchemaValidationError on missing arguments or ambiguity.",
-      codePath: "python/src/veyra/boundary/validator.py",
+      codePath: "python/src/soro_boro/boundary.py",
     },
     {
       id: "engine",
@@ -55,15 +55,15 @@ export default function ArchitecturePage() {
       subtitle: "Core Runtime Pipeline",
       role: "Execution Orchestrator",
       description: "Orchestrates the entire lifecycle: proposal -> candidates -> hard constraints -> route policy -> normalization -> execution -> outcome classification -> recovery.",
-      codePath: "python/src/veyra/execution/engine.py",
+      codePath: "python/src/soro_boro/boundary.py",
     },
     {
       id: "taxonomy",
-      title: "7-Tier Failure Taxonomy",
-      subtitle: "FailureClassification",
+      title: "Rich Lifecycle State Engine",
+      subtitle: "ProviderLifecycleState",
       role: "Structured Diagnostics",
-      description: "Classifies failures into SCHEMA_ERROR, TRANSIENT_ERROR, RATE_LIMIT, PRECONDITION_ERROR, AUTHORIZATION_ERROR, UNKNOWN_STATE, or UNKNOWN.",
-      codePath: "python/src/veyra/boundary/taxonomy.py",
+      description: "Classifies provider states into SUCCEEDED, PENDING, FAILED, REQUIRES_ACTION, NOT_FOUND, or UNKNOWN.",
+      codePath: "python/src/soro_boro/lifecycle.py",
     },
     {
       id: "recovery",
@@ -71,15 +71,15 @@ export default function ArchitecturePage() {
       subtitle: "Bounded Retry Engine",
       role: "Boundary Recovery",
       description: "Retries ONLY transient and rate-limit errors when the operation is explicitly declared retryable AND idempotent. Guarantees 0 unsafe retries on non-idempotent writes.",
-      codePath: "python/src/veyra/policy/recovery.py",
+      codePath: "python/src/soro_boro/boundary.py",
     },
     {
       id: "trace",
-      title: "Trace Sink & Redaction",
-      subtitle: "Section 11 Observability",
+      title: "Write-Ahead Log (WAL)",
+      subtitle: "Tamper-Evident Durability",
       role: "Telemetry Logger",
-      description: "Captures full execution traces (proposal, candidates, resolved arguments, policy decision, failure kind, latency) with recursive credential redaction.",
-      codePath: "python/src/veyra/core/trace.py",
+      description: "Captures full execution traces and write-ahead intent with SHA-256 block hash chaining and startup crash gap recovery.",
+      codePath: "python/src/soro_boro/wal.py",
     },
   ];
 
@@ -100,7 +100,7 @@ export default function ArchitecturePage() {
               Tool-Boundary Execution Pipeline
             </h1>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Veyra operates strictly at the tool execution boundary outside the agent reasoning loop:
+              Soro is a framework whose kernel is the tool boundary. Routing is deterministic; the optional loop never bypasses wrap:
               <br />
               <code className="text-xs font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 mt-1 inline-block">
                 Agent Proposes → Candidate Resolution → Hard Constraints → RoutePolicy → Resolved Action → Execution → Recovery → Trace

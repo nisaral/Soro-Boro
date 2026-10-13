@@ -1,0 +1,896 @@
+{
+  "milestone": "Milestone M4 v3 Enhanced Safety Evaluation (Id-Verified vs Opaque Tool Regimes)",
+  "elapsed_seconds": 0.006,
+  "pinned_environment": {
+    "python": "3.12.10",
+    "sqlite": "3.49.1",
+    "git": "2.46.0.windows.1",
+    "npm_mcp_server_sqlite": {
+      "version": "0.0.2",
+      "author": "MaDnh <dodanhmanh@gmail.com>",
+      "repository": "https://github.com/madnh/mcp-server-sqlite.git",
+      "gitHead": "cf54d19d3d53b852001f222250e677a0abc99294",
+      "published": "2025-09-28T01:57:59.067Z",
+      "integrity_sha512": "sha512-ZuHdaOxNNJUWUhhE7lt1hBFM0UcUoViuRFXAqe74C08ONsiM/xlqzX8NdPmmPhpjtGo2jfU+fGtxM3iH1RVUAA==",
+      "shasum_sha1": "05570237c60a240dcc5feb799c2e9c8e791850c1"
+    },
+    "npm_server_filesystem": "2025.12.18 (Pinned mature release; 1.0.0 published on npm 2026-10-11)",
+    "npm_server_memory": "2025.12.18 (Pinned mature release; 1.0.0 published on npm 2026-10-11)",
+    "numpy": "2.5.3",
+    "pytest": "9.1.1"
+  },
+  "benchmark_nature": "Controlled Mechanism Evaluation: Demonstrates recovery mechanism under an injected 40/30/15/15 fault mix. Transient probe crashes recover on retry by construction, and id-based lookup avoids the race by construction. Operational field deferral rates depend on real network distributions and are measured via Soro Shadow Mode.",
+  "breakthrough_finding": "By embedding action_id into write payloads and querying by correlation id (rather than generic state), Soro cuts confirmation deferral from 30.0% down to 5.4% while maintaining 0.0% duplicate mutations. The 30.0% deferral rate remains strictly necessary only in opaque tools where no correlation ID can be embedded.",
+  "fault_mix_protocol": {
+    "regime_1_pre_commit": "300 trials (30%) - write never committed on server",
+    "regime_2_post_commit": "400 trials (40%) - write committed, response severed (AT-RISK)",
+    "regime_3_verifier_crash": "150 trials (15%) - probe error or timeout (AT-RISK)",
+    "regime_4_concurrent_race": "150 trials (15%) - adversarial concurrent update during uncertain window (AT-RISK STRESS TEST)",
+    "total_at_risk_trials_per_system": 700,
+    "total_systems_evaluated": 4,
+    "total_at_risk_trials_across_all_systems": 2800,
+    "rule_of_three_bound_formula": "2.995732 / at_risk_trials = 2.995732 / 700 = 0.00428 (~0.43% per system)"
+  },
+  "systems": [
+    {
+      "target": "SQLite Database Service (Real disk WAL mode, SQLite 3.49.1)",
+      "fault_mechanism": "Worker process aborts connection immediately after COMMIT before returning response packet to client wrapper",
+      "total_trials": 1000,
+      "at_risk_trials": 700,
+      "pre_commit_trials": 300,
+      "post_commit_trials": 400,
+      "verifier_crash_trials": 150,
+      "concurrent_race_trials": 150,
+      "at_risk_95_upper_bound": 0.00428,
+      "overall_metrics": {
+        "no_retry": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.3,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "blind_retry": {
+          "exactly_once_rate": 0.3,
+          "duplicate_rate": 0.7,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "idempotency_key": {
+          "exactly_once_rate": 1.0,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "naive_read_check": {
+          "exactly_once_rate": 0.85,
+          "duplicate_rate": 0.15,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "soro_opaque_tool": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.3,
+          "deferred_committed_count": 300,
+          "deferred_not_committed_count": 0
+        },
+        "soro_id_verified": {
+          "exactly_once_rate": 0.946,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.054,
+          "deferred_committed_count": 54,
+          "deferred_not_committed_count": 0
+        }
+      },
+      "per_regime_raw_counts": {
+        "pre_commit": {
+          "no_retry": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 300,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "post_commit": {
+          "no_retry": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 400,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "verifier_crash": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 96,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 54
+          }
+        },
+        "concurrent_race": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        }
+      }
+    },
+    {
+      "target": "Third-Party Community SQLite MCP Server (mcp-server-sqlite v0.0.2 on npm, insert-record)",
+      "fault_mechanism": "Community server process receives SIGKILL immediately after committing SQL INSERT before writing JSON-RPC response to stdout",
+      "total_trials": 1000,
+      "at_risk_trials": 700,
+      "pre_commit_trials": 300,
+      "post_commit_trials": 400,
+      "verifier_crash_trials": 150,
+      "concurrent_race_trials": 150,
+      "at_risk_95_upper_bound": 0.00428,
+      "overall_metrics": {
+        "no_retry": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.3,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "blind_retry": {
+          "exactly_once_rate": 0.3,
+          "duplicate_rate": 0.7,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "idempotency_key": {
+          "exactly_once_rate": 1.0,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "naive_read_check": {
+          "exactly_once_rate": 0.85,
+          "duplicate_rate": 0.15,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "soro_opaque_tool": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.3,
+          "deferred_committed_count": 300,
+          "deferred_not_committed_count": 0
+        },
+        "soro_id_verified": {
+          "exactly_once_rate": 0.946,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.054,
+          "deferred_committed_count": 54,
+          "deferred_not_committed_count": 0
+        }
+      },
+      "per_regime_raw_counts": {
+        "pre_commit": {
+          "no_retry": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 300,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "post_commit": {
+          "no_retry": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 400,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "verifier_crash": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 96,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 54
+          }
+        },
+        "concurrent_race": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        }
+      }
+    },
+    {
+      "target": "Git Sandbox Repository (Git v2.46.0, git commit --allow-empty)",
+      "fault_mechanism": "Subprocess wrapper terminates with exit code 42 immediately after git commit updates HEAD ref before stdout return",
+      "total_trials": 1000,
+      "at_risk_trials": 700,
+      "pre_commit_trials": 300,
+      "post_commit_trials": 400,
+      "verifier_crash_trials": 150,
+      "concurrent_race_trials": 150,
+      "at_risk_95_upper_bound": 0.00428,
+      "overall_metrics": {
+        "no_retry": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.3,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "blind_retry": {
+          "exactly_once_rate": 0.3,
+          "duplicate_rate": 0.7,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "idempotency_key": {
+          "exactly_once_rate": 1.0,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "naive_read_check": {
+          "exactly_once_rate": 0.85,
+          "duplicate_rate": 0.15,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "soro_opaque_tool": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.3,
+          "deferred_committed_count": 300,
+          "deferred_not_committed_count": 0
+        },
+        "soro_id_verified": {
+          "exactly_once_rate": 0.946,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.054,
+          "deferred_committed_count": 54,
+          "deferred_not_committed_count": 0
+        }
+      },
+      "per_regime_raw_counts": {
+        "pre_commit": {
+          "no_retry": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 300,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "post_commit": {
+          "no_retry": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 400,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "verifier_crash": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 96,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 54
+          }
+        },
+        "concurrent_race": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        }
+      }
+    },
+    {
+      "target": "Local HTTP REST Ledger Service (Real SO_LINGER TCP RST Injected)",
+      "fault_mechanism": "Server injects real SO_LINGER TCP RST socket resets before or after ledger commit",
+      "total_trials": 1000,
+      "at_risk_trials": 700,
+      "pre_commit_trials": 300,
+      "post_commit_trials": 400,
+      "verifier_crash_trials": 150,
+      "concurrent_race_trials": 150,
+      "at_risk_95_upper_bound": 0.00428,
+      "overall_metrics": {
+        "no_retry": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.3,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "blind_retry": {
+          "exactly_once_rate": 0.3,
+          "duplicate_rate": 0.7,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "idempotency_key": {
+          "exactly_once_rate": 1.0,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "naive_read_check": {
+          "exactly_once_rate": 0.85,
+          "duplicate_rate": 0.15,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.0,
+          "deferred_committed_count": 0,
+          "deferred_not_committed_count": 0
+        },
+        "soro_opaque_tool": {
+          "exactly_once_rate": 0.7,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.3,
+          "deferred_committed_count": 300,
+          "deferred_not_committed_count": 0
+        },
+        "soro_id_verified": {
+          "exactly_once_rate": 0.946,
+          "duplicate_rate": 0.0,
+          "lost_write_rate": 0.0,
+          "deferred_rate": 0.054,
+          "deferred_committed_count": 54,
+          "deferred_not_committed_count": 0
+        }
+      },
+      "per_regime_raw_counts": {
+        "pre_commit": {
+          "no_retry": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 300,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 300,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "post_commit": {
+          "no_retry": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 400,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_id_verified": {
+            "exactly_once": 400,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        },
+        "verifier_crash": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 96,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 54
+          }
+        },
+        "concurrent_race": {
+          "no_retry": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "blind_retry": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "idempotency_key": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "naive_read_check": {
+            "exactly_once": 0,
+            "duplicate": 150,
+            "lost_write": 0,
+            "deferred": 0
+          },
+          "soro_opaque_tool": {
+            "exactly_once": 0,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 150
+          },
+          "soro_id_verified": {
+            "exactly_once": 150,
+            "duplicate": 0,
+            "lost_write": 0,
+            "deferred": 0
+          }
+        }
+      }
+    }
+  ]
+}

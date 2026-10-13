@@ -50,3 +50,10 @@ out/kev/**
 .idea/
 .DS_Store
 Thumbs.db
+
+# scratch and ephemeral experiment dumps
+scratch/
+python/scratch_*.py
+python/raw_tools_*.json
+python/src/out/
+audit_summary*.md

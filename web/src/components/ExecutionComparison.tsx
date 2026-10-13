@@ -17,13 +17,13 @@ export default function ExecutionComparison() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-          {/* LEFT: Raw Agent Without Veyra */}
+          {/* LEFT: Raw Agent Without Soro-Boro */}
           <div className="technical-card p-6 bg-white flex flex-col justify-between border-slate-200/80">
             <div>
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <span className="flex h-2 w-2 rounded-full bg-rose-500" />
-                  <h3 className="font-semibold text-slate-900 text-sm">Raw Agent (Before Veyra)</h3>
+                  <h3 className="font-semibold text-slate-900 text-sm">Raw agent (before Soro)</h3>
                 </div>
                 <span className="text-[11px] font-mono text-slate-400">16.7% Success on Faults</span>
               </div>
@@ -64,34 +64,34 @@ export default function ExecutionComparison() {
             </div>
           </div>
 
-          {/* RIGHT: With Veyra */}
+          {/* RIGHT: With Soro-Boro */}
           <div className="technical-card p-6 bg-white flex flex-col justify-between border-emerald-500/30 ring-1 ring-emerald-500/20 shadow-sm">
             <div>
               <div className="flex items-center justify-between border-b border-emerald-100 pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-                  <h3 className="font-semibold text-slate-900 text-sm">Agent + Veyra (Boundary Reliability)</h3>
+                  <h3 className="font-semibold text-slate-900 text-sm">Agent + Soro-Boro (Boundary SDK)</h3>
                 </div>
-                <span className="text-[11px] font-mono text-emerald-600 font-semibold">0% Duplicate Mutations (Verified)</span>
+                <span className="text-[11px] font-mono text-emerald-600 font-semibold">Zero Duplicate Effects (Observed in Tests)</span>
               </div>
 
               {/* Diagram */}
               <div className="flex flex-col items-center gap-2 my-6 font-mono text-xs text-slate-700">
                 <div className="px-3 py-1.5 rounded bg-slate-100 border border-slate-200 font-medium">User Instruction</div>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400 rotate-90" />
-                <div className="px-3 py-1.5 rounded bg-slate-100 border border-slate-200 font-medium">Agent Proposes Tool Call</div>
+                <div className="px-3 py-1.5 rounded bg-slate-100 border border-slate-200 font-medium">Agent Proposes Mutating Action</div>
                 <ArrowRight className="w-3.5 h-3.5 text-emerald-600 rotate-90" />
                 <div className="px-4 py-2 rounded-md bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold text-center">
-                  VEYRA: Safe Normalizer & Safe Retry
-                  <div className="text-[10px] text-emerald-400 font-normal">0 semantic guessing · 0 unsafe retries</div>
+                  SORO-BORO: Durable Identity &amp; Reconciler
+                  <div className="text-[10px] text-emerald-400 font-normal">Stable key reused · WAL intent logged · Fail-closed when ambiguous</div>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-emerald-600 rotate-90" />
                 <div className="px-3 py-1.5 rounded bg-emerald-50 border border-emerald-200 font-medium text-emerald-800">
-                  Tool Executes Successfully (200 OK)
+                  Tool Executes or Halts Safely (0 Duplicate Writes)
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400 rotate-90" />
                 <div className="px-3 py-1.5 rounded bg-slate-900 text-white font-medium">
-                  Agent Continues Plan (0 Re-plans Needed)
+                  Typed Terminal Outcome (COMMITTED or AMBIGUOUS_DEFERRED)
                 </div>
               </div>
             </div>

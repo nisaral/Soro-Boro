@@ -1,0 +1,94 @@
+name: "Soro MCP Server Audit"
+description: "Audits Model Context Protocol (MCP) servers for missing annotations, spec default risks, and behavioral discrepancies."
+author: "Soro"
+inputs:
+  command:
+    description: "Command to start the MCP server over stdio"
+    required: true
+  dry-run:
+    description: "Perform schema/spec default audit without invoking dynamic tools (true/false)"
+    required: false
+    default: "true"
+  strict:
+    description: "Fail if any discrepancies or unannotated tools are detected"
+    required: false
+    default: "false"
+  profile:
+    description: "Path to audit profile YAML"
+    required: false
+    default: ""
+  github-token:
+    description: "Optional GitHub token for posting PR comments"
+    required: false
+    default: ""
+  comment-pr:
+    description: "Post audit report as a PR comment when github-token is provided"
+    required: false
+    default: "false"
+
+outputs:
+  audit-summary:
+    description: "Markdown audit summary"
+    value: ${{ steps.audit.outputs.summary }}
+  exit-code:
+    description: "Exit code of audit (0 clean, 1 discrepancies, 2 error)"
+    value: ${{ steps.audit.outputs.audit_exit }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install Soro CLI
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e "${{ github.action_path }}/python"
+
+    - name: Run Soro Audit
+      id: audit
+      shell: bash
+      run: |
+        STRICT_FLAG=""
+        if [ "${{ inputs.strict }}" = "true" ]; then
+          STRICT_FLAG="--strict"
+        fi
+        PROFILE_FLAG=""
+        if [ -n "${{ inputs.profile }}" ]; then
+          PROFILE_FLAG="--profile ${{ inputs.profile }}"
+        fi
+        DRY_RUN_FLAG=""
+        if [ "${{ inputs.dry-run }}" = "true" ]; then
+          DRY_RUN_FLAG="--dry-run"
+        fi
+
+        soro-audit \
+          --stdio "${{ inputs.command }}" \
+          --json audit_report.json \
+          --markdown audit_summary.md \
+          $DRY_RUN_FLAG $STRICT_FLAG $PROFILE_FLAG || AUDIT_EXIT=$?
+
+        if [ -f audit_summary.md ]; then
+          cat audit_summary.md >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "audit_exit=${AUDIT_EXIT:-0}" >> $GITHUB_OUTPUT
+
+    - name: Comment PR (Internal PRs with token)
+      if: inputs.comment-pr == 'true' && github.event_name == 'pull_request' && inputs.github-token != ''
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const fs = require('fs');
+          if (fs.existsSync('audit_summary.md')) {
+            const body = fs.readFileSync('audit_summary.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+          }
