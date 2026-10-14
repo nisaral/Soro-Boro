@@ -1,7 +1,0 @@
-task,harness,seed,pass,cost
-t1,a,1,false,1
-t1,a,2,false,1
-t1,a,3,true,1
-t1,b,1,false,1
-t1,b,2,false,1
-t1,b,3,true,1

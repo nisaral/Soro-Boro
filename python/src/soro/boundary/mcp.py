@@ -23,8 +23,9 @@ from soro.boundary.taxonomy import VeyraBoundaryError
 class MCPToolMiddleware:
     """Middleware wrapper for MCP tool execution."""
 
-    def __init__(self, veyra: Veyra | None = None):
-        self.veyra = veyra or Veyra()
+    def __init__(self, veyra: Veyra | None = None, soro: Veyra | None = None):
+        self.soro = soro or veyra or Veyra()
+        self.veyra = self.soro
 
     def handle_call_tool(
         self,

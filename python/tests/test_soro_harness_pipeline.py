@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from soro import SoroHarness
+from soro.routing.kev_local import LocalKevScorer
 
 
 def test_harness_route_repair_guard_pipeline():
@@ -39,14 +40,17 @@ def test_harness_route_repair_guard_pipeline():
         def get_user(user_id: int):
             return {"user_id": user_id, "name": "Alice"}
 
-        # 1. Test ROUTING
+        # 1. Test ROUTING (Conformal 2-stage)
         best_tools = harness.route("I need to refund order 992")
         assert len(best_tools) > 0
         assert best_tools[0] == "refund_order"
+        assert best_tools.action == "EXECUTE"
+        assert best_tools.selected_tool == "refund_order"
 
         user_tools = harness.route("Find user profile")
         assert len(user_tools) > 0
         assert user_tools[0] == "get_user"
+        assert user_tools.action == "EXECUTE"
 
         # 2. Test REPAIR (Argument Coercion & Normalization)
         # LLM passes string for float, camelCase key for snake_case
@@ -81,3 +85,84 @@ def test_harness_route_repair_guard_pipeline():
         assert pipeline_res.data["order_id"] == "1005"
         assert pipeline_res.data["amount"] == 15.50
         assert refund_calls == 2
+
+
+def test_semantic_argument_mapping():
+    """Verify semantic misnomers are mapped to schema properties."""
+    harness = SoroHarness()
+
+    @harness.tool(description="Refund customer order")
+    def refund_order(order_id: str, amount: float, reason: str = "customer_request"):
+        return {"order_id": order_id, "amount": amount, "reason": reason}
+
+    # LLM passed semantic synonyms instead of schema names:
+    # customer_order_identifier -> order_id
+    # refund_value -> amount
+    # explanation -> reason
+    misnamed_args = {
+        "customer_order_identifier": "TX-8841",
+        "refund_value": "99.50",
+        "explanation": "Defective item",
+    }
+    repaired = harness.repair("refund_order", misnamed_args)
+    assert repaired["order_id"] == "TX-8841"
+    assert repaired["amount"] == 99.50
+    assert repaired["reason"] == "Defective item"
+
+
+def test_conformal_route_actions():
+    """Verify EXECUTE, ASK, and ABSTAIN decisions under conformal routing."""
+    harness = SoroHarness(default_alpha=0.10)
+
+    @harness.tool(description="Query billing invoices and statements")
+    def get_invoice(invoice_id: str):
+        return {}
+
+    @harness.tool(description="Search user account and billing profile")
+    def get_billing_account(user_id: str):
+        return {}
+
+    # Clear single intent -> EXECUTE
+    res_exec = harness.route("Download my billing invoice statement")
+    assert res_exec.action in ("EXECUTE", "ASK")
+    assert "get_invoice" in res_exec.candidates
+
+    # Unrelated query -> ABSTAIN
+    res_abstain = harness.route("bake a chocolate strawberry birthday cake in the oven")
+    assert res_abstain.action == "ABSTAIN"
+
+
+def test_local_kev_multi_question_evaluation():
+    """Verify LocalKevScorer multi-question single forward pass evaluation."""
+    scorer = LocalKevScorer()
+
+    query = "delete customer order record 501"
+    questions = {
+        "tool_route": {
+            "type": "choice",
+            "criteria": {
+                "delete_order": "Delete a customer order by ID",
+                "view_order": "View an order by ID",
+                "__abstain__": "Abstain",
+            },
+        },
+        "is_mutation": {
+            "type": "noul",
+        },
+        "arg_mapping": {
+            "type": "choice",
+            "criteria": {
+                "order_id": "The target order ID",
+                "customer_name": "The customer's name",
+            },
+        },
+    }
+
+    turn_res = scorer.evaluate_turn(query, questions)
+    probs = turn_res["probabilities"]
+    answers = turn_res["answers"]
+
+    assert "tool_route" in probs
+    assert answers["tool_route"] == "delete_order"
+    assert answers["is_mutation"] == "yes"
+    assert probs["is_mutation"]["yes"] > 0.90

@@ -1,8 +1,0 @@
-# Normalise line endings across the Go/Python boundary so generated files and
-# source check out identically on every platform.
-* text=auto eol=lf
-*.png binary
-*.jpg binary
-*.pdf binary
-*.exe binary
-*.dll binary

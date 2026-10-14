@@ -1,1 +1,0 @@
-"""Generated gRPC/protobuf bindings for the Veyra wire contract."""
