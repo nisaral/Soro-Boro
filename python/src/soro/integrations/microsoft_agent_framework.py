@@ -13,6 +13,7 @@ class VeyraMicrosoftAgentMiddleware:
 
     def __init__(self, veyra_instance: Any):
         self.veyra = veyra_instance
+        self.soro = veyra_instance
 
     def process_function_call(self, tool_name: str, arguments: Dict[str, Any], fn: Callable[..., Any]) -> Any:
         """Process function call through Veyra execution boundary."""

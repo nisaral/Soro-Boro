@@ -146,7 +146,7 @@ def test_structured_trace_exporter(tmp_path):
     # 2. Export OTel Spans
     spans = exporter.export_otel_spans()
     assert len(spans) == 2
-    assert spans[0]["name"] == "veyra.resolution/search_db"
+    assert spans[0]["name"] in ("soro.resolution/search_db", "veyra.resolution/search_db")
     assert spans[0]["status"]["code"] == "OK"
     assert spans[1]["status"]["code"] == "ERROR"
 

@@ -1,0 +1,56 @@
+{
+  "backend": "Neural SoroKevModel (runs\\soro_kev_run)",
+  "n_cal_samples": 300,
+  "n_test_samples": 900,
+  "overall_route_accuracy": 0.1389,
+  "permutation_flip_rate": 0.6867,
+  "by_format": {
+    "rest_openapi": {
+      "total": 191,
+      "accuracy": 0.1466
+    },
+    "python_sig": {
+      "total": 171,
+      "accuracy": 0.1871
+    },
+    "graphql_rpc": {
+      "total": 179,
+      "accuracy": 0.1173
+    },
+    "agent_skill": {
+      "total": 171,
+      "accuracy": 0.1754
+    },
+    "mcp_json": {
+      "total": 188,
+      "accuracy": 0.0745
+    }
+  },
+  "by_delexicalized": {
+    "delexicalized_accuracy": 0.0,
+    "named_accuracy": 0.1389
+  },
+  "conformal_calibration": {
+    "target_coverage": 0.9,
+    "calibrated_q_hat": 1.0,
+    "inclusion_threshold": 0.0,
+    "empirical_coverage": 1.0,
+    "wilson_95_ci": [
+      0.9957,
+      1.0
+    ],
+    "mean_set_size": 7.02,
+    "median_set_size": 7.0,
+    "singleton_rate": 0.0,
+    "action_distribution": {
+      "EXECUTE_share": 0.0,
+      "ASK_share": 0.8056,
+      "ABSTAIN_share": 0.1944
+    }
+  },
+  "auxiliary_tasks": {
+    "arg_mapping_accuracy": 0.3356,
+    "missing_required_detection_accuracy": 0.3889,
+    "is_mutation_detection_accuracy": 0.4522
+  }
+}

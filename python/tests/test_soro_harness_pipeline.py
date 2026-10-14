@@ -166,3 +166,49 @@ def test_local_kev_multi_question_evaluation():
     assert answers["tool_route"] == "delete_order"
     assert answers["is_mutation"] == "yes"
     assert probs["is_mutation"]["yes"] > 0.90
+
+
+def test_polymorphic_registration_rest_and_skills():
+    """Verify SoroHarness seamlessly registers REST endpoints and Agent Skills."""
+    harness = SoroHarness()
+
+    # 1. Register REST endpoint
+    harness.register_rest(
+        endpoint="/v1/payments/refund",
+        method="POST",
+        description="Issue a full or partial refund for a transaction",
+        parameters={"payment_id": {"type": str}, "amount": {"type": float}},
+    )
+
+    # 2. Register Agent Skill
+    harness.register_skill(
+        skill_name="deploy_staging",
+        description="Deploys container image to staging cluster",
+        triggers=["deploy staging", "release staging"],
+        command_format="/deploy --env staging --image <tag>",
+        parameters={"image_tag": {"type": str}},
+    )
+
+    # 3. Register raw OpenAPI/MCP dictionary
+    harness.register({
+        "name": "lookup_customer",
+        "description": "Fetch customer profile by email address",
+        "parameters": {"email": {"type": str}},
+        "side_effect": "read_only",
+    })
+
+    assert len(harness.tools) == 3
+
+    # Route to REST tool
+    res_rest = harness.route("Please refund transaction txn_409")
+    assert "POST_v1_payments_refund" in res_rest.candidates
+
+    # Route to Skill
+    res_skill = harness.route("Deploy image v2.4 to staging cluster")
+    assert "deploy_staging" in res_skill.candidates
+
+    # Execute REST action with argument repair
+    exec_res = harness.execute("POST_v1_payments_refund", {"payment_id": "txn_409", "amount": "85.20"})
+    assert exec_res.status == "COMMITTED"
+    assert exec_res.data["parameters"]["amount"] == 85.20
+

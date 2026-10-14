@@ -14,6 +14,7 @@ class VeyraOpenAIAgentsAdapter:
 
     def __init__(self, veyra_instance: Any):
         self.veyra = veyra_instance
+        self.soro = veyra_instance
 
     def wrap_tool(self, tool_fn: Callable[..., Any], name: Optional[str] = None) -> Callable[..., Any]:
         """Wrap an OpenAI function tool with Veyra contract validation & execution safety."""

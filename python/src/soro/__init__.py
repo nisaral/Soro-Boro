@@ -27,6 +27,11 @@ from soro.production.production_layer import Mode, ProductionConfig, Soro, Veyra
 
 from soro.harness.pipeline import SoroHarness
 from soro_boro import soro_wrap, OperationIdentity, TerminalOutcome
+from soro.config.equivalence import EquivalenceConfig, load_equivalence_config
+from soro.plugins.registry import PolicyPluginRegistry, RoutePolicy
+from soro.export.trace_export import StructuredTraceExporter
+from soro.registry.tool_registry import ToolDefinition, ToolRegistry
+from soro.core.trajectory import TrajectoryRecord
 
 __version__ = "0.2.0"
 

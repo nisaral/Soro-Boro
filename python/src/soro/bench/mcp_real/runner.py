@@ -417,7 +417,7 @@ def _execute_arm_task(
             )
         )
 
-        wrapped = soro.wrap(
+        wrapped = veyra.wrap(
             raw_mcp_call,
             name=descriptor.name,
             retryable=descriptor.is_retryable,

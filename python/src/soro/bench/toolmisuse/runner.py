@@ -628,7 +628,7 @@ def _execute_arm_task(arm: SystemArm, task: ToolMisuseTask, stats: ArmResult) ->
                     raise TimeoutError("503 Service Unavailable upstream")
             return tool_impl(**kwargs)
 
-        wrapped = soro.wrap(
+        wrapped = veyra.wrap(
             veyra_tool_impl,
             name=task.tool_name,
             retryable=task.is_retryable,

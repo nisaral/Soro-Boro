@@ -1,16 +1,18 @@
-"""In-process Kev (Apache-2.0). Uses local HF snapshot or model hub + kev.LocalPredictor.
+"""In-process Kev (Apache-2.0). Uses local PyTorch checkpoints or fast deterministic fallback.
 
 Supports single-turn multi-question System-One evaluation:
 - tool_route: choice over candidate tools + "__abstain__"
 - arg_mapping: choice mapping unrecognized LLM argument keys to target schema property names
 - is_mutation: noul/boolean predicting if a tool mutates state when MCP annotations are missing
+- missing_required: noul/boolean predicting if required arguments were omitted
 
-Includes a fast deterministic fallback (dense hashed embeddings + token overlap)
-when local Kev weights or GPU are unavailable, ensuring microsecond CI runs.
+Directly loads SoroKevModel checkpoints (head.pt + config.json + temperature.json)
+without requiring external pip dependencies.
 """
 
 from __future__ import annotations
 
+import json
 import math
 import os
 import re
@@ -18,6 +20,11 @@ import sys
 import types
 from pathlib import Path
 from typing import Any
+
+import torch
+import torch.nn.functional as F
+
+from soro.routing.kev_model import SoroKevModel, load_soro_kev_checkpoint
 
 if sys.platform == "win32" and "fcntl" not in sys.modules:
     sys.modules["fcntl"] = types.ModuleType("fcntl")
@@ -80,47 +87,85 @@ def resolve_kev_dir(path: str | None = None) -> Path | str:
 
 
 class LocalKevScorer:
-    """Multi-question System-One decision scorer with cached lazy weights and deterministic fallback."""
+    """Multi-question System-One decision scorer with direct checkpoint loading and deterministic fallback."""
 
-    _CACHED_PRED: Any = None
-    _CACHED_RUN: str | None = None
-
-    def __init__(self, run: str | None = None, device: str | None = None) -> None:
+    def __init__(
+        self,
+        run: str | None = None,
+        device: str | None = None,
+        backend: str = "auto",
+    ) -> None:
         self.run = str(resolve_kev_dir(run))
         self.device = device or os.environ.get("SORO_KEV_DEVICE", "cpu")
+        self.backend = backend  # "auto", "neural", "heuristic"
         self.error: str | None = None
+        self._neural_model: SoroKevModel | None = None
+        self._temperature: float = 1.0
+        self._loaded = False
 
     def load(self) -> bool:
-        if LocalKevScorer._CACHED_PRED is not None and LocalKevScorer._CACHED_RUN == self.run:
-            return True
+        if self._loaded:
+            return self._neural_model is not None
+
+        self._loaded = True
+        if self.backend == "heuristic":
+            return False
+
+        # Attempt to load SoroKevModel checkpoint directly
+        run_path = Path(self.run)
+        if run_path.exists() and (run_path / "head.pt").exists():
+            try:
+                model, temp = load_soro_kev_checkpoint(run_path, device=self.device)
+                self._neural_model = model
+                self._temperature = temp
+                return True
+            except Exception as exc:
+                self.error = f"Failed to load neural checkpoint from {run_path}: {exc}"
+                if self.backend == "neural":
+                    raise RuntimeError(self.error) from exc
+                return False
+
+        # Attempt external kev library if available
         try:
             from kev.checkpoint import LoadOptions
             from kev.predictors import LocalPredictor
 
-            LocalKevScorer._CACHED_PRED = LocalPredictor(self.run, self.device, LoadOptions())
-            LocalKevScorer._CACHED_RUN = self.run
+            self._external_pred = LocalPredictor(self.run, self.device, LoadOptions())
             return True
-        except Exception as exc:
-            self.error = str(exc)
-            return False
+        except Exception:
+            pass
+
+        if self.backend == "neural":
+            raise RuntimeError(f"Neural checkpoint requested but not found at '{self.run}' (head.pt missing).")
+
+        return False
 
     @property
     def is_available(self) -> bool:
         return self.load()
+
+    @property
+    def backend_name(self) -> str:
+        if self.load() and self._neural_model is not None:
+            return f"Neural SoroKevModel ({self.run})"
+        elif self.load() and hasattr(self, "_external_pred"):
+            return f"External Kev ({self.run})"
+        return "Heuristic Fallback"
 
     def evaluate_turn(self, state: str, questions: dict[str, dict[str, Any]]) -> dict[str, Any]:
         """Evaluate one or multiple System-One questions in a single forward pass."""
         if not questions:
             return {"probabilities": {}, "answers": {}}
 
-        # If Kev weights are available, run in-process model
-        if self.load() and LocalKevScorer._CACHED_PRED is not None:
-            record = {
-                "state": state,
-                "questions": questions,
-            }
+        # If native SoroKevModel is loaded, run neural forward pass
+        if self.load() and self._neural_model is not None:
+            return self._neural_evaluate_turn(state, questions)
+
+        # If external Kev predictor is loaded
+        if self.load() and hasattr(self, "_external_pred"):
+            record = {"state": state, "questions": questions}
             try:
-                out = LocalKevScorer._CACHED_PRED(record)
+                out = self._external_pred(record)
                 return {
                     "probabilities": out.get("probabilities", {}),
                     "answers": out.get("answers", {}),
@@ -130,6 +175,41 @@ class LocalKevScorer:
 
         # Fast deterministic fallback (dense hashed embeddings + token overlap)
         return self._fallback_evaluate_turn(state, questions)
+
+    def _neural_evaluate_turn(self, state: str, questions: dict[str, dict[str, Any]]) -> dict[str, Any]:
+        assert self._neural_model is not None
+        probabilities: dict[str, dict[str, float]] = {}
+        answers: dict[str, Any] = {}
+
+        with torch.no_grad():
+            for q_name, q_spec in questions.items():
+                q_type = q_spec.get("type", "choice")
+                criteria: dict[str, str] = q_spec.get("criteria", {})
+                instructions = q_spec.get("instructions", "")
+
+                if q_type == "choice":
+                    if not criteria:
+                        probabilities[q_name] = {}
+                        answers[q_name] = None
+                        continue
+
+                    logits, opt_keys = self._neural_model.score_choice_sequence(state, instructions, criteria)
+                    probs = F.softmax(logits / max(self._temperature, 1e-4), dim=-1).cpu().tolist()
+                    q_probs = {k: float(probs[i]) for i, k in enumerate(opt_keys)}
+                    probabilities[q_name] = q_probs
+                    answers[q_name] = max(q_probs.keys(), key=lambda k: q_probs[k])
+
+                elif q_type in ("noul", "boolean"):
+                    logits = self._neural_model.score_binary(state)
+                    probs = F.softmax(logits, dim=-1).cpu().tolist()
+                    probabilities[q_name] = {"no": float(probs[0]), "yes": float(probs[1])}
+                    answers[q_name] = "yes" if probs[1] > probs[0] else "no"
+
+                else:
+                    probabilities[q_name] = {}
+                    answers[q_name] = None
+
+        return {"probabilities": probabilities, "answers": answers}
 
     def _fallback_evaluate_turn(self, state: str, questions: dict[str, dict[str, Any]]) -> dict[str, Any]:
         probabilities: dict[str, dict[str, float]] = {}

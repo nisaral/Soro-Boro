@@ -200,19 +200,164 @@ class SoroHarness:
 
     def register(
         self,
-        fn: Callable[..., Any],
+        fn_or_spec: Callable[..., Any] | dict[str, Any],
         name: str | None = None,
         description: str | None = None,
         side_effect: str | SideEffectClass = "read_only",
         reconciler: Callable[..., Any] | None = None,
+        parameters: dict[str, Any] | None = None,
     ) -> None:
-        """Register an existing function without using a decorator."""
+        """Register a Python callable, MCP tool definition, or API spec."""
+        if isinstance(fn_or_spec, dict):
+            spec = fn_or_spec
+            t_name = name or spec.get("name") or spec.get("operationId") or "unnamed_action"
+            t_desc = description or spec.get("description") or spec.get("summary") or t_name
+            t_params = parameters or spec.get("parameters") or spec.get("inputSchema", {}).get("properties") or {}
+            sec = side_effect
+            if "side_effect" in spec:
+                sec = spec["side_effect"]
+            elif "readOnlyHint" in spec.get("annotations", {}):
+                sec = "read_only" if spec["annotations"]["readOnlyHint"] else "mutation"
+
+            def mock_dispatch(**kwargs):
+                return {"action": t_name, "status": "executed", "inputs": kwargs}
+
+            self.register_action(
+                name=t_name,
+                description=t_desc,
+                parameters=t_params,
+                fn=mock_dispatch,
+                side_effect=sec,
+                reconciler=reconciler,
+            )
+            return
+
         self.tool(
             name=name,
             description=description,
             side_effect=side_effect,
             reconciler=reconciler,
+        )(fn_or_spec)
+
+    def register_action(
+        self,
+        name: str,
+        description: str,
+        parameters: dict[str, Any],
+        fn: Callable[..., Any],
+        side_effect: str | SideEffectClass = "read_only",
+        reconciler: Callable[..., Any] | None = None,
+        window_sec: float | None = None,
+    ) -> None:
+        """Register an arbitrary action with explicit parameters dictionary."""
+        if isinstance(side_effect, str):
+            s_clean = side_effect.strip().lower()
+            if s_clean in ("mutation", "write", "non_idempotent", "non_idempotent_mutation"):
+                sec = SideEffectClass.NON_IDEMPOTENT_MUTATION
+            elif s_clean in ("read", "read_only", "readonly", "lookup"):
+                sec = SideEffectClass.READ_ONLY
+            elif s_clean in ("idempotent", "idempotent_mutation", "upsert"):
+                sec = SideEffectClass.IDEMPOTENT_MUTATION
+            elif s_clean in ("destructive", "delete", "drop"):
+                sec = SideEffectClass.DESTRUCTIVE
+            else:
+                sec = SideEffectClass(s_clean)
+        else:
+            sec = side_effect
+
+        parsed_params = {}
+        for p_name, p_val in parameters.items():
+            if isinstance(p_val, dict):
+                p_type = p_val.get("type", Any)
+                p_def = p_val.get("default", inspect.Parameter.empty)
+            else:
+                p_type = p_val
+                p_def = inspect.Parameter.empty
+            parsed_params[p_name] = {"type": p_type, "default": p_def}
+
+        eff_window = window_sec if window_sec is not None else self.window_sec
+        wrapped = soro_wrap(
+            side_effect_class=sec,
+            reconciler=reconciler,
+            dedupe_mode=self.dedupe_mode,
+            window_sec=eff_window,
+            claims_db_path=self.claims_db_path,
+            wal_path=self.wal_path,
         )(fn)
+
+        entry = ToolEntry(
+            name=name,
+            description=description,
+            fn=fn,
+            side_effect=sec,
+            parameters=parsed_params,
+            wrapped_fn=wrapped,
+        )
+        self._tools[name] = entry
+
+    def register_rest(
+        self,
+        endpoint: str,
+        method: str = "POST",
+        description: str = "",
+        parameters: dict[str, Any] | None = None,
+        fn: Callable[..., Any] | None = None,
+        side_effect: str | SideEffectClass | None = None,
+        name: str | None = None,
+    ) -> None:
+        """Register a REST API endpoint (OpenAPI format)."""
+        m_upper = method.upper()
+        clean_ep = endpoint.strip("/")
+        t_name = name or f"{m_upper}_{re.sub(r'[^a-zA-Z0-9]+', '_', clean_ep)}"
+        full_desc = f"[REST: {m_upper} /{clean_ep}] {description}".strip()
+
+        if side_effect is None:
+            if m_upper == "GET":
+                sec = "read_only"
+            elif m_upper in ("PUT", "PATCH"):
+                sec = "idempotent"
+            elif m_upper == "DELETE":
+                sec = "destructive"
+            else:
+                sec = "mutation"
+        else:
+            sec = side_effect
+
+        def default_rest_handler(**kwargs):
+            return {"endpoint": f"/{clean_ep}", "method": m_upper, "parameters": kwargs}
+
+        self.register_action(
+            name=t_name,
+            description=full_desc,
+            parameters=parameters or {},
+            fn=fn or default_rest_handler,
+            side_effect=sec,
+        )
+
+    def register_skill(
+        self,
+        skill_name: str,
+        description: str = "",
+        triggers: list[str] | None = None,
+        command_format: str = "",
+        parameters: dict[str, Any] | None = None,
+        fn: Callable[..., Any] | None = None,
+        side_effect: str | SideEffectClass = "read_only",
+    ) -> None:
+        """Register an Agent Skill (SKILL.md / plugin format)."""
+        trig_str = ", ".join(triggers) if triggers else skill_name
+        full_desc = f"[SKILL: {skill_name}] triggers: {trig_str} | format: {command_format} | {description}".strip()
+
+        def default_skill_handler(**kwargs):
+            return {"skill": skill_name, "executed": True, "arguments": kwargs}
+
+        self.register_action(
+            name=skill_name,
+            description=full_desc,
+            parameters=parameters or {},
+            fn=fn or default_skill_handler,
+            side_effect=side_effect,
+        )
 
     # --------------------------------------------------------------------------
     # 1. ROUTE: 2-stage Conformal Router (Dense Shortlist -> Kev Scorer -> LAC)

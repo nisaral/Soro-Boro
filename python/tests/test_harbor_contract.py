@@ -97,27 +97,35 @@ def test_options_schema():
     assert "shadow" in schema["properties"]
 
 
-@pytest.mark.asyncio
-async def test_agent_run_contract(tmp_path: Path):
-    agent = VeyraHarborAgent(logs_dir=tmp_path, model_name="gemini-3.1-pro", shadow=True)
-    env = FakeEnvironment()
-    ctx = AgentContext()
+def test_agent_run_contract(tmp_path: Path):
+    import asyncio
 
-    await agent.setup(env)
-    await agent.run("pytest python/tests", env, ctx)
+    async def _test():
+        agent = VeyraHarborAgent(logs_dir=tmp_path, model_name="gemini-3.1-pro", shadow=True)
+        env = FakeEnvironment()
+        ctx = AgentContext()
 
-    assert "pytest python/tests" in env.commands
-    assert ctx.metadata.get("veyra_shadow") is True
+        await agent.setup(env)
+        await agent.run("pytest python/tests", env, ctx)
+
+        assert "pytest python/tests" in env.commands
+        assert ctx.metadata.get("veyra_shadow") is True
+
+    asyncio.run(_test())
 
 
-@pytest.mark.asyncio
-async def test_agent_fails_open_on_env_failure(tmp_path: Path):
-    agent = VeyraHarborAgent(logs_dir=tmp_path, model_name="claude-3-7-sonnet", shadow=True)
-    env = FakeEnvironment(should_fail=True)
-    ctx = AgentContext()
+def test_agent_fails_open_on_env_failure(tmp_path: Path):
+    import asyncio
 
-    # Even if environment raises, agent setup and run do not crash unhandled
-    await agent.setup(env)
-    with pytest.raises(RuntimeError, match="Environment execution failed"):
-        await agent.run("risky command", env, ctx)
-    assert ctx.metadata.get("veyra_shadow") is True
+    async def _test():
+        agent = VeyraHarborAgent(logs_dir=tmp_path, model_name="claude-3-7-sonnet", shadow=True)
+        env = FakeEnvironment(should_fail=True)
+        ctx = AgentContext()
+
+        # Even if environment raises, agent setup and run do not crash unhandled
+        await agent.setup(env)
+        with pytest.raises(RuntimeError, match="Environment execution failed"):
+            await agent.run("risky command", env, ctx)
+        assert ctx.metadata.get("veyra_shadow") is True
+
+    asyncio.run(_test())

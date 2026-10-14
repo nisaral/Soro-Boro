@@ -13,6 +13,7 @@ class VeyraAutoGenAdapter:
 
     def __init__(self, veyra_instance: Any):
         self.veyra = veyra_instance
+        self.soro = veyra_instance
 
     def register_function(self, fn: Callable[..., Any], name: str | None = None) -> Callable[..., Any]:
         """Wrap and register a function for AutoGen agent execution."""
