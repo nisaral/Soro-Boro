@@ -34,7 +34,8 @@ def run_cached_dense() -> dict[str, Any]:
     for i in range(index.ntotal):
         op_to_row[meta[str(i)]["operation_id"]] = i
     gold = [op_to_row[r["expected_operation"]] for r in rows]
-    scores, idxs = index.search(q.astype(np.float32), 20)
+    q_arr = np.ascontiguousarray(q, dtype=np.float32)
+    scores, idxs = index.search(q_arr, 20)
     pred = idxs
     n = len(rows)
     top1 = sum(1 for i, g in enumerate(gold) if g == pred[i, 0])

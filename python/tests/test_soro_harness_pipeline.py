@@ -170,7 +170,9 @@ def test_local_kev_multi_question_evaluation():
 
 def test_polymorphic_registration_rest_and_skills():
     """Verify SoroHarness seamlessly registers REST endpoints and Agent Skills."""
-    harness = SoroHarness()
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmpdir:
+        claims_path = str(Path(tmpdir) / "claims.db")
+        harness = SoroHarness(claims_db_path=claims_path)
 
     # 1. Register REST endpoint
     harness.register_rest(
