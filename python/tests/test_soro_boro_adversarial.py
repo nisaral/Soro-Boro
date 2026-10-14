@@ -231,3 +231,57 @@ def test_github_issue_duplicate_prevention():
     assert outcome.data["title"] == "Outage in us-east-1"
     assert len(backend.issues) == 1
     assert backend.duplicate_issues_count == 0
+
+
+def test_loop_guard_blocks_duplicate_llm_turns():
+    """Scenario 7: LLM gets stuck in a loop and calls the same tool twice across turns.
+    
+    In loop_guard mode (default), even with no explicit intent_id provided,
+    the second call is blocked and returns PREVENTED_DUPLICATE.
+    """
+    call_count = 0
+
+    @soro_wrap(
+        side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION,
+        dedupe_mode="loop_guard",
+        window_sec=120.0,
+    )
+    def send_slack_alert(channel: str, message: str):
+        nonlocal call_count
+        call_count += 1
+        return {"status": "sent", "channel": channel, "call_num": call_count}
+
+    # Turn 1: LLM proposes action without intent_id
+    res1 = send_slack_alert(channel="#prod-alerts", message="High latency detected")
+    assert res1.status == "COMMITTED"
+    assert res1.data["call_num"] == 1
+    assert call_count == 1
+
+    # Turn 2: LLM repeats the exact same call (no intent_id passed)
+    res2 = send_slack_alert(channel="#prod-alerts", message="High latency detected")
+    assert res2.status == "PREVENTED_DUPLICATE"
+    assert res2.data["call_num"] == 1  # Returns cached result from turn 1
+    assert call_count == 1  # Underlying tool was NOT re-dispatched!
+
+
+def test_explicit_intent_allows_separate_steps():
+    """Scenario 8: In explicit_intent mode, calls without intent_id are treated as separate steps."""
+    call_count = 0
+
+    @soro_wrap(
+        side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION,
+        dedupe_mode="explicit_intent",
+    )
+    def partial_charge(order_id: str, amount: int):
+        nonlocal call_count
+        call_count += 1
+        return {"status": "charged", "order_id": order_id, "amount": amount, "num": call_count}
+
+    res1 = partial_charge(order_id="ord_99", amount=10)
+    assert res1.status == "COMMITTED"
+    assert call_count == 1
+
+    # Second distinct step with identical parameters is permitted in explicit_intent mode
+    res2 = partial_charge(order_id="ord_99", amount=10)
+    assert res2.status == "COMMITTED"
+    assert call_count == 2

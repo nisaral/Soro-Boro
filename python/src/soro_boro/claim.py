@@ -68,6 +68,7 @@ class SQLiteClaimStore:
         idempotency_key: str,
         owner_token: str,
         lease_ttl_sec: float = 30.0,
+        window_sec: float | None = None,
     ) -> tuple[bool, str, dict[str, Any] | None]:
         """Atomically acquire claim for an operation.
         
@@ -101,6 +102,19 @@ class SQLiteClaimStore:
             cached_data = json.loads(result_json) if result_json else None
 
             if status == ClaimStatus.COMMITTED.value:
+                # If window_sec is provided and the commit is older than window_sec, allow fresh execution
+                if window_sec is not None and window_sec > 0 and (now - claimed_at) >= window_sec:
+                    conn.execute(
+                        """
+                        UPDATE claims
+                        SET owner_token = ?, claimed_at = ?, lease_ttl_sec = ?, status = ?, result_json = NULL
+                        WHERE operation_id = ?
+                        """,
+                        (owner_token, now, lease_ttl_sec, ClaimStatus.IN_FLIGHT.value, operation_id),
+                    )
+                    conn.commit()
+                    return True, ClaimStatus.IN_FLIGHT.value, None
+
                 conn.commit()
                 return False, ClaimStatus.COMMITTED.value, cached_data
 

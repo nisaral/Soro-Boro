@@ -35,35 +35,62 @@ class OperationIdentity:
     scope: str = "default"
     metadata: dict[str, Any] = field(default_factory=dict)
     arguments: dict[str, Any] = field(default_factory=dict)
+    dedupe_mode: str = "loop_guard"
+    window_sec: float = 120.0
 
     @classmethod
     def mint(
         cls,
-        intent_id: str,
-        arguments: dict[str, Any],
+        intent_id: str | None = None,
+        arguments: dict[str, Any] | None = None,
+        tool_name: str = "anonymous_tool",
+        dedupe_mode: str = "loop_guard",
+        window_sec: float = 120.0,
         scope: str = "default",
         metadata: dict[str, Any] | None = None,
     ) -> OperationIdentity:
-        """Mint a fresh OperationIdentity bound to a logical workflow intent.
+        """Mint an OperationIdentity.
         
-        Args:
-            intent_id: Unique logical intent from workflow (e.g. 'wf_run_981_step_4').
-            arguments: The arguments for the action.
-            scope: Tenant or namespace scope.
-            metadata: Custom metadata.
+        Modes:
+        - 'loop_guard' (default): When no explicit intent_id is given, automatically derives
+          the operation key from sha256(tool_name + canonical_json(arguments)) within window_sec
+          to catch runaway LLM duplicate tool loops out-of-the-box.
+        - 'explicit_intent': Derives identity strictly from workflow intent_id (or mints a unique
+          UUID if absent), allowing identical-argument calls in different workflow steps.
         """
-        args_hash = cls.compute_args_hash(arguments)
-        h = hashlib.sha256(f"{scope}:{intent_id}".encode()).hexdigest()[:24]
-        idemp_key = f"sb_key_{h}"
-        clean_args = {k: v for k, v in arguments.items() if k != "op" and not k.startswith("_sb_")}
+        raw_args = arguments or {}
+        clean_args = {k: v for k, v in raw_args.items() if k != "op" and not k.startswith("_sb_")}
+        args_hash = cls.compute_args_hash(clean_args)
+
+        if dedupe_mode == "loop_guard":
+            if intent_id:
+                op_id = intent_id
+                h = hashlib.sha256(f"{scope}:{intent_id}".encode()).hexdigest()[:24]
+            else:
+                # Automatic loop guard: derive key from tool + arguments
+                time_bucket = int(time.time() // window_sec) if window_sec > 0 else 0
+                key_seed = f"{scope}:{tool_name}:{args_hash}:{time_bucket}"
+                h = hashlib.sha256(key_seed.encode()).hexdigest()[:24]
+                op_id = f"lg_{tool_name}_{h}"
+            idemp_key = f"sb_key_{h}"
+        else:
+            # explicit_intent mode
+            if not intent_id:
+                intent_id = f"op_{tool_name}_{uuid.uuid4().hex[:12]}"
+            op_id = intent_id
+            h = hashlib.sha256(f"{scope}:{intent_id}".encode()).hexdigest()[:24]
+            idemp_key = f"sb_key_{h}"
+
         return cls(
-            operation_id=intent_id,
+            operation_id=op_id,
             idempotency_key=idemp_key,
             args_hash=args_hash,
             created_at=time.time(),
             scope=scope,
             metadata=metadata or {},
             arguments=clean_args,
+            dedupe_mode=dedupe_mode,
+            window_sec=window_sec,
         )
 
     @classmethod

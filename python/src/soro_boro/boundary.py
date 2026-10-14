@@ -60,6 +60,8 @@ class SoroBoundary:
         max_retry_window_sec: float = 3600.0,
         lease_ttl_sec: float = 30.0,
         supports_native_idempotency: bool = False,
+        dedupe_mode: str = "loop_guard",
+        window_sec: float = 120.0,
     ) -> TerminalOutcome[Any]:
         tool_name = getattr(fn, "__name__", "anonymous_tool")
         bound_kwargs = dict(kwargs)
@@ -69,9 +71,14 @@ class SoroBoundary:
             if "op" in bound_kwargs and isinstance(bound_kwargs["op"], OperationIdentity):
                 op_identity = bound_kwargs["op"]
             else:
-                # Mint from workflow intent if provided, else create deterministic ID
-                intent_id = bound_kwargs.pop("_sb_intent_id", None) or f"op_{tool_name}_{uuid.uuid4().hex[:12]}"
-                op_identity = OperationIdentity.mint(intent_id=intent_id, arguments=bound_kwargs)
+                intent_id = bound_kwargs.pop("_sb_intent_id", None)
+                op_identity = OperationIdentity.mint(
+                    intent_id=intent_id,
+                    arguments=bound_kwargs,
+                    tool_name=tool_name,
+                    dedupe_mode=dedupe_mode,
+                    window_sec=window_sec,
+                )
 
         # Inject operation identity if function expects it
         sig = inspect.signature(fn)
@@ -150,6 +157,7 @@ class SoroBoundary:
             idempotency_key=op_identity.idempotency_key,
             owner_token=owner_token,
             lease_ttl_sec=lease_ttl_sec,
+            window_sec=window_sec,
         )
 
         if not acquired and claim_state == ClaimStatus.COMMITTED.value:
@@ -411,6 +419,8 @@ def soro_wrap(
     max_retry_window_sec: float = 3600.0,
     lease_ttl_sec: float = 30.0,
     supports_native_idempotency: bool = False,
+    dedupe_mode: str = "loop_guard",
+    window_sec: float = 120.0,
     wal_path: str | Path | None = None,
     claims_db_path: str | Path | None = None,
 ) -> Callable[[Callable[..., Any]], Callable[..., TerminalOutcome[Any]]]:
@@ -432,6 +442,8 @@ def soro_wrap(
                 max_retry_window_sec=max_retry_window_sec,
                 lease_ttl_sec=lease_ttl_sec,
                 supports_native_idempotency=supports_native_idempotency,
+                dedupe_mode=dedupe_mode,
+                window_sec=window_sec,
             )
 
         return wrapper

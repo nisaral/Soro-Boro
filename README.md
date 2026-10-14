@@ -1,143 +1,121 @@
-# Soro-Boro
+# Soro
 
-> **Find which agent tools are unsafe to retry, then make them safe.**
+> **The Type-Safe MCP & Agent Tool Harness.**
+> Stop runaway LLM duplicate tool loops, auto-repair broken JSON arguments, and audit MCP servers for reliability.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![CI](https://github.com/nisaral/Veyra/actions/workflows/ci.yml/badge.svg)](https://github.com/nisaral/Veyra/actions)
-
-Soro-Boro is execution-boundary middleware for autonomous AI agents. It consists of two unified components:
-1. **The Audit Layer (`soro-audit`)**: Scans MCP server tool manifests and execution traces to find which tools lack idempotency keys, hide non-idempotent side effects, or cause confirmation fatigue.
-2. **The Execution Boundary SDK (`soro_boro`)**: Wraps consequential mutations to prevent duplicate side effects on network drops, manages atomic cross-process claims, and fails closed to explicit ambiguous outcomes (`AMBIGUOUS_DEFERRED`) when upstream state cannot be confirmed.
+[![CI](https://github.com/nisaral/Soro-Boro/actions/workflows/ci.yml/badge.svg)](https://github.com/nisaral/Soro-Boro/actions)
 
 ---
 
-## The Problem
+## Why Soro?
 
-Autonomous agents frequently call tools that perform consequential real-world side effects (charging cards, creating tickets, mutating databases, dispatching webhooks). When a network timeout or connection reset occurs:
+When AI agents use tools in production, three things routinely break:
+1. **Runaway LLM Duplicate Loops**: An LLM gets confused or loops across conversational turns, repeatedly calling `charge_card()` or `create_ticket()` with the same parameters.
+2. **Brittle Argument Formatting**: The LLM passes `"49.99"` instead of `49.99`, `'{"items": [1, 2]}'` as a raw string instead of a dictionary, or `orderId` instead of `order_id`, causing runtime `TypeError` crashes.
+3. **Unchecked MCP Tool Servers**: Third-party Model Context Protocol (MCP) servers omit safety hints (`readOnlyHint`, `idempotentHint`), causing constant approval popup fatigue in Cursor / Claude Desktop or blind retries during network hiccups.
 
-```text
-Agent / Host                      External API / Service
-    │                                       │
-    │──── POST /v1/mutations ──────────────>│ (Write COMMITTED to DB)
-    │                                       │
-    │< - - - 504 Timeout / Connection Drop -│ (ACK lost in transit)
-    │                                       │
-    ▼                                       ▼
-Outcome UNKNOWN                     Side Effect Already Occurred!
-```
-
-1. **Native keys don't protect most APIs**: Stripe and AWS support native idempotency keys, but internal databases, SQL inserts, GitHub issues, Slack messages, and internal webhooks **do not**.
-2. **Local receipt logging isn't enough**: Systems that log receipts locally on success (e.g. SafeAgent) still blind-retry when a network drop prevents receiving the receipt.
-3. **Eventual consistency breaks naive verification**: Reading from read replicas right after a write often returns `NOT_FOUND`. Treating `NOT_FOUND` as authoritative permission to retry causes duplicate mutations.
-4. **Idempotency keys expire**: Providers (like Stripe) prune keys after 24–48 hours. Blind re-dispatch of orphaned intents after an outage creates new duplicate writes.
+**Soro solves all three in a unified, lightweight package.**
 
 ---
 
-## Architecture & Guarantees
+## 3 Core Features
 
-```mermaid
-flowchart TD
-    Intent[1. Workflow Intent Minted] --> Lock[2. Atomic Distributed / SQLite Claim]
-    Lock --> WAL[3. Synchronous WAL Intent Flush]
-    WAL --> Exec[4. Dispatch External Mutation]
-    Exec -->|200 OK| Done[COMMITTED]
-    Exec -->|504 / Connection Drop| Trap[5. Trap UNKNOWN_ACK]
-    Trap --> Recon[6. Authoritative Reconciliation Probe]
-    Recon -->|Observed in Upstream| Dedup[PREVENTED_DUPLICATE]
-    Recon -->|Linearizable Confirmed NOT_FOUND| Retry[Safe Bounded Retry]
-    Recon -->|Eventual Replica / Probe 500| Halt[Fail-Closed: AMBIGUOUS_DEFERRED]
-```
+### 1. `soro-audit` — Test Any MCP Server in 10 Seconds
+A standalone CLI chaos and schema linter for Model Context Protocol servers. It connects over `stdio`, tests schemas, verifies behavior in an isolated sandbox, and outputs instant patches.
 
-### Technical Guarantees
-- **Intent-Based Identity**: Keys are minted once per logical workflow intent (not hashed from token parameters, preventing intent conflation). Parameters are hashed to enforce contract consistency (`MismatchedParametersError`).
-- **Atomic Pre-Dispatch Claim**: Cross-process `SQLiteClaimStore` with `BEGIN IMMEDIATE` prevents millisecond concurrency races between parallel agent actions.
-- **Durable Write-Ahead Log**: Intent is synchronously flushed (`fsync`) before the socket connects. Startup scans segregate recoverable in-flight operations from expired orphans.
-- **Fail-Closed on Eventual Consistency**: `NOT_FOUND` on read replicas is non-authoritative by default. If a provider cannot guarantee linearizable read-after-write, Soro-Boro returns `AMBIGUOUS_DEFERRED`.
-
----
-
-## Benchmark: Non-Keyed Services Evaluation
-
-Evaluated against a real SQLite database service lacking native API deduplication under 5 distributed systems failure modes:
-
-| Failure Mode | Naive Retries | SafeAgent Baseline (Req-ID + Receipt) | Naive Verify-Before-Retry | Soro-Boro Execution Boundary |
-|---|---|---|---|---|
-| **Dropped ACK on Commit (504)** | 100% Duplicate Write | 100% Duplicate Write | 0% Duplicate *(strong read)* | **0% Duplicate Write** *(PREVENTED_DUPLICATE)* |
-| **Eventual Replica Lag** | 100% Duplicate Write | 100% Duplicate Write | 100% Duplicate Write *(premature retry)* | **0% Duplicate Write** *(AMBIGUOUS_DEFERRED)* |
-| **Reconciler Probe 500** | 100% Duplicate Write | 100% Duplicate Write | Crashes / Blind Retry | **0% Duplicate Write** *(AMBIGUOUS_DEFERRED)* |
-| **Concurrency Race** | 100% Duplicate Writes | 100% Duplicate Writes | Race Condition / Duplicate | **0% Duplicate Write** *(Atomic claim blocks race)* |
-
----
-
-## Quickstart
-
-### 1. Install
 ```bash
-pip install -e "./python[dev]"
-```
+# Run schema and annotation audit on any server
+soro-audit --stdio "npx -y @modelcontextprotocol/server-filesystem /tmp" --dry-run
 
-### 2. Audit MCP Tools (`soro-audit`)
-Run the standalone behavioral linter to find unsafe tools across any Model Context Protocol server:
-```bash
-# Static annotation and hint inspection
-soro-audit --stdio "node dist/index.js" --dry-run
-
-# Dynamic behavioral verification in an isolated sandbox
+# Run dynamic behavioral verification
 soro-audit --stdio "node dist/index.js" --markdown audit_summary.md
 ```
 
-### 3. Wrap Consequential Tools (`soro_boro`)
-Protect external writes using `@soro_wrap`:
+> **Real-World Census**: We audited **359 public MCP servers** ([see census report](reports/mcp_live_census_report.json)) and found that **over 40% omit `readOnlyHint`**, causing AI desktop clients to prompt for user approval on harmless search queries. We generated instant fix patches for servers like [Datadog](reports/patch_datadog_mcp_server.diff) and [DuckDuckGo](reports/patch_duckduckgo_mcp_server.diff).
+
+---
+
+### 2. `@soro_wrap` — Stop LLM Double-Calls & Retry Double-Writes
+Add a 1-line decorator to any tool. Soro automatically caches successful writes in a 120-second sliding loop guard and guards against network timeout double-writes:
 
 ```python
-from soro_boro import (
-    soro_wrap,
-    SideEffectClass,
-    OperationIdentity,
-    ReconciliationResult,
-    ProviderLifecycleState,
-)
+from soro import soro_wrap
 
-# Define reconciler for non-keyed service
-def order_reconciler(op: OperationIdentity) -> ReconciliationResult:
-    # Query upstream by op marker
-    order = my_db.query_by_op_marker(op.operation_id)
-    if order:
-        return ReconciliationResult(
-            state=ProviderLifecycleState.SUCCEEDED,
-            authoritative=True,
-            raw_response=order,
-        )
-    return ReconciliationResult(
-        state=ProviderLifecycleState.NOT_FOUND,
-        authoritative=False, # Eventual consistency by default!
-        consistency_observed="eventual",
-    )
+@soro_wrap(side_effect="mutation")
+def refund_customer(order_id: str, amount: float):
+    return stripe.Refund.create(charge=order_id, amount=int(amount * 100))
 
-@soro_wrap(
-    side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION,
-    reconciler=order_reconciler,
-)
-def create_order(customer_id: str, sku: str, amount: int, op: OperationIdentity | None = None):
-    # Pass operation ID as marker to non-keyed service
-    return my_db.insert_order(customer_id, sku, amount, client_op_marker=op.operation_id)
+# Turn 1: Normal execution
+res1 = refund_customer("ord_101", 50.0)
 
-outcome = create_order("cust_101", "SKU-99", 5000)
-if outcome.is_ambiguous:
-    print(f"Halted safely: {outcome.status}")  # AMBIGUOUS_DEFERRED
-else:
-    print(f"Outcome: {outcome.status}")       # COMMITTED or PREVENTED_DUPLICATE
+# Turn 2: LLM gets stuck in a loop and calls it again with identical arguments
+res2 = refund_customer("ord_101", 50.0)
+# -> Stopped automatically! Returns PREVENTED_DUPLICATE with cached result.
+```
+
+---
+
+### 3. `SoroHarness` — Route -> Repair -> Guard in 5 Lines
+A complete, type-safe pipeline that routes natural language queries, auto-repairs LLM argument types, and executes with loop guard protection:
+
+```python
+from soro import SoroHarness
+
+harness = SoroHarness()
+
+@harness.tool(description="Process customer refund", side_effect="mutation")
+def refund(order_id: str, amount: float, reason: str = "customer_request"):
+    return {"status": "ok", "order_id": order_id, "amount": amount}
+
+# 1. Automatic Argument Repair: Coerces strings to floats & camelCase to snake_case!
+res = harness.execute("refund", {"orderId": "ord_882", "amount": "99.50"})
+print(res.data)
+# {'status': 'ok', 'order_id': 'ord_882', 'amount': 99.5}
+
+# 2. Natural Language Routing + Auto-Repair + Loop-Guard:
+res = harness.run("Please refund order ord_99 for 25 dollars", {"orderId": "ord_99", "amount": "25"})
+```
+
+---
+
+## Installation
+
+```bash
+# Install Soro tool harness & boundary SDK
+pip install -e "./python[dev]"
+
+# Or run the standalone zero-dependency MCP auditor directly
+pip install soro-audit
+```
+
+---
+
+## Pipeline Architecture
+
+```text
+User / Agent Query
+        │
+        ▼
+┌────────────────────────────────────────────────────────┐
+│  1. ROUTE: Local Conformal Router (Fast Shortlisting)  │
+│  2. REPAIR: Auto-Coerce Types & JSON Schema (Kev)      │
+│  3. GUARD: Soro-Boro Boundary & 120s Loop Guard        │
+└────────────────────────────────────────────────────────┘
+        │
+   Protected External Execution (API / SQL / MCP / HTTP)
 ```
 
 ---
 
 ## Repository Structure
 
-- `python/src/soro_boro/`: Core execution boundary SDK (identity, claims, WAL, lifecycle, interceptor).
-- `python/src/soro/cli_audit.py`: `soro-audit` MCP server linter and behavioral verifier.
-- `python/tests/`: Adversarial distributed systems test suites and non-keyed service benchmarks.
-- `web/`: Next.js interactive architecture visualization and synthetic failure mode simulator.
+- `python/src/soro/harness/`: Unified `SoroHarness` pipeline (`Route -> Repair -> Guard`).
+- `python/src/soro_boro/`: Execution boundary engine (`@soro_wrap`, atomic claim store, intent minting).
+- `python/src/soro/cli_audit.py`: `soro-audit` MCP server linter and behavioral sandbox verifier.
+- `reports/`: Real findings across 359 MCP servers (`mcp_live_census_report.json` and generated patches).
+- `web/`: Next.js interactive architecture visualization and simulator demo.
 
 ---
 

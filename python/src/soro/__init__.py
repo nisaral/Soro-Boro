@@ -25,9 +25,16 @@ from soro.framework import Agent, DeterministicRouter, RouteDecision, RouteKind
 from soro.routing import ScaleRouter, ToolSpec
 from soro.production.production_layer import Mode, ProductionConfig, Soro, VeyraMiddleware
 
+from soro.harness.pipeline import SoroHarness
+from soro_boro import soro_wrap, OperationIdentity, TerminalOutcome
+
 __version__ = "0.2.0"
 
 __all__ = [
+    "SoroHarness",
+    "soro_wrap",
+    "OperationIdentity",
+    "TerminalOutcome",
     "Soro",
     "VeyraMiddleware",
     "wrap",
@@ -58,3 +65,4 @@ __all__ = [
 def wrap(fn, **kwargs):
     """Wrap a Python function with a default Soro instance."""
     return Soro().wrap(fn, **kwargs)
+
