@@ -94,8 +94,9 @@ def run_split_conformal_val(
     val_records: list[dict[str, Any]],
     cal_size: int = 300,
     alpha: float = 0.10,
+    batch_size: int = 4,
 ) -> dict[str, Any]:
-    """Run split conformal validation on held-out zero-shot records."""
+    """Run split conformal validation on held-out zero-shot records using batched forward passes."""
     model.eval()
     cal_records = val_records[:cal_size]
     test_records = val_records[cal_size:]
@@ -103,17 +104,17 @@ def run_split_conformal_val(
     # Calibration Phase: compute non-conformity scores
     nonconf_scores: list[float] = []
     with torch.no_grad():
-        for r in cal_records:
-            state = r["state"]
-            q_dict = r["questions"]
-            q_route = q_dict["tool_route"]
-            gold = q_route["label"]
-            logits, keys = model.score_choice_sequence(
-                state, q_route.get("instructions", ""), q_route["criteria"]
-            )
-            probs = F.softmax(logits, dim=-1).cpu().tolist()
-            p_gold = probs[keys.index(gold)] if gold in keys else 0.0
-            nonconf_scores.append(1.0 - p_gold)
+        for i in range(0, len(cal_records), batch_size):
+            b_items = cal_records[i : i + batch_size]
+            out = model.forward_batch(b_items)
+            for j, r in enumerate(b_items):
+                logits = out["logits_route_batch"][j]
+                q_route = r["questions"]["tool_route"]
+                keys = list(q_route["criteria"].keys())
+                gold = q_route["label"]
+                probs = F.softmax(logits, dim=-1).cpu().tolist()
+                p_gold = probs[keys.index(gold)] if gold in keys else 0.0
+                nonconf_scores.append(1.0 - p_gold)
 
     q_hat = conformal_quantile(np.array(nonconf_scores, dtype=np.float64), alpha=alpha)
     threshold = max(0.0, 1.0 - q_hat)
@@ -124,24 +125,24 @@ def run_split_conformal_val(
     set_sizes: list[int] = []
 
     with torch.no_grad():
-        for r in test_records:
-            state = r["state"]
-            q_dict = r["questions"]
-            q_route = q_dict["tool_route"]
-            gold = q_route["label"]
-            logits, keys = model.score_choice_sequence(
-                state, q_route.get("instructions", ""), q_route["criteria"]
-            )
-            probs = F.softmax(logits, dim=-1).cpu().tolist()
-            pred_key = keys[int(torch.argmax(logits).item())]
-            if pred_key == gold:
-                correct += 1
+        for i in range(0, len(test_records), batch_size):
+            b_items = test_records[i : i + batch_size]
+            out = model.forward_batch(b_items)
+            for j, r in enumerate(b_items):
+                logits = out["logits_route_batch"][j]
+                q_route = r["questions"]["tool_route"]
+                keys = list(q_route["criteria"].keys())
+                gold = q_route["label"]
+                probs = F.softmax(logits, dim=-1).cpu().tolist()
+                pred_key = keys[int(torch.argmax(logits).item())]
+                if pred_key == gold:
+                    correct += 1
 
-            p_set = [keys[i] for i, p in enumerate(probs) if p >= threshold]
-            sz = len(p_set)
-            set_sizes.append(sz)
-            if gold in p_set:
-                covered += 1
+                p_set = [keys[k] for k, p in enumerate(probs) if p >= threshold]
+                sz = len(p_set)
+                set_sizes.append(sz)
+                if gold in p_set:
+                    covered += 1
 
     n_test = len(test_records)
     lo, hi = _wilson(covered, n_test)
@@ -171,14 +172,15 @@ def main():
     parser.add_argument("--profile", type=str, default="cpu_smoke", choices=["cpu_smoke", "kaggle_t4", "a6000"])
     parser.add_argument("--data-dir", type=str, default=str(DEFAULT_DATA_DIR))
     parser.add_argument("--output-dir", type=str, default=str(DEFAULT_OUTPUT_DIR))
-    parser.add_argument("--base-model", type=str, default="Qwen/Qwen2.5-0.5B")
+    parser.add_argument("--base-model", type=str, default="Qwen/Qwen3-0.6B", help="Base backbone (e.g. Qwen/Qwen3-0.6B, Qwen/Qwen3.5-0.8B-Base, Qwen/Qwen3.5-4B-Base)")
+    parser.add_argument("--batch-size", type=int, default=4, help="GPU mini-batch size (number of packed records per step)")
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--grad-accum", type=int, default=4)
     parser.add_argument("--eval-every", type=int, default=500)
     args = parser.parse_args()
 
-    print(f"=== Initializing Soro-Kev Training (Profile: {args.profile} | Model: {args.base_model}) ===")
+    print(f"=== Initializing Soro-Kev Training (Profile: {args.profile} | Model: {args.base_model} | Batch Size: {args.batch_size}) ===")
 
     out_path = Path(args.output_dir)
     data_path = Path(args.data_dir)
@@ -200,19 +202,19 @@ def main():
                 val_records.append(json.loads(line))
 
     is_smoke = (args.profile == "cpu_smoke")
+    batch_size = 2 if is_smoke else args.batch_size
     if is_smoke:
         train_records = train_records[:20]
         val_records = val_records[:40]
         total_steps = 2
     else:
-        total_steps = len(train_records) * args.epochs
+        total_steps = (len(train_records) // batch_size) * args.epochs
 
     device = "cuda" if torch.cuda.is_available() and not is_smoke else "cpu"
-    print(f"Loaded {len(train_records)} train records | {len(val_records)} zero-shot val records | Device: {device}")
+    print(f"Loaded {len(train_records)} train records | {len(val_records)} zero-shot val records | Batch Size: {batch_size} | Device: {device}")
 
     model = SoroKevModel(model_name=args.base_model, use_mock=is_smoke)
     model.to(device)
-    loss_fn = RLCDLoss(brier_lambda=0.25, jsd_lambda=0.30)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
 
     warmup_steps = 1 if is_smoke else 100
@@ -222,78 +224,36 @@ def main():
     t0 = time.time()
 
     running_loss = 0.0
-    running_ce = 0.0
+    running_route = 0.0
     running_brier = 0.0
     running_jsd = 0.0
     running_hits = 0.0
-    running_gold_p = 0.0
 
-    print(f"Starting training loop ({total_steps} steps | Profile: {args.profile})...")
+    print(f"Starting batched training loop ({total_steps} steps | Profile: {args.profile})...")
 
     optimizer.zero_grad()
 
     while step_idx < total_steps:
-        r = train_records[step_idx % len(train_records)]
-        state = r["state"]
-        q_dict = r["questions"]
-
         # Current learning rate schedule
         cur_lr = get_cosine_lr(step_idx, total_steps, warmup_steps, args.lr)
         for pg in optimizer.param_groups:
             pg["lr"] = cur_lr
 
-        # Forward pass on tool_route and permuted tool_route
-        q_route = q_dict["tool_route"]
-        q_perm = q_dict["tool_route_perm"]
+        # Mini-batch slice
+        batch_start = (step_idx * batch_size) % len(train_records)
+        batch_items = [train_records[(batch_start + j) % len(train_records)] for j in range(batch_size)]
 
-        route_logits, route_keys = model.score_choice_sequence(
-            state, q_route.get("instructions", ""), q_route["criteria"]
-        )
-        perm_logits, perm_keys = model.score_choice_sequence(
-            state, q_perm.get("instructions", ""), q_perm["criteria"]
-        )
-
-        gold_label = q_route["label"]
-        gold_idx = route_keys.index(gold_label) if gold_label in route_keys else 0
-        perm_to_route = [perm_keys.index(k) for k in route_keys]
-
-        # Auxiliary branches
-        aux_losses = []
-        if "arg_mapping" in q_dict:
-            q_arg = q_dict["arg_mapping"]
-            arg_logits, arg_keys = model.score_choice_sequence(
-                state, q_arg.get("instructions", ""), q_arg["criteria"]
-            )
-            arg_gold = q_arg["label"]
-            arg_gold_idx = arg_keys.index(arg_gold) if arg_gold in arg_keys else 0
-            p_arg = F.softmax(arg_logits, dim=-1)
-            aux_losses.append(-torch.log(torch.clamp(p_arg[arg_gold_idx], min=1e-9)))
-
-        if "missing_required" in q_dict:
-            q_miss = q_dict["missing_required"]
-            miss_logits = model.score_binary(state)
-            miss_gold_idx = 1 if q_miss["label"] == "yes" else 0
-            p_miss = F.softmax(miss_logits, dim=-1)
-            aux_losses.append(-torch.log(torch.clamp(p_miss[miss_gold_idx], min=1e-9)))
-
-        if "is_mutation" in q_dict:
-            q_mut = q_dict["is_mutation"]
-            mut_logits = model.score_binary(state)
-            mut_gold_idx = 1 if q_mut["label"] == "yes" else 0
-            p_mut = F.softmax(mut_logits, dim=-1)
-            aux_losses.append(-torch.log(torch.clamp(p_mut[mut_gold_idx], min=1e-9)))
-
-        # Composite RLCD loss
-        loss, m = loss_fn(route_logits, gold_idx, perm_logits, perm_to_route, aux_losses=aux_losses)
+        # Batched forward pass: packs 2 sequences per record, single backbone execution
+        out = model.forward_batch(batch_items)
+        loss = out["loss"]
         scaled_loss = loss / args.grad_accum
         scaled_loss.backward()
 
-        running_loss += m["loss_total"]
-        running_ce += m["loss_ce"]
-        running_brier += m["loss_brier"]
-        running_jsd += m["loss_jsd"]
-        running_hits += m["hit"]
-        running_gold_p += m["prob_gold"]
+        running_loss += float(loss.item())
+        running_route += out["loss_route"]
+        running_brier += out["loss_brier"]
+        running_jsd += out["loss_jsd"]
+        running_hits += out["metrics"]["route_acc"]
 
         grad_norm = 0.0
         if (step_idx + 1) % args.grad_accum == 0 or is_smoke:
@@ -306,22 +266,23 @@ def main():
         # Periodic logging every 50 steps (or on smoke steps)
         if step_idx % 50 == 0 or is_smoke:
             n_sub = 50 if step_idx >= 50 else step_idx
-            speed = n_sub / max(time.time() - t0, 0.001)
+            speed = (n_sub * batch_size) / max(time.time() - t0, 0.001)
             print(
                 f"Step {step_idx:05d}/{total_steps} | "
-                f"Loss: {running_loss / n_sub:.4f} (CE: {running_ce / n_sub:.4f}, Brier: {running_brier / n_sub:.4f}, JSD: {running_jsd / n_sub:.6f}) | "
+                f"Loss: {running_loss / n_sub:.4f} (Route: {running_route / n_sub:.4f}, Brier: {running_brier / n_sub:.4f}, JSD: {running_jsd / n_sub:.6f}) | "
                 f"Train Route Acc: {running_hits / n_sub * 100:.1f}% | "
-                f"Gold Prob: {running_gold_p / n_sub:.3f} | "
                 f"Grad Norm: {grad_norm:.2f} | "
-                f"Speed: {speed:.1f} it/s"
+                f"Throughput: {speed:.1f} rec/s"
             )
-            running_loss = running_ce = running_brier = running_jsd = running_hits = running_gold_p = 0.0
+            running_loss = running_route = running_brier = running_jsd = running_hits = 0.0
             t0 = time.time()
 
         # Periodic split conformal validation
         if (step_idx % args.eval_every == 0 or step_idx == total_steps) and len(val_records) >= 10:
-            print(f"--- Running Split Conformal Validation (Step {step_idx}) ---")
-            val_res = run_split_conformal_val(model, val_records, cal_size=min(300, len(val_records) // 2))
+            print(f"--- Running Batched Split Conformal Validation (Step {step_idx}) ---")
+            val_res = run_split_conformal_val(
+                model, val_records, cal_size=min(300, len(val_records) // 2), batch_size=batch_size
+            )
             print(
                 f"Zero-Shot Route Acc: {val_res['val_route_acc'] * 100:.2f}% | "
                 f"Coverage: {val_res['empirical_coverage'] * 100:.2f}% (Wilson: [{val_res['wilson_ci'][0]*100:.1f}%, {val_res['wilson_ci'][1]*100:.1f}%]) | "

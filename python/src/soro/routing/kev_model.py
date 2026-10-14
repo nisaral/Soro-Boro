@@ -50,13 +50,14 @@ class MockCausalBackbone(nn.Module):
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         self.proj = nn.Linear(hidden_size, hidden_size)
 
-    def forward(self, input_ids: torch.Tensor) -> torch.Tensor:
-        # input_ids: (1, seq_len)
-        seq_len = input_ids.size(1)
-        positions = torch.arange(seq_len, device=input_ids.device).unsqueeze(0)
+    def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor | None = None) -> torch.Tensor:
+        # input_ids: (B, seq_len)
+        B, seq_len = input_ids.shape
+        positions = torch.arange(seq_len, device=input_ids.device).unsqueeze(0).expand(B, -1)
         x = self.embedding(input_ids) + self.pos_emb(positions)
-        mask = nn.Transformer.generate_square_subsequent_mask(seq_len, device=input_ids.device)
-        h_seq = self.transformer(x, mask=mask, is_causal=True)
+        causal_mask = nn.Transformer.generate_square_subsequent_mask(seq_len, device=input_ids.device).bool()
+        pad_mask = (attention_mask == 0) if attention_mask is not None else None
+        h_seq = self.transformer(x, mask=causal_mask, src_key_padding_mask=pad_mask, is_causal=True)
         return self.proj(h_seq)
 
 
@@ -127,6 +128,11 @@ class SoroKevModel(nn.Module):
     def _tokenize_text(self, text: str) -> list[int]:
         words = re.findall(r"\w+", text.lower())
         return [abs(hash(w)) % 2000 for w in words] or [0]
+
+    def encode_tokens(self, text: str, add_special_tokens: bool = False) -> list[int]:
+        if self.tokenizer is not None:
+            return self.tokenizer.encode(text, add_special_tokens=add_special_tokens)
+        return self._tokenize_text(text)
 
     def score_choice_sequence(
         self,
@@ -212,6 +218,300 @@ class SoroKevModel(nn.Module):
         h_last = h_seq[0, -1, :].float()
         q_vec = self.q_proj_head(h_last.unsqueeze(0))
         return self.binary_head(q_vec).squeeze(0)  # (2,) [no, yes]
+
+    def forward_batch(
+        self,
+        batch_items: list[dict[str, Any]],
+        max_seq_len: int = 1024,
+    ) -> dict[str, Any]:
+        """Multi-question packed sequence forward pass across B records.
+
+        Packs all 4 non-permuted questions (tool_route, arg_mapping, missing_required,
+        is_mutation) in Sequence 1, and encodes tool_route_perm in Sequence 2.
+        Batches all 2*B sequences in ONE single backbone forward pass.
+        """
+        B = len(batch_items)
+        if B == 0:
+            return {"loss": torch.tensor(0.0), "metrics": {}}
+
+        device = next(self.parameters()).device
+        scale = 1.0 / math.sqrt(self.proj_dim)
+        temp = torch.exp(self.log_temp) + 1e-4
+
+        packed_tokens_list: list[list[int]] = []
+        perm_tokens_list: list[list[int]] = []
+
+        # Store metadata for span extraction per item
+        meta_packed: list[dict[str, Any]] = []
+        meta_perm: list[dict[str, Any]] = []
+
+        for item in batch_items:
+            state = item["state"]
+            q_dict = item["questions"]
+            q_route = q_dict["tool_route"]
+            q_perm = q_dict["tool_route_perm"]
+            q_arg = q_dict.get("arg_mapping")
+            q_miss = q_dict.get("missing_required")
+            q_mut = q_dict.get("is_mutation")
+
+            # --- Sequence 1: Packed Main Sequence ---
+            prefix_text = f"State: {state}\n"
+            toks = self.encode_tokens(prefix_text, add_special_tokens=True)
+
+            # 1. tool_route
+            r_keys = list(q_route["criteria"].keys())
+            q1_text = f"Question [tool_route]: {q_route.get('instructions', '')}\nOptions:\n"
+            toks.extend(self.encode_tokens(q1_text))
+            q_end_route = len(toks) - 1
+            opt_ends_route = []
+            for idx, k in enumerate(r_keys):
+                o_str = f"[{idx}] {k}: {q_route['criteria'][k]}\n"
+                toks.extend(self.encode_tokens(o_str))
+                opt_ends_route.append(len(toks) - 1)
+
+            # 2. arg_mapping
+            q_end_arg = None
+            opt_ends_arg = []
+            arg_keys = []
+            if q_arg:
+                arg_keys = list(q_arg["criteria"].keys())
+                q2_text = f"\nQuestion [arg_mapping]: {q_arg.get('instructions', '')}\nOptions:\n"
+                toks.extend(self.encode_tokens(q2_text))
+                q_end_arg = len(toks) - 1
+                for idx, k in enumerate(arg_keys):
+                    o_str = f"[{idx}] {k}: {q_arg['criteria'][k]}\n"
+                    toks.extend(self.encode_tokens(o_str))
+                    opt_ends_arg.append(len(toks) - 1)
+
+            # 3. missing_required
+            q_end_miss = None
+            if q_miss:
+                q3_text = f"\nQuestion [missing_required]: {q_miss.get('instructions', '')}\n"
+                toks.extend(self.encode_tokens(q3_text))
+                q_end_miss = len(toks) - 1
+
+            # 4. is_mutation
+            q_end_mut = None
+            if q_mut:
+                q4_text = f"\nQuestion [is_mutation]: {q_mut.get('instructions', '')}\n"
+                toks.extend(self.encode_tokens(q4_text))
+                q_end_mut = len(toks) - 1
+
+            # Truncation check
+            if len(toks) > max_seq_len:
+                toks = toks[:max_seq_len]
+                q_end_route = min(q_end_route, max_seq_len - 1)
+                opt_ends_route = [min(pos, max_seq_len - 1) for pos in opt_ends_route]
+                if q_end_arg is not None:
+                    q_end_arg = min(q_end_arg, max_seq_len - 1)
+                    opt_ends_arg = [min(pos, max_seq_len - 1) for pos in opt_ends_arg]
+                if q_end_miss is not None:
+                    q_end_miss = min(q_end_miss, max_seq_len - 1)
+                if q_end_mut is not None:
+                    q_end_mut = min(q_end_mut, max_seq_len - 1)
+
+            packed_tokens_list.append(toks)
+            meta_packed.append({
+                "q_end_route": q_end_route,
+                "opt_ends_route": opt_ends_route,
+                "route_keys": r_keys,
+                "route_gold": q_route["label"],
+                "q_end_arg": q_end_arg,
+                "opt_ends_arg": opt_ends_arg,
+                "arg_keys": arg_keys,
+                "arg_gold": q_arg["label"] if q_arg else None,
+                "q_end_miss": q_end_miss,
+                "miss_gold": 1 if q_miss and q_miss.get("label") == "yes" else 0,
+                "q_end_mut": q_end_mut,
+                "mut_gold": 1 if q_mut and q_mut.get("label") == "yes" else 0,
+            })
+
+            # --- Sequence 2: Permuted Sequence ---
+            p_keys = list(q_perm["criteria"].keys())
+            q_perm_text = f"State: {state}\nQuestion [tool_route]: {q_perm.get('instructions', '')}\nOptions:\n"
+            p_toks = self.encode_tokens(q_perm_text, add_special_tokens=True)
+            q_end_perm = len(p_toks) - 1
+            opt_ends_perm = []
+            for idx, k in enumerate(p_keys):
+                o_str = f"[{idx}] {k}: {q_perm['criteria'][k]}\n"
+                p_toks.extend(self.encode_tokens(o_str))
+                opt_ends_perm.append(len(p_toks) - 1)
+
+            if len(p_toks) > max_seq_len:
+                p_toks = p_toks[:max_seq_len]
+                q_end_perm = min(q_end_perm, max_seq_len - 1)
+                opt_ends_perm = [min(pos, max_seq_len - 1) for pos in opt_ends_perm]
+
+            perm_tokens_list.append(p_toks)
+            meta_perm.append({
+                "q_end_perm": q_end_perm,
+                "opt_ends_perm": opt_ends_perm,
+                "perm_keys": p_keys,
+                "perm_gold": q_perm["label"],
+            })
+
+        # Batch all 2*B sequences
+        all_sequences = packed_tokens_list + perm_tokens_list
+        max_len = max(len(s) for s in all_sequences)
+        total_seqs = len(all_sequences)
+
+        batch_input_ids = torch.zeros((total_seqs, max_len), dtype=torch.long, device=device)
+        batch_attention_mask = torch.zeros((total_seqs, max_len), dtype=torch.long, device=device)
+
+        for row_idx, s in enumerate(all_sequences):
+            batch_input_ids[row_idx, :len(s)] = torch.tensor(s, dtype=torch.long, device=device)
+            batch_attention_mask[row_idx, :len(s)] = 1
+
+        # Single backbone forward pass!
+        if isinstance(self.backbone, MockCausalBackbone):
+            h_all = self.backbone(batch_input_ids, attention_mask=batch_attention_mask)
+        else:
+            outputs = self.backbone(input_ids=batch_input_ids, attention_mask=batch_attention_mask, output_hidden_states=True)
+            h_all = outputs.last_hidden_state if hasattr(outputs, "last_hidden_state") else outputs[0]
+
+        # Extract representations and compute logits & multi-task losses
+        losses_route = []
+        losses_jsd = []
+        losses_brier = []
+        losses_arg = []
+        losses_miss = []
+        losses_mut = []
+
+        route_hits = 0
+        perm_flips = 0
+        arg_hits = 0
+        miss_hits = 0
+        mut_hits = 0
+
+        route_logits_list = []
+
+        for i in range(B):
+            mp = meta_packed[i]
+            mperm = meta_perm[i]
+
+            h_packed = h_all[i]
+            h_perm = h_all[B + i]
+
+            # 1. tool_route
+            h_q1 = h_packed[mp["q_end_route"], :].float()
+            h_opts1 = torch.stack([h_packed[pos, :].float() for pos in mp["opt_ends_route"]], dim=0)
+            q1_vec = self.q_proj_head(h_q1.unsqueeze(0))
+            k1_mat = self.opt_proj_head(h_opts1)
+            logits_route = torch.matmul(k1_mat, q1_vec.squeeze(0)) * scale / temp
+            route_logits_list.append(logits_route)
+
+            # Permuted route
+            h_q_perm = h_perm[mperm["q_end_perm"], :].float()
+            h_opts_perm = torch.stack([h_perm[pos, :].float() for pos in mperm["opt_ends_perm"]], dim=0)
+            q_perm_vec = self.q_proj_head(h_q_perm.unsqueeze(0))
+            k_perm_mat = self.opt_proj_head(h_opts_perm)
+            logits_perm = torch.matmul(k_perm_mat, q_perm_vec.squeeze(0)) * scale / temp
+
+            # Target route CE
+            r_keys = mp["route_keys"]
+            r_gold = mp["route_gold"]
+            r_gold_idx = r_keys.index(r_gold) if r_gold in r_keys else 0
+            p_route = F.softmax(logits_route, dim=-1)
+            loss_r = -torch.log(torch.clamp(p_route[r_gold_idx], min=1e-9))
+            losses_route.append(loss_r)
+
+            pred_r_idx = int(torch.argmax(logits_route).item())
+            if pred_r_idx == r_gold_idx:
+                route_hits += 1
+
+            # Brier loss
+            num_opts = len(r_keys)
+            gold_oh = torch.zeros(num_opts, device=device)
+            gold_oh[r_gold_idx] = 1.0
+            losses_brier.append(torch.mean((p_route - gold_oh) ** 2))
+
+            # Permutation JSD & check flip
+            p_keys = mperm["perm_keys"]
+            perm_map = {k: idx for idx, k in enumerate(p_keys)}
+            p_perm = F.softmax(logits_perm, dim=-1)
+            p_perm_aligned = torch.stack([p_perm[perm_map[k]] for k in r_keys])
+
+            pred_perm_key = p_keys[int(torch.argmax(logits_perm).item())]
+            if pred_perm_key != r_keys[pred_r_idx]:
+                perm_flips += 1
+
+            p_safe = torch.clamp(p_route, min=1e-9)
+            q_safe = torch.clamp(p_perm_aligned, min=1e-9)
+            m_dist = 0.5 * (p_safe + q_safe)
+            kl1 = torch.sum(p_safe * (torch.log(p_safe) - torch.log(m_dist)))
+            kl2 = torch.sum(q_safe * (torch.log(q_safe) - torch.log(m_dist)))
+            losses_jsd.append(torch.clamp(0.5 * (kl1 + kl2), min=0.0))
+
+            # 2. arg_mapping
+            if mp["q_end_arg"] is not None and mp["opt_ends_arg"]:
+                h_q2 = h_packed[mp["q_end_arg"], :].float()
+                h_opts2 = torch.stack([h_packed[pos, :].float() for pos in mp["opt_ends_arg"]], dim=0)
+                q2_vec = self.q_proj_head(h_q2.unsqueeze(0))
+                k2_mat = self.opt_proj_head(h_opts2)
+                logits_arg = torch.matmul(k2_mat, q2_vec.squeeze(0)) * scale / temp
+                arg_gold = mp["arg_gold"]
+                arg_keys = mp["arg_keys"]
+                arg_gold_idx = arg_keys.index(arg_gold) if arg_gold in arg_keys else 0
+                p_arg = F.softmax(logits_arg, dim=-1)
+                losses_arg.append(-torch.log(torch.clamp(p_arg[arg_gold_idx], min=1e-9)))
+                if torch.argmax(logits_arg).item() == arg_gold_idx:
+                    arg_hits += 1
+
+            # 3. missing_required
+            if mp["q_end_miss"] is not None:
+                h_q3 = h_packed[mp["q_end_miss"], :].float()
+                q3_vec = self.q_proj_head(h_q3.unsqueeze(0))
+                logits_miss = self.binary_head(q3_vec).squeeze(0)  # (2,) [no, yes]
+                miss_target = mp["miss_gold"]
+                p_miss = F.softmax(logits_miss, dim=-1)
+                losses_miss.append(-torch.log(torch.clamp(p_miss[miss_target], min=1e-9)))
+                if torch.argmax(logits_miss).item() == miss_target:
+                    miss_hits += 1
+
+            # 4. is_mutation
+            if mp["q_end_mut"] is not None:
+                h_q4 = h_packed[mp["q_end_mut"], :].float()
+                q4_vec = self.q_proj_head(h_q4.unsqueeze(0))
+                logits_mut = self.binary_head(q4_vec).squeeze(0)  # (2,) [no, yes]
+                mut_target = mp["mut_gold"]
+                p_mut = F.softmax(logits_mut, dim=-1)
+                losses_mut.append(-torch.log(torch.clamp(p_mut[mut_target], min=1e-9)))
+                if torch.argmax(logits_mut).item() == mut_target:
+                    mut_hits += 1
+
+        loss_route_t = torch.stack(losses_route).mean() if losses_route else torch.tensor(0.0, device=device)
+        loss_brier_t = torch.stack(losses_brier).mean() if losses_brier else torch.tensor(0.0, device=device)
+        loss_jsd_t = torch.stack(losses_jsd).mean() if losses_jsd else torch.tensor(0.0, device=device)
+        loss_arg_t = torch.stack(losses_arg).mean() if losses_arg else torch.tensor(0.0, device=device)
+        loss_miss_t = torch.stack(losses_miss).mean() if losses_miss else torch.tensor(0.0, device=device)
+        loss_mut_t = torch.stack(losses_mut).mean() if losses_mut else torch.tensor(0.0, device=device)
+
+        total_loss = (
+            loss_route_t
+            + 0.25 * loss_brier_t
+            + 0.30 * loss_jsd_t
+            + 0.50 * loss_arg_t
+            + 0.25 * loss_miss_t
+            + 0.25 * loss_mut_t
+        )
+
+        return {
+            "loss": total_loss,
+            "loss_route": float(loss_route_t.item()),
+            "loss_brier": float(loss_brier_t.item()),
+            "loss_jsd": float(loss_jsd_t.item()),
+            "loss_arg": float(loss_arg_t.item()),
+            "loss_missing": float(loss_miss_t.item()),
+            "loss_mutation": float(loss_mut_t.item()),
+            "metrics": {
+                "route_acc": float(route_hits / B),
+                "perm_flip_rate": float(perm_flips / B),
+                "arg_acc": float(arg_hits / max(len(losses_arg), 1)),
+                "missing_acc": float(miss_hits / max(len(losses_miss), 1)),
+                "mutation_acc": float(mut_hits / max(len(losses_mut), 1)),
+            },
+            "logits_route_batch": route_logits_list,
+        }
 
 
 def save_soro_kev_checkpoint(

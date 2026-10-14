@@ -12,7 +12,10 @@ def test_linucb_learns_on_linear_bandit():
 
 
 def test_cached_public_embeddings_match_paper_top1_count():
+    import sys
     pytest.importorskip("faiss")
+    if sys.platform == "win32":
+        pytest.skip("FAISS binary file format (tools.faiss) is incompatible with Windows AVX2 build")
     try:
         out = run_cached_dense()
     except Exception as exc:

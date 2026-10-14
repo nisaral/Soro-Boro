@@ -817,6 +817,286 @@ def generate_dataset_records(
     return dataset
 
 
+def find_third_party_dir(subpath: str) -> Path | None:
+    """Find local benchmark directory either under current root or parent workspace root."""
+    for candidate in [ROOT_DIR / "third_party" / subpath, ROOT_DIR.parent / "third_party" / subpath]:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def load_all_benchmark_human_queries() -> list[dict[str, Any]]:
+    """Ingest real human queries, scenarios, and tool pairs from local benchmark datasets."""
+    items: list[dict[str, Any]] = []
+
+    # 1. mcp-semantic-tool-routing-benchmark (707 queries across 18 servers and 101 tools)
+    p_mcp = find_third_party_dir("mcp-semantic-tool-routing-benchmark")
+    if p_mcp:
+        tools_file = p_mcp / "data" / "tools.json"
+        dataset_file = p_mcp / "benchmark" / "dataset_expanded.jsonl"
+        tools_map: dict[str, dict[str, Any]] = {}
+        if tools_file.exists():
+            with open(tools_file, "r", encoding="utf-8") as f:
+                tdata = json.load(f)
+                for s in tdata.get("servers", []):
+                    srv_name = s.get("name", s.get("server_id", ""))
+                    pkg_id = s.get("server_id", "")
+                    for t in s.get("tools", []):
+                        tools_map[t["tool_id"]] = {
+                            "name": t["tool_id"],
+                            "description": t.get("description", ""),
+                            "properties": t.get("input_schema", {}),
+                            "required": [
+                                k for k, v in t.get("input_schema", {}).items()
+                                if isinstance(v, dict) and v.get("required")
+                            ],
+                            "server": srv_name,
+                            "package": f"mcp_benchmark/{pkg_id}",
+                        }
+        if dataset_file.exists():
+            with open(dataset_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    rec = json.loads(line)
+                    q = rec.get("query")
+                    t_id = rec.get("expected_tool")
+                    if q and t_id in tools_map:
+                        items.append({
+                            "source": "mcp-semantic-tool-routing-benchmark",
+                            "query": q,
+                            "gold_tool": tools_map[t_id],
+                            "domain_tools": list(tools_map.values()),
+                            "package": tools_map[t_id]["package"],
+                        })
+
+    # 2. tau2-bench (airline, retail, telecom: real customer service instructions & ground truth actions)
+    p_tau = find_third_party_dir("tau2-bench")
+    if p_tau:
+        tools_data_file = p_tau / "web" / "leaderboard" / "public" / "task-data" / "tools-data.json"
+        tools_by_domain: dict[str, dict[str, dict[str, Any]]] = {}
+        if tools_data_file.exists():
+            with open(tools_data_file, "r", encoding="utf-8") as f:
+                td = json.load(f)
+                for dom, dom_obj in td.items():
+                    tools_by_domain[dom] = {}
+                    for t in dom_obj.get("tools", []):
+                        props = {}
+                        for param in t.get("parameters", []):
+                            props[param.get("name")] = {
+                                "type": param.get("type", "string"),
+                                "description": param.get("description", ""),
+                                "required": param.get("required", False),
+                            }
+                        tools_by_domain[dom][t["name"]] = {
+                            "name": t["name"],
+                            "description": t.get("description", ""),
+                            "properties": props,
+                            "required": [k for k, v in props.items() if v.get("required")],
+                            "server": f"tau2_{dom}",
+                            "package": f"tau2/{dom}",
+                        }
+
+        domains_dir = p_tau / "data" / "tau2" / "domains"
+        for dom in ["airline", "retail", "telecom"]:
+            tasks_file = domains_dir / dom / "tasks.json"
+            if tasks_file.exists() and dom in tools_by_domain:
+                with open(tasks_file, "r", encoding="utf-8") as f:
+                    tasks = json.load(f)
+                    for task in tasks:
+                        inst = task.get("user_scenario", {}).get("instructions", {})
+                        if isinstance(inst, dict):
+                            q = inst.get("reason_for_call") or inst.get("task_instructions")
+                        elif isinstance(inst, str):
+                            q = inst
+                        else:
+                            q = None
+                        actions = task.get("evaluation_criteria", {}).get("actions", [])
+                        if q and actions and isinstance(actions, list):
+                            target_tool = actions[0].get("name")
+                            if target_tool and target_tool in tools_by_domain[dom]:
+                                items.append({
+                                    "source": f"tau2_{dom}",
+                                    "query": q.strip(),
+                                    "gold_tool": tools_by_domain[dom][target_tool],
+                                    "domain_tools": list(tools_by_domain[dom].values()),
+                                    "package": f"tau2/{dom}",
+                                })
+
+    # 3. MCPAgentBench
+    p_mcpagent = find_third_party_dir("MCPAgentBench")
+    if p_mcpagent:
+        tasks_file = p_mcpagent / "data" / "tasks.json"
+        if tasks_file.exists():
+            with open(tasks_file, "r", encoding="utf-8") as f:
+                tasks = json.load(f)
+                agentbench_tools: dict[str, dict[str, Any]] = {}
+                for t in tasks:
+                    tools_list = t.get("tools", [])
+                    inputs_list = t.get("inputs", [])
+                    if tools_list and tools_list[0]:
+                        t_name = tools_list[0][0]
+                        inp = (
+                            inputs_list[0][0]
+                            if (inputs_list and inputs_list[0] and isinstance(inputs_list[0][0], dict))
+                            else {}
+                        )
+                        if t_name not in agentbench_tools:
+                            props = {k: {"type": "string", "description": f"{k} parameter"} for k in inp.keys()}
+                            agentbench_tools[t_name] = {
+                                "name": t_name,
+                                "description": f"Agent tool to handle {t_name.replace('_', ' ')}",
+                                "properties": props,
+                                "required": list(props.keys()),
+                                "server": "MCPAgentBench_Server",
+                                "package": "MCPAgentBench",
+                            }
+                for t in tasks:
+                    q = t.get("content")
+                    tools_list = t.get("tools", [])
+                    if q and tools_list and tools_list[0]:
+                        t_name = tools_list[0][0]
+                        if t_name in agentbench_tools:
+                            items.append({
+                                "source": "MCPAgentBench",
+                                "query": q.strip(),
+                                "gold_tool": agentbench_tools[t_name],
+                                "domain_tools": list(agentbench_tools.values()),
+                                "package": "MCPAgentBench",
+                            })
+
+    return items
+
+
+def generate_benchmark_records(
+    human_items: list[dict[str, Any]],
+    all_catalog_tools: list[dict[str, Any]],
+    rng: random.Random,
+    prefix: str = "val_ext",
+) -> list[dict[str, Any]]:
+    """Convert raw human benchmark queries into polymorphic 5-format multi-question records."""
+    FORMATS = ["mcp_json", "agent_skill", "rest_openapi", "python_sig", "graphql_rpc"]
+    records = []
+    delex_counter = 1
+
+    for idx, item in enumerate(human_items):
+        gold = item["gold_tool"]
+        query_text = item["query"]
+        domain_tools = item.get("domain_tools", [])
+        pkg = gold.get("package", "benchmark")
+        srv = gold.get("server", "BenchmarkServer")
+        record_format = rng.choice(FORMATS)
+        delexicalize = rng.random() < 0.15
+        is_mixed_format = rng.random() < 0.40
+        is_abstain = rng.random() < 0.10
+
+        delex_id = f"op_{delex_counter}" if delexicalize else ""
+        if delexicalize:
+            delex_counter += 1
+
+        num_candidates = rng.randint(4, 8)
+        chosen_candidates = []
+
+        domain_distractors = [t for t in domain_tools if t["name"] != gold["name"]]
+        if domain_distractors:
+            k = min(len(domain_distractors), rng.randint(1, 3))
+            chosen_candidates.extend(rng.sample(domain_distractors, k))
+
+        needed = num_candidates - len(chosen_candidates) - (0 if is_abstain else 1)
+        attempts = 0
+        while len(chosen_candidates) < (num_candidates - (0 if is_abstain else 1)) and attempts < 40:
+            attempts += 1
+            cand = rng.choice(all_catalog_tools)
+            if cand["name"] != gold["name"] and cand not in chosen_candidates:
+                chosen_candidates.append(cand)
+
+        criteria: dict[str, str] = {}
+        rendered_gold_key = None
+
+        gold_fmt = rng.choice(FORMATS) if is_mixed_format else record_format
+        if not is_abstain:
+            g_key, g_spec = render_action_spec(
+                gold["name"], srv, gold["description"], gold["properties"],
+                gold["required"], gold_fmt, delexicalize=delexicalize, delex_id=delex_id
+            )
+            criteria[g_key] = g_spec
+            rendered_gold_key = g_key
+
+        for cand in chosen_candidates:
+            cand_fmt = rng.choice(FORMATS) if is_mixed_format else record_format
+            c_key, c_spec = render_action_spec(
+                cand["name"], cand.get("server", "Server"), cand["description"],
+                cand.get("properties", {}), cand.get("required", []), cand_fmt, delexicalize=False
+            )
+            if c_key not in criteria:
+                criteria[c_key] = c_spec
+
+        criteria["__abstain__"] = "None of the listed tools/skills fit the user request"
+
+        opt_keys = list(criteria.keys())
+        rng.shuffle(opt_keys)
+        shuffled_criteria = {k: criteria[k] for k in opt_keys}
+
+        perm_keys = list(reversed(opt_keys))
+        perm_criteria = {k: criteria[k] for k in perm_keys}
+
+        gold_route_choice = "__abstain__" if is_abstain else rendered_gold_key
+
+        arg_criteria, arg_choice, perturbed_arg = build_arg_mapping_question(gold.get("properties", {}), rng)
+
+        missing_label = "no"
+        is_mut = is_mutation_action(gold["name"], gold["description"])
+        mutation_label = "yes" if is_mut else "no"
+
+        state_text = f"User Request: {query_text}"
+
+        rec = {
+            "id": f"{prefix}_{idx:06d}",
+            "package": pkg,
+            "server_name": srv,
+            "format": record_format,
+            "delexicalized": delexicalize,
+            "is_multi_turn": False,
+            "has_collision_distractor": len(domain_distractors) > 0,
+            "is_external_human_benchmark": True,
+            "source": item.get("source", "benchmark"),
+            "state": state_text,
+            "questions": {
+                "tool_route": {
+                    "type": "choice",
+                    "instructions": "Which single tool or skill should run for this request? Use only the listed candidates.",
+                    "criteria": shuffled_criteria,
+                    "label": gold_route_choice,
+                },
+                "tool_route_perm": {
+                    "type": "choice",
+                    "instructions": "Which single tool or skill should run for this request? Use only the listed candidates.",
+                    "criteria": perm_criteria,
+                    "label": gold_route_choice,
+                },
+                "arg_mapping": {
+                    "type": "choice",
+                    "instructions": f"Which target parameter in the tool schema does the argument '{perturbed_arg}' correspond to?",
+                    "criteria": arg_criteria,
+                    "label": arg_choice,
+                },
+                "missing_required": {
+                    "type": "noul",
+                    "instructions": "Is any required parameter missing from the context, requiring the harness to ask the user before calling the tool?",
+                    "label": missing_label,
+                },
+                "is_mutation": {
+                    "type": "noul",
+                    "instructions": "Does this action execute a mutation (write, update, delete, payment) rather than a read-only query?",
+                    "label": mutation_label,
+                },
+            },
+        }
+        records.append(rec)
+
+    return records
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build Soro-Kev Universal Multi-Question Dataset")
     parser.add_argument("--catalog", type=str, default=str(CATALOG_PATH))
@@ -824,6 +1104,7 @@ def main():
     parser.add_argument("--train-ratio", type=float, default=0.85)
     parser.add_argument("--train-count", type=int, default=34000)
     parser.add_argument("--val-count", type=int, default=3000)
+    parser.add_argument("--val-external-count", type=int, default=600)
     args = parser.parse_args()
 
     out_dir = Path(args.output_dir)
@@ -834,12 +1115,53 @@ def main():
     total_tools = len(table)
     print(f"Total tools in catalog: {total_tools}")
 
-    # Unique packages (servers)
+    # Build flat all_tools list for cross-server distractor sampling
+    all_catalog_tools: list[dict[str, Any]] = []
+    for pkg, srv, name, desc, raw_sch in zip(
+        table["package"].to_pylist(),
+        table["server_name"].to_pylist(),
+        table["tool_name"].to_pylist(),
+        table["tool_description"].to_pylist(),
+        table["input_schema"].to_pylist(),
+    ):
+        try:
+            sch = json.loads(raw_sch) if isinstance(raw_sch, str) and raw_sch else {}
+        except Exception:
+            sch = {}
+        all_catalog_tools.append({
+            "package": pkg,
+            "server": srv or pkg,
+            "name": name,
+            "description": (desc or name).strip(),
+            "properties": sch.get("properties", {}) if isinstance(sch, dict) else {},
+            "required": sch.get("required", []) if isinstance(sch, dict) else [],
+        })
+
+    # Ingest real human queries from third-party benchmark datasets
+    print("Ingesting real human queries from local benchmarks (mcp-semantic-tool-routing, tau2, MCPAgentBench)...")
+    human_items = load_all_benchmark_human_queries()
+    print(f"Total real human benchmark queries ingested: {len(human_items)}")
+
+    rng = random.Random(2026)
+    rng.shuffle(human_items)
+
+    val_ext_items = human_items[: args.val_external_count]
+    train_human_items = human_items[args.val_external_count :]
+
+    print(f"Dedicated external benchmark split: {len(val_ext_items)} records.")
+    print(f"Blending {len(train_human_items)} real human benchmark queries into train split.")
+
+    val_ext_records = generate_benchmark_records(
+        val_ext_items, all_catalog_tools, rng, prefix="val_ext"
+    )
+    train_human_records = generate_benchmark_records(
+        train_human_items, all_catalog_tools, rng, prefix="train_human"
+    )
+
+    # Unique packages (servers) for zero-shot split
     packages = sorted(list(set(table["package"].to_pylist())))
     print(f"Total unique server packages: {len(packages)}")
 
-    # Deterministic zero-shot split by package
-    rng = random.Random(2026)
     rng.shuffle(packages)
     n_train_pkgs = int(len(packages) * args.train_ratio)
     train_packages = packages[:n_train_pkgs]
@@ -847,14 +1169,19 @@ def main():
 
     print(f"Partitioned: {len(train_packages)} train server packages / {len(val_packages)} held-out zero-shot val packages.")
 
-    print(f"Synthesizing {args.train_count} train records (polymorphic + 4 hardness layers)...")
-    train_data = generate_dataset_records(table, train_packages, is_train=True, target_count=args.train_count)
+    print(f"Synthesizing {args.train_count} catalog train records (polymorphic + 4 hardness layers)...")
+    catalog_train_data = generate_dataset_records(table, train_packages, is_train=True, target_count=args.train_count)
 
     print(f"Synthesizing {args.val_count} zero-shot held-out val records...")
     val_data = generate_dataset_records(table, val_packages, is_train=False, target_count=args.val_count)
 
+    # Combine catalog train data + blended real human benchmark records
+    train_data = catalog_train_data + train_human_records
+    rng.shuffle(train_data)
+
     train_path = out_dir / "train.jsonl"
     val_path = out_dir / "val_zeroshot.jsonl"
+    val_ext_path = out_dir / "val_external_human.jsonl"
 
     print(f"Writing {len(train_data)} records to {train_path}...")
     with train_path.open("w", encoding="utf-8") as f:
@@ -866,7 +1193,12 @@ def main():
         for r in val_data:
             f.write(json.dumps(r) + "\n")
 
-    print("Upscaled universal dataset generation complete!")
+    print(f"Writing {len(val_ext_records)} records to {val_ext_path}...")
+    with val_ext_path.open("w", encoding="utf-8") as f:
+        for r in val_ext_records:
+            f.write(json.dumps(r) + "\n")
+
+    print("Upscaled universal dataset generation with real human benchmarks complete!")
 
 
 if __name__ == "__main__":

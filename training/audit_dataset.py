@@ -156,30 +156,45 @@ def audit_dataset(data_dir: Path, catalog_path: Path) -> dict[str, Any]:
     inv6_pass = (collision_distractor_rate >= 0.35)
 
     # Invariant 7: Heuristic Ceiling Check
-    # Measures the accuracy of simple token-overlap heuristic on val records.
+    # Evaluates the exact same LocalKevScorer as evaluate_benchmark.py on held-out records.
+    # Reports overall accuracy, standard named accuracy, and delexicalized obfuscated accuracy.
     # On high-difficulty datasets with cross-server collisions & mixed formats,
-    # keyword heuristic accuracy should be bounded (< 75.0%) and fail to cheat.
+    # keyword heuristic accuracy must be bounded (< 75.0%) and fail to cheat.
+    from soro.routing.kev_local import LocalKevScorer
+    scorer = LocalKevScorer()
+
     heuristic_hits = 0
     heuristic_evaluated = 0
+    named_hits = 0
+    named_total = 0
+    delex_hits = 0
+    delex_total = 0
+
     for r in val_records[:500]:
         gold_label = r["questions"]["tool_route"]["label"]
-        query_tokens = set(re.findall(r"\w+", r["state"].lower()))
-        crit = r["questions"]["tool_route"]["criteria"]
-        scored = []
-        for k, text in crit.items():
-            if k == "__abstain__":
-                scored.append((k, 0.5))
-                continue
-            c_tokens = set(re.findall(r"\w+", text.lower()))
-            score = len(query_tokens & c_tokens) / max(len(c_tokens), 1)
-            scored.append((k, score))
-        scored.sort(key=lambda x: x[1], reverse=True)
-        pred = scored[0][0] if scored else "__abstain__"
-        if pred == gold_label:
+        is_delex = r.get("delexicalized", False)
+        turn_res = scorer.evaluate_turn(r["state"], r["questions"])
+        probs = turn_res.get("probabilities", {}).get("tool_route", {})
+        pred = turn_res.get("answers", {}).get("tool_route") or (
+            max(probs.keys(), key=lambda k: probs[k]) if probs else "__abstain__"
+        )
+        is_hit = (pred == gold_label)
+        if is_hit:
             heuristic_hits += 1
         heuristic_evaluated += 1
 
+        if is_delex:
+            delex_total += 1
+            if is_hit:
+                delex_hits += 1
+        else:
+            named_total += 1
+            if is_hit:
+                named_hits += 1
+
     heuristic_accuracy = heuristic_hits / max(heuristic_evaluated, 1)
+    named_accuracy = named_hits / max(named_total, 1)
+    delex_accuracy = delex_hits / max(delex_total, 1)
     inv7_pass = (heuristic_accuracy < 0.75)
 
     results = {
@@ -227,6 +242,8 @@ def audit_dataset(data_dir: Path, catalog_path: Path) -> dict[str, Any]:
             "inv7_heuristic_ceiling_check": {
                 "passed": inv7_pass,
                 "heuristic_accuracy": round(heuristic_accuracy, 4),
+                "standard_named_accuracy": round(named_accuracy, 4),
+                "delexicalized_accuracy": round(delex_accuracy, 4),
                 "ceiling_threshold": 0.75,
                 "checked_samples": heuristic_evaluated,
             },
@@ -267,7 +284,17 @@ def main():
     print(f"4. Label & Branch Integrity: {'[PASSED]' if inv['inv4_label_and_branch_integrity']['passed'] else '[FAILED]'} (100% valid criteria keys & labels)")
     print(f"5. Delex & Abstain Ratios:   {'[PASSED]' if inv['inv5_delexicalized_and_abstain_ratios']['passed'] else '[FAILED]'} (Delex: {inv['inv5_delexicalized_and_abstain_ratios']['delexicalized_train_share']*100:.1f}%, Abstain: {inv['inv5_delexicalized_and_abstain_ratios']['abstain_twin_val_share']*100:.1f}%, Drop: {inv['inv5_delexicalized_and_abstain_ratios']['drop_argument_val_share']*100:.1f}%)")
     print(f"6. Collision Distractors:    {'[PASSED]' if inv['inv6_hard_negative_difficulty']['passed'] else '[FAILED]'} ({inv['inv6_hard_negative_difficulty']['cross_server_collision_distractor_share']*100:.1f}% >= 35.0%, Avg Distractor Sim: {inv['inv6_hard_negative_difficulty']['avg_top_distractor_similarity']:.3f})")
-    print(f"7. Heuristic Ceiling Check:  {'[PASSED]' if inv['inv7_heuristic_ceiling_check']['passed'] else '[FAILED]'} ({inv['inv7_heuristic_ceiling_check']['heuristic_accuracy']*100:.1f}% < 75.0% - heuristic cannot cheat)")
+    inv7 = inv['inv7_heuristic_ceiling_check']
+    print(f"7. Heuristic Ceiling Check:  {'[PASSED]' if inv7['passed'] else '[FAILED]'} (Overall: {inv7['heuristic_accuracy']*100:.1f}% < 75.0% | Standard Named: {inv7['standard_named_accuracy']*100:.1f}% | Delexicalized: {inv7['delexicalized_accuracy']*100:.1f}%)")
+
+    # Check external human benchmark if present
+    ext_file = data_path / "val_external_human.jsonl"
+    if ext_file.exists():
+        with ext_file.open(encoding="utf-8") as f:
+            ext_count = sum(1 for line in f if line.strip())
+        print(f"\n--- EXTERNAL HUMAN BENCHMARK ---")
+        print(f"External Benchmark File:     {ext_file.name}")
+        print(f"Real Human Query Records:    {ext_count:,} (held-out non-template benchmark)")
 
     print("=" * 70)
     if res["all_invariants_passed"]:
