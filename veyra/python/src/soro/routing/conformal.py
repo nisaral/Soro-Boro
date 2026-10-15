@@ -14,7 +14,6 @@ from typing import Any, Callable
 import numpy as np
 
 from soro.routing.public_bench import ROOT
-from soro.routing.public_encoders import _load_public
 
 OUT = Path(__file__).resolve().parents[4] / "reports" / "conformal_public_505.json"
 OUT_DEBUG = Path(__file__).resolve().parents[4] / "reports" / "conformal_debug.json"
@@ -119,6 +118,7 @@ def score_matrix_cached() -> tuple[np.ndarray, np.ndarray]:
 
 def score_matrix_minilm() -> tuple[np.ndarray, np.ndarray]:
     from soro.routing.encoders import MiniLMEncoder
+    from soro.routing.public_encoders import _load_public
 
     docs, queries, gold_list, _ = _load_public()
     enc = MiniLMEncoder()
