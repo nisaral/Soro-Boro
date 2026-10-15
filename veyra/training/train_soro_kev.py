@@ -239,6 +239,7 @@ def main():
     world_size = int(os.environ.get("WORLD_SIZE", "1"))
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     distributed = world_size > 1
+    dist = None
     if distributed:
         import torch.distributed as dist
         dist.init_process_group(backend="nccl")
@@ -360,9 +361,14 @@ def main():
             t0 = time.time()
 
         # Mid-epoch eval is a 400-row stratified slice. Full val runs at epoch boundaries.
+        # Rank 0 holds the val file. The other rank waits, or the next training
+        # allreduce starts while rank 0 is still scoring and the job hangs.
         steps_per_epoch = max(1, math.ceil(len(train_records) / batch_size))
         at_epoch_end = step_idx % steps_per_epoch == 0 or step_idx == total_steps
-        if ((step_idx % args.eval_every == 0) or at_epoch_end) and len(val_records) >= 10 and local_rank == 0:
+        should_eval = (step_idx % args.eval_every == 0) or at_epoch_end
+        if should_eval and dist is not None:
+            dist.barrier()
+        if should_eval and local_rank == 0 and len(val_records) >= 10:
             if at_epoch_end:
                 eval_records = val_records
                 eval_label = "full"
@@ -391,6 +397,8 @@ def main():
                 print(f"--> New best model found! Saving checkpoint to {out_path}...")
                 if local_rank == 0:
                     save_soro_kev_checkpoint(raw_model, out_path, q_hat=best_q_hat)
+        if should_eval and dist is not None:
+            dist.barrier()
 
     if local_rank == 0:
         print(f"=== Training Complete! Saving final checkpoint to {out_path} ===")

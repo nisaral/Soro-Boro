@@ -113,6 +113,22 @@ class SoroKevModel(nn.Module):
                 from transformers import AutoModel, AutoTokenizer
                 from peft import LoraConfig, get_peft_model
 
+                # Kaggle's image has torchao 0.10. Current PEFT raises on that
+                # during every LoRA wrap, even when the backbone is plain fp16.
+                def _torchao_unused() -> bool:
+                    return False
+
+                try:
+                    import peft.import_utils as _peft_imports
+                    _peft_imports.is_torchao_available = _torchao_unused
+                except Exception:
+                    pass
+                try:
+                    import peft.tuners.lora.torchao as _peft_torchao
+                    _peft_torchao.is_torchao_available = _torchao_unused
+                except Exception:
+                    pass
+
                 dtype = torch_dtype or (
                     torch.bfloat16
                     if torch.cuda.is_available() and torch.cuda.is_bf16_supported()
