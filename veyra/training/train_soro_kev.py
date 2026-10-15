@@ -245,10 +245,20 @@ def main():
         dist.init_process_group(backend="nccl")
         torch.cuda.set_device(local_rank)
 
-    # kaggle_t4 keeps the batch size the caller passed. Qwen3-0.6B fp16 at
-    # batch 4 and grad_accum 2 fits a 16 GB T4 when sequences stay at 768 tokens.
+    # Qwen3-0.6B fp16 fits batch 4 on a 16 GB T4.
+    # Qwen3.5-0.8B does not: each record is two sequences, and its linear-attention
+    # fallback fills the card at batch 4. One record per GPU, accumulate to the
+    # same effective batch of 16 across 2 GPUs.
     batch_size = 2 if is_smoke else args.batch_size
     max_seq_len = 768 if args.profile == "kaggle_t4" else 1024
+    if args.profile == "kaggle_t4" and "3.5" in args.base_model:
+        if batch_size > 1 and local_rank == 0:
+            print(
+                f"Qwen3.5 on a T4: lowering batch {batch_size} -> 1 and "
+                f"grad_accum {args.grad_accum} -> {max(args.grad_accum, 8)} so the linear-attention forward fits."
+            )
+        batch_size = 1
+        args.grad_accum = max(args.grad_accum, 8)
     if is_smoke:
         train_records = train_records[:20]
         val_records = val_records[:40]

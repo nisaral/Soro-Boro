@@ -138,12 +138,22 @@ class SoroKevModel(nn.Module):
                 if self.tokenizer.pad_token is None:
                     self.tokenizer.pad_token = self.tokenizer.eos_token
 
-                base = AutoModel.from_pretrained(
+                loaded = AutoModel.from_pretrained(
                     model_name,
                     torch_dtype=dtype,
                     trust_remote_code=True,
                 )
-                backbone_dim = getattr(base.config, "hidden_size", hidden_size)
+                # Qwen3.5 is a vision-language wrapper. Tool routing is text only.
+                # Dropping the vision tower keeps it off the 16 GB T4.
+                if hasattr(loaded, "language_model"):
+                    base = loaded.language_model
+                    del loaded
+                else:
+                    base = loaded
+                text_cfg = getattr(base, "config", None)
+                backbone_dim = getattr(text_cfg, "hidden_size", None) or getattr(
+                    getattr(text_cfg, "text_config", None), "hidden_size", hidden_size
+                )
                 lora_cfg = LoraConfig(
                     r=16,
                     lora_alpha=32,
@@ -231,7 +241,7 @@ class SoroKevModel(nn.Module):
         if isinstance(self.backbone, MockCausalBackbone):
             h_seq = self.backbone(input_ids)  # (1, seq_len, hidden_size)
         else:
-            outputs = self.backbone(input_ids=input_ids, output_hidden_states=True)
+            outputs = self.backbone(input_ids=input_ids)
             h_seq = outputs.last_hidden_state if hasattr(outputs, "last_hidden_state") else outputs[0]
 
         # 3. Exact token-span slicing
@@ -260,7 +270,7 @@ class SoroKevModel(nn.Module):
         if isinstance(self.backbone, MockCausalBackbone):
             h_seq = self.backbone(input_ids)
         else:
-            outputs = self.backbone(input_ids=input_ids, output_hidden_states=True)
+            outputs = self.backbone(input_ids=input_ids)
             h_seq = outputs.last_hidden_state if hasattr(outputs, "last_hidden_state") else outputs[0]
 
         h_last = h_seq[0, -1, :].float()
@@ -425,7 +435,7 @@ class SoroKevModel(nn.Module):
         if isinstance(self.backbone, MockCausalBackbone):
             h_all = self.backbone(batch_input_ids, attention_mask=batch_attention_mask)
         else:
-            outputs = self.backbone(input_ids=batch_input_ids, attention_mask=batch_attention_mask, output_hidden_states=True)
+            outputs = self.backbone(input_ids=batch_input_ids, attention_mask=batch_attention_mask)
             h_all = outputs.last_hidden_state if hasattr(outputs, "last_hidden_state") else outputs[0]
 
         # Extract representations and compute logits & multi-task losses
