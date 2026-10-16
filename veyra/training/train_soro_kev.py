@@ -49,8 +49,9 @@ class RLCDLoss(nn.Module):
         arg_ce: torch.Tensor,
         missing_ce: torch.Tensor,
         mutation_ce: torch.Tensor,
+        intent_ce: torch.Tensor | None = None,
     ) -> torch.Tensor:
-        return compute_rlcd_loss(route_ce, brier, jsd, arg_ce, missing_ce, mutation_ce)
+        return compute_rlcd_loss(route_ce, brier, jsd, arg_ce, missing_ce, mutation_ce, intent_ce)
 
 
 def _legacy_example_rlcd(

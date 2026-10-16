@@ -26,6 +26,7 @@ def compute_rlcd_loss(
     arg_ce: torch.Tensor,
     missing_ce: torch.Tensor,
     mutation_ce: torch.Tensor,
+    intent_ce: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Reinforcement Learning from Contrastive Distillation.
 
@@ -34,6 +35,8 @@ def compute_rlcd_loss(
     parameters, and mutation detection. JSD is the permutation term:
     the route distribution must match the same options in a new order.
     """
+    if intent_ce is None:
+        intent_ce = route_ce * 0.0
     return (
         route_ce
         + 0.25 * brier
@@ -41,6 +44,7 @@ def compute_rlcd_loss(
         + 0.50 * arg_ce
         + 0.25 * missing_ce
         + 0.25 * mutation_ce
+        + 0.40 * intent_ce
     )
 
 
@@ -196,6 +200,8 @@ class SoroKevModel(nn.Module):
 
         # Binary head for noul / boolean questions
         self.binary_head = nn.Linear(proj_dim, 2)
+        # single=0, multi=1, none=2. multi must not auto-execute a mutation.
+        self.intent_head = nn.Linear(proj_dim, 3)
 
     def _tokenize_text(self, text: str) -> list[int]:
         words = re.findall(r"\w+", text.lower())
@@ -434,6 +440,7 @@ class SoroKevModel(nn.Module):
                 "opt_ends_route": opt_ends_route,
                 "route_keys": r_keys,
                 "route_gold": q_route["label"],
+                "intent": {"single": 0, "multi": 1, "none": 2}.get(item.get("intent") or "single", 0),
                 "q_end_arg": q_end_arg,
                 "opt_ends_arg": opt_ends_arg,
                 "arg_keys": arg_keys,
@@ -513,12 +520,14 @@ class SoroKevModel(nn.Module):
         losses_arg = []
         losses_miss = []
         losses_mut = []
+        losses_intent = []
 
         route_hits = 0
         perm_flips = 0
         arg_hits = 0
         miss_hits = 0
         mut_hits = 0
+        intent_hits = 0
 
         route_logits_list = []
 
@@ -536,6 +545,12 @@ class SoroKevModel(nn.Module):
             k1_mat = self.opt_proj_head(h_opts1)
             logits_route = torch.matmul(k1_mat, q1_vec.squeeze(0)) * scale / temp
             route_logits_list.append(logits_route)
+            intent_logits = self.intent_head(q1_vec).squeeze(0)
+            intent_target = int(mp.get("intent", 0))
+            p_intent = F.softmax(intent_logits, dim=-1)
+            losses_intent.append(-torch.log(torch.clamp(p_intent[intent_target], min=1e-9)))
+            if int(torch.argmax(intent_logits).item()) == intent_target:
+                intent_hits += 1
 
             # Permuted route
             h_q_perm = h_perm[mperm["q_end_perm"], :].float()
@@ -622,9 +637,10 @@ class SoroKevModel(nn.Module):
         loss_arg_t = torch.stack(losses_arg).mean() if losses_arg else torch.tensor(0.0, device=device)
         loss_miss_t = torch.stack(losses_miss).mean() if losses_miss else torch.tensor(0.0, device=device)
         loss_mut_t = torch.stack(losses_mut).mean() if losses_mut else torch.tensor(0.0, device=device)
+        loss_intent_t = torch.stack(losses_intent).mean() if losses_intent else torch.tensor(0.0, device=device)
 
         total_loss = compute_rlcd_loss(
-            loss_route_t, loss_brier_t, loss_jsd_t, loss_arg_t, loss_miss_t, loss_mut_t
+            loss_route_t, loss_brier_t, loss_jsd_t, loss_arg_t, loss_miss_t, loss_mut_t, loss_intent_t
         )
 
         return {
@@ -635,13 +651,15 @@ class SoroKevModel(nn.Module):
             "loss_arg": float(loss_arg_t.item()),
             "loss_missing": float(loss_miss_t.item()),
             "loss_mutation": float(loss_mut_t.item()),
-            "parts": (loss_route_t, loss_brier_t, loss_jsd_t, loss_arg_t, loss_miss_t, loss_mut_t),
+            "loss_intent": float(loss_intent_t.item()),
+            "parts": (loss_route_t, loss_brier_t, loss_jsd_t, loss_arg_t, loss_miss_t, loss_mut_t, loss_intent_t),
             "metrics": {
                 "route_acc": float(route_hits / B),
                 "perm_flip_rate": float(perm_flips / B),
                 "arg_acc": float(arg_hits / max(len(losses_arg), 1)),
                 "missing_acc": float(miss_hits / max(len(losses_miss), 1)),
                 "mutation_acc": float(mut_hits / max(len(losses_mut), 1)),
+                "intent_acc": float(intent_hits / max(len(losses_intent), 1)),
             },
             "logits_route_batch": route_logits_list,
             "kept_indices": kept_indices,
@@ -661,6 +679,7 @@ def save_soro_kev_checkpoint(
         "q_proj_head": model.q_proj_head.state_dict(),
         "opt_proj_head": model.opt_proj_head.state_dict(),
         "binary_head": model.binary_head.state_dict(),
+        "intent_head": model.intent_head.state_dict(),
         "log_temp": model.log_temp.data,
     }
     torch.save(head_weights, out_dir / "head.pt")
@@ -722,6 +741,8 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
     model.opt_proj_head.load_state_dict(weights["opt_proj_head"])
     if "binary_head" in weights:
         model.binary_head.load_state_dict(weights["binary_head"])
+    if "intent_head" in weights and hasattr(model, "intent_head"):
+        model.intent_head.load_state_dict(weights["intent_head"])
     if "log_temp" in weights:
         model.log_temp.data = weights["log_temp"]
 
