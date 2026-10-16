@@ -368,30 +368,24 @@ def main():
                 out = raw_model.forward_batch(batch_items, max_seq_len=max_seq_len)
         else:
             out = raw_model.forward_batch(batch_items, max_seq_len=max_seq_len)
-        if out.get("skipped"):
-            # Both GPUs must backward on every iteration. If one rank skips a long
-            # row and the other does not, their allreduces diverge and the
-            # validation barrier waits until NCCL kills the job.
-            dummy = sum((p.sum() * 0.0) for p in model.parameters())
-            scaler.scale(dummy).backward()
-            step_idx += 1
-            if (step_idx % args.grad_accum) == 0:
-                if scaler.is_enabled():
-                    scaler.unscale_(optimizer)
-                scaler.step(optimizer)
-                scaler.update()
-                optimizer.zero_grad()
-            continue
-        loss = criterion(*out["parts"])
+        skipped = bool(out.get("skipped"))
+        if skipped:
+            # Keep the autograd graph so this rank still steps. The eval check
+            # below must still run, or this rank walks past step 400 and the
+            # other rank waits at the barrier until NCCL kills the job.
+            loss = sum((p.sum() * 0.0) for p in model.parameters())
+        else:
+            loss = criterion(*out["parts"])
         scaled_loss = loss / args.grad_accum
         scaler.scale(scaled_loss).backward()
 
-        running_loss += float(loss.item())
-        running_route += out["loss_route"]
-        running_brier += out["loss_brier"]
-        running_jsd += out["loss_jsd"]
-        running_hits += out["metrics"]["route_acc"]
-        logged_steps += 1
+        if not skipped:
+            running_loss += float(out["loss"].item())
+            running_route += out["loss_route"]
+            running_brier += out["loss_brier"]
+            running_jsd += out["loss_jsd"]
+            running_hits += out["metrics"]["route_acc"]
+            logged_steps += 1
 
         grad_norm = 0.0
         if (step_idx + 1) % args.grad_accum == 0 or is_smoke:
@@ -436,8 +430,8 @@ def main():
                 eval_records = val_records
                 eval_label = "full"
             else:
-                eval_records = stratified_val_sample(val_records, 400, seed=step_idx)
-                eval_label = "subsample-400"
+                eval_records = stratified_val_sample(val_records, 80, seed=step_idx)
+                eval_label = "subsample-80"
             print(f"--- Split conformal val ({eval_label}, n={len(eval_records)}, step {step_idx}) ---")
             val_res = run_split_conformal_val(
                 raw_model,
