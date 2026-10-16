@@ -172,19 +172,22 @@ def run_split_conformal_val(
                 if gold in p_set:
                     covered += 1
 
-    n_test = len(test_records)
-    lo, hi = _wilson(covered, n_test)
+    n_scored = len(set_sizes)
+    lo, hi = _wilson(covered, n_scored) if n_scored else (0.0, 0.0)
     singletons = sum(1 for s in set_sizes if s == 1)
+    q_value = float(q_hat) if n_scored and np.isfinite(q_hat) else float("nan")
 
     model.train()
     return {
-        "val_route_acc": correct / n_test if n_test else 0.0,
-        "empirical_coverage": covered / n_test if n_test else 0.0,
+        "val_route_acc": correct / n_scored if n_scored else 0.0,
+        "empirical_coverage": covered / n_scored if n_scored else 0.0,
         "wilson_ci": [lo, hi],
         "mean_set_size": float(np.mean(set_sizes)) if set_sizes else 0.0,
-        "singleton_rate": singletons / n_test if n_test else 0.0,
-        "q_hat": float(q_hat),
-        "threshold": float(threshold),
+        "singleton_rate": singletons / n_scored if n_scored else 0.0,
+        "q_hat": q_value,
+        "threshold": float(threshold) if n_scored else 0.0,
+        "n_scored": n_scored,
+        "n_skipped": len(test_records) - n_scored,
     }
 
 
@@ -266,10 +269,20 @@ def main():
             )
         batch_size = 1
         args.grad_accum = max(args.grad_accum, 8)
-    if args.profile == "kaggle_t4" and "4b" in args.base_model.lower():
+    qwen35_4b = args.profile == "kaggle_t4" and "4b" in args.base_model.lower() and "3.5" in args.base_model
+    plain_4b = args.profile == "kaggle_t4" and "4b" in args.base_model.lower() and "3.5" not in args.base_model
+    if qwen35_4b:
         max_seq_len = 256
         if local_rank == 0:
-            print("4B on a T4: max_seq_len=256 and one sequence per step. Qwen3.5 linear attention has no fast T4 kernel.")
+            print("Qwen3.5-4B on a T4: max_seq_len=256 and one sequence per step.")
+    if plain_4b:
+        max_seq_len = 768
+        batch_size = 1
+        args.grad_accum = max(args.grad_accum, 8)
+        if args.lr > 5e-5:
+            args.lr = 5e-5
+        if local_rank == 0:
+            print("Qwen3-4B on a T4: max_seq_len=768, batch 1, lr 5e-5, no GradScaler.")
     if is_smoke:
         train_records = train_records[:20]
         val_records = val_records[:40]
@@ -309,7 +322,7 @@ def main():
         for child in (model.q_proj_head, model.opt_proj_head, model.binary_head, model.intent_head):
             child.to(device)
         model.log_temp.data = model.log_temp.data.to(device)
-        model.single_sequence = True
+        model.single_sequence = qwen35_4b
     else:
         model.to(device)
     if distributed:
@@ -319,7 +332,8 @@ def main():
     raw_model = model.module if distributed else model
     criterion = RLCDLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
-    scaler = torch.amp.GradScaler("cuda", enabled=use_fp16)
+    # 4-bit weights are already fp16 inside the matmul. A GradScaler on top of that overflows to NaN.
+    scaler = torch.amp.GradScaler("cuda", enabled=use_fp16 and not load_in_4bit)
 
     warmup_steps = 1 if is_smoke else 100
     best_val_score = -1.0
@@ -332,6 +346,7 @@ def main():
     running_brier = 0.0
     running_jsd = 0.0
     running_hits = 0.0
+    logged_steps = 0
 
     print(f"Starting batched training loop ({total_steps} steps | Profile: {args.profile})...")
 
@@ -365,29 +380,36 @@ def main():
         running_brier += out["loss_brier"]
         running_jsd += out["loss_jsd"]
         running_hits += out["metrics"]["route_acc"]
+        logged_steps += 1
 
         grad_norm = 0.0
         if (step_idx + 1) % args.grad_accum == 0 or is_smoke:
-            scaler.unscale_(optimizer)
+            if scaler.is_enabled():
+                scaler.unscale_(optimizer)
             grad_norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0).item())
-            scaler.step(optimizer)
+            if math.isfinite(grad_norm):
+                scaler.step(optimizer)
+            else:
+                print(f"Step {step_idx + 1}: non-finite grad {grad_norm}. Skipping update.", flush=True)
             scaler.update()
             optimizer.zero_grad()
 
         step_idx += 1
 
         # Periodic logging every 50 steps (or on smoke steps)
-        if step_idx % 50 == 0 or is_smoke:
-            n_sub = 50 if step_idx >= 50 else step_idx
+        if logged_steps >= 50 or is_smoke:
+            n_sub = max(logged_steps, 1)
             speed = (n_sub * batch_size) / max(time.time() - t0, 0.001)
             print(
                 f"Step {step_idx:05d}/{total_steps} | "
                 f"Loss: {running_loss / n_sub:.4f} (Route: {running_route / n_sub:.4f}, Brier: {running_brier / n_sub:.4f}, JSD: {running_jsd / n_sub:.6f}) | "
-                f"Train Route Acc: {running_hits / n_sub * 100:.1f}% | "
+                f"Train Route Acc: {min(100.0, running_hits / n_sub * 100):.1f}% | "
                 f"Grad Norm: {grad_norm:.2f} | "
-                f"Throughput: {speed:.1f} rec/s"
+                f"Throughput: {speed:.1f} rec/s",
+                flush=True,
             )
             running_loss = running_route = running_brier = running_jsd = running_hits = 0.0
+            logged_steps = 0
             t0 = time.time()
 
         # Mid-epoch eval is a 400-row stratified slice. Full val runs at epoch boundaries.
@@ -418,10 +440,13 @@ def main():
                 f"Coverage: {val_res['empirical_coverage'] * 100:.2f}% (Wilson: [{val_res['wilson_ci'][0]*100:.1f}%, {val_res['wilson_ci'][1]*100:.1f}%]) | "
                 f"Mean |S|: {val_res['mean_set_size']:.2f} | "
                 f"Singleton Rate: {val_res['singleton_rate'] * 100:.2f}% | "
-                f"q_hat: {val_res['q_hat']:.4f}"
+                f"q_hat: {val_res['q_hat']:.4f} | scored {val_res['n_scored']} skipped {val_res['n_skipped']}",
+                flush=True,
             )
             score = val_res["val_route_acc"] + val_res["singleton_rate"]
-            if score > best_val_score:
+            if val_res["n_scored"] < 20 or not math.isfinite(val_res["q_hat"]):
+                print("--> Validation scored too few rows. Not saving.", flush=True)
+            elif score > best_val_score:
                 best_val_score = score
                 best_q_hat = val_res["q_hat"]
                 print(f"--> New best model found! Saving checkpoint to {out_path}...")
