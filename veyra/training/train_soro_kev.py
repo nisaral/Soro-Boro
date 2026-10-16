@@ -276,13 +276,13 @@ def main():
         if local_rank == 0:
             print("Qwen3.5-4B on a T4: max_seq_len=256 and one sequence per step.")
     if plain_4b:
-        max_seq_len = 768
+        max_seq_len = 512
         batch_size = 1
         args.grad_accum = max(args.grad_accum, 8)
         if args.lr > 5e-5:
             args.lr = 5e-5
         if local_rank == 0:
-            print("Qwen3-4B on a T4: max_seq_len=768, batch 1, lr 5e-5, no GradScaler.")
+            print("Qwen3-4B on a T4: max_seq_len=512, one sequence, batch 1, lr 5e-5, no GradScaler.")
     if is_smoke:
         train_records = train_records[:20]
         val_records = val_records[:40]
@@ -322,7 +322,7 @@ def main():
         for child in (model.q_proj_head, model.opt_proj_head, model.binary_head, model.intent_head):
             child.to(device)
         model.log_temp.data = model.log_temp.data.to(device)
-        model.single_sequence = qwen35_4b
+        model.single_sequence = True
     else:
         model.to(device)
     if distributed:
