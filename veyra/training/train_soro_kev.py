@@ -303,7 +303,13 @@ def main():
         allow_mock_fallback=is_smoke,
         load_in_4bit=load_in_4bit and not is_smoke,
     )
-    if not load_in_4bit:
+    if load_in_4bit:
+        # The quantized backbone is already on this GPU. The pointer heads are
+        # created on CPU. DDP rejects a mix of the two.
+        for child in (model.q_proj_head, model.opt_proj_head, model.binary_head, model.intent_head):
+            child.to(device)
+        model.log_temp.data = model.log_temp.data.to(device)
+    else:
         model.to(device)
     if distributed:
         model = torch.nn.parallel.DistributedDataParallel(
