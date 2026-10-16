@@ -369,7 +369,18 @@ def main():
         else:
             out = raw_model.forward_batch(batch_items, max_seq_len=max_seq_len)
         if out.get("skipped"):
+            # Both GPUs must backward on every iteration. If one rank skips a long
+            # row and the other does not, their allreduces diverge and the
+            # validation barrier waits until NCCL kills the job.
+            dummy = sum((p.sum() * 0.0) for p in model.parameters())
+            scaler.scale(dummy).backward()
             step_idx += 1
+            if (step_idx % args.grad_accum) == 0:
+                if scaler.is_enabled():
+                    scaler.unscale_(optimizer)
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad()
             continue
         loss = criterion(*out["parts"])
         scaled_loss = loss / args.grad_accum
