@@ -267,9 +267,9 @@ def main():
         batch_size = 1
         args.grad_accum = max(args.grad_accum, 8)
     if args.profile == "kaggle_t4" and "4b" in args.base_model.lower():
-        max_seq_len = 512
+        max_seq_len = 256
         if local_rank == 0:
-            print("4B on a T4: max_seq_len=512. The 4-bit weights stay, the long linear-attention pass does not.")
+            print("4B on a T4: max_seq_len=256 and one sequence per step. Qwen3.5 linear attention has no fast T4 kernel.")
     if is_smoke:
         train_records = train_records[:20]
         val_records = val_records[:40]
@@ -309,6 +309,7 @@ def main():
         for child in (model.q_proj_head, model.opt_proj_head, model.binary_head, model.intent_head):
             child.to(device)
         model.log_temp.data = model.log_temp.data.to(device)
+        model.single_sequence = True
     else:
         model.to(device)
     if distributed:

@@ -497,8 +497,10 @@ class SoroKevModel(nn.Module):
                 "skipped": True,
             }
 
-        # Batch all 2*B sequences
-        all_sequences = packed_tokens_list + perm_tokens_list
+        # 4B on a T4 cannot afford the route sequence and its permutation together.
+        # The permutation loss is zero for that step. The route loss still trains.
+        single_sequence = bool(getattr(self, "single_sequence", False))
+        all_sequences = packed_tokens_list if single_sequence else packed_tokens_list + perm_tokens_list
         max_len = max(len(s) for s in all_sequences)
         total_seqs = len(all_sequences)
 
@@ -515,6 +517,8 @@ class SoroKevModel(nn.Module):
         else:
             outputs = self.backbone(input_ids=batch_input_ids, attention_mask=batch_attention_mask)
             h_all = outputs.last_hidden_state if hasattr(outputs, "last_hidden_state") else outputs[0]
+        if single_sequence:
+            h_all = torch.cat([h_all, h_all], dim=0)
 
         # Extract representations and compute logits & multi-task losses
         losses_route = []
