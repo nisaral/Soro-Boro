@@ -15,7 +15,7 @@ Multi-intent prompts that auto-executed a mutation: **3/4**.
 | search salt and pepper | EXECUTE | search_products | no |
 | souffle | ABSTAIN | none | no |
 
-`append_intent_rows.py` has been run. `train.jsonl` is now 23,192 rows: 18,555 single, 2,494 multi, 2,143 none. `val_zeroshot.jsonl` is 2,220 rows: 1,811 single, 200 multi, 209 none. The intent head (`single` / `multi` / `none`) is in the training loss at weight 0.40. Sequential rows and `__done__` rows are included. Toucan, ToolACE, and xLAM are not in this file yet. Drop a converted `external_intent.jsonl` in the data folder and rerun the append script before the 4B job if you want those sources included.
+`append_intent_rows.py` has been run. `train.jsonl` is now 23,192 rows: 18,555 single, 2,494 multi, 2,143 none. `val_zeroshot.jsonl` is 2,220 rows: 1,811 single, 200 multi, 209 none. The intent head (`single` / `multi` / `none`) is in the training loss at weight 0.40. Sequential rows and `__done__` rows are included. `external_intent.jsonl` is loaded automatically beside `train.jsonl`. The committed file has 7,770 ToolACE rows (3,182 multi, 3,606 single, 982 none) and 8,000 Toucan rows labeled multi, from one public shard. xLAM is CC-BY-4.0 and the Hub file is gated, so it is not in the jsonl. Put `xlam_function_calling_60k.json` in `data/external_raw` and rerun `python training/convert_external_tools.py --skip-download` to add it. NESTFUL stays held out.
 
 ## Datasets to pull on Kaggle before a multi-intent 4B run
 

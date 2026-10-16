@@ -222,6 +222,15 @@ def main():
     with train_file.open(encoding="utf-8") as f:
         for line in f:
             train_records.append(json.loads(line))
+    extra_file = data_path / "external_intent.jsonl"
+    if extra_file.exists():
+        extra_n = 0
+        with extra_file.open(encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    train_records.append(json.loads(line))
+                    extra_n += 1
+        print(f"Added {extra_n} external intent rows from {extra_file.name}")
 
     val_records = []
     if val_file.exists():
