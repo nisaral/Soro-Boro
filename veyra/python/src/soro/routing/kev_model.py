@@ -157,12 +157,15 @@ class SoroKevModel(nn.Module):
                     load_kw["torch_dtype"] = dtype
                 loaded = AutoModel.from_pretrained(model_name, **load_kw)
                 use_4bit = bool(load_kw.get("quantization_config"))
-                # Qwen3.5 is a vision-language wrapper. Tool routing is text only.
-                # Keep the parent when the weights are 4-bit, because the quantized
-                # modules are tied to that root.
-                if hasattr(loaded, "language_model") and not use_4bit:
-                    base = loaded.language_model
+                # Qwen3.5 ships a vision tower this router never uses. Drop it
+                # even in 4-bit, or the T4 is full before the first step.
+                if hasattr(loaded, "language_model"):
+                    base = loaded._modules.pop("language_model")
+                    for name in list(getattr(loaded, "_modules", {})):
+                        del loaded._modules[name]
                     del loaded
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
                 else:
                     base = loaded
                 if use_4bit:

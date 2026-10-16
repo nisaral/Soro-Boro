@@ -266,6 +266,10 @@ def main():
             )
         batch_size = 1
         args.grad_accum = max(args.grad_accum, 8)
+    if args.profile == "kaggle_t4" and "4b" in args.base_model.lower():
+        max_seq_len = 512
+        if local_rank == 0:
+            print("4B on a T4: max_seq_len=512. The 4-bit weights stay, the long linear-attention pass does not.")
     if is_smoke:
         train_records = train_records[:20]
         val_records = val_records[:40]
@@ -299,7 +303,8 @@ def main():
         allow_mock_fallback=is_smoke,
         load_in_4bit=load_in_4bit and not is_smoke,
     )
-    model.to(device)
+    if not load_in_4bit:
+        model.to(device)
     if distributed:
         model = torch.nn.parallel.DistributedDataParallel(
             model, device_ids=[local_rank], find_unused_parameters=True
