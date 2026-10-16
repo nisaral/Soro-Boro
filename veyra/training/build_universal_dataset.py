@@ -1259,6 +1259,20 @@ def _drop_value_clause(state: str) -> str:
     return state
 
 
+def _missing_instructions(tool: dict[str, Any]) -> str:
+    props = tool.get("properties") or {}
+    reqs = list(tool.get("required") or [])
+    bits = []
+    for name in reqs:
+        info = props.get(name) if isinstance(props.get(name), dict) else {}
+        bits.append(f"{name} ({(info or {}).get('type', 'string')})")
+    shown = ", ".join(bits) if bits else "none"
+    return (
+        f"Required parameters for {tool.get('name')}: [{shown}]. "
+        "Is any required parameter value missing from the user request?"
+    )
+
+
 def apply_missing_required(state: str, rng: random.Random, rate: float = 0.25) -> tuple[str, str]:
     """Complete requests are labeled no. A 25% slice is underspecified and labeled yes.
 
@@ -1421,13 +1435,21 @@ def make_real_record(
                 "label": arg_choice,
             },
             "missing_required": {
-                "type": "noul",
-                "instructions": "Is any required parameter missing from the user request, so the harness must ask before calling the tool?",
+                "type": "choice",
+                "instructions": _missing_instructions(gold),
+                "criteria": {
+                    "yes": "A required parameter value is missing from the user request.",
+                    "no": "All required parameter values are present in the user request.",
+                },
                 "label": missing_label,
             },
             "is_mutation": {
-                "type": "noul",
-                "instructions": "Does this action mutate external state (write, update, delete, payment) rather than read it?",
+                "type": "choice",
+                "instructions": f"Does {gold['name']} mutate external state rather than read it?",
+                "criteria": {
+                    "yes": "This tool writes, updates, deletes, or moves external state.",
+                    "no": "This tool only reads external state.",
+                },
                 "label": "yes" if is_mutation_action(gold["name"], gold.get("description") or "") else "no",
             },
         },

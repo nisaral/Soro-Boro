@@ -97,6 +97,7 @@ class SoroKevModel(nn.Module):
         use_mock: bool = False,
         torch_dtype: torch.dtype | None = None,
         allow_mock_fallback: bool = True,
+        load_in_4bit: bool = False,
     ):
         super().__init__()
         self.model_name = model_name
@@ -138,18 +139,31 @@ class SoroKevModel(nn.Module):
                 if self.tokenizer.pad_token is None:
                     self.tokenizer.pad_token = self.tokenizer.eos_token
 
-                loaded = AutoModel.from_pretrained(
-                    model_name,
-                    torch_dtype=dtype,
-                    trust_remote_code=True,
-                )
+                load_kw: dict[str, Any] = {"trust_remote_code": True}
+                if load_in_4bit or "4b" in model_name.lower():
+                    from transformers import BitsAndBytesConfig
+                    load_kw["quantization_config"] = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16,
+                    )
+                    load_kw["device_map"] = {"": torch.cuda.current_device() if torch.cuda.is_available() else "cpu"}
+                else:
+                    load_kw["torch_dtype"] = dtype
+                loaded = AutoModel.from_pretrained(model_name, **load_kw)
+                use_4bit = bool(load_kw.get("quantization_config"))
                 # Qwen3.5 is a vision-language wrapper. Tool routing is text only.
-                # Dropping the vision tower keeps it off the 16 GB T4.
-                if hasattr(loaded, "language_model"):
+                # Keep the parent when the weights are 4-bit, because the quantized
+                # modules are tied to that root.
+                if hasattr(loaded, "language_model") and not use_4bit:
                     base = loaded.language_model
                     del loaded
                 else:
                     base = loaded
+                if use_4bit:
+                    from peft import prepare_model_for_kbit_training
+                    base = prepare_model_for_kbit_training(base, use_gradient_checkpointing=True)
                 text_cfg = getattr(base, "config", None)
                 backbone_dim = getattr(text_cfg, "hidden_size", None) or getattr(
                     getattr(text_cfg, "text_config", None), "hidden_size", hidden_size
@@ -192,47 +206,101 @@ class SoroKevModel(nn.Module):
             return self.tokenizer.encode(text, add_special_tokens=add_special_tokens)
         return self._tokenize_text(text)
 
-    def score_choice_sequence(
+    def _encode_choice(
         self,
         state: str,
         instructions: str,
         criteria: dict[str, str],
-        max_seq_len: int = 1024,
-    ) -> tuple[torch.Tensor, list[str]]:
-        """Encode full [State + Question + Options] in ONE causal sequence pass.
-
-        Because causal attention flows across all tokens, candidate representations h_{opt, i}
-        compete directly with each other in context and change under permutation.
-        """
+        max_seq_len: int,
+    ) -> tuple[list[int], int, list[int], list[str]] | None:
         opt_keys = list(criteria.keys())
-        if not opt_keys:
-            return torch.tensor([]), []
-
-        # 1. Build concatenated sequence with span markers
         q_prefix = f"State: {state}\nQuestion: {instructions}\nOptions:\n"
         if self.tokenizer is not None:
             prefix_toks = self.tokenizer.encode(q_prefix, add_special_tokens=True)
         else:
             prefix_toks = self._tokenize_text(q_prefix)
-
         q_span_end = len(prefix_toks) - 1
         all_toks = list(prefix_toks)
         opt_span_ends = []
-
         for idx, k in enumerate(opt_keys):
-            opt_str = f"[{idx}] {k}: {criteria[k]}\n"
+            spec = criteria[k]
+            if len(spec) > 400:
+                spec = spec[:400]
+            opt_str = f"[{idx}] {k}: {spec}\n"
             if self.tokenizer is not None:
                 opt_toks = self.tokenizer.encode(opt_str, add_special_tokens=False)
             else:
                 opt_toks = self._tokenize_text(opt_str)
             all_toks.extend(opt_toks)
             opt_span_ends.append(len(all_toks) - 1)
-
         if len(all_toks) > max_seq_len:
-            raise ValueError(
-                f"choice sequence is {len(all_toks)} tokens, over max_seq_len={max_seq_len}. "
-                "Drop the record. Span indices are not clamped."
+            return None
+        return all_toks, q_span_end, opt_span_ends, opt_keys
+
+    def score_choice_sequence(
+        self,
+        state: str,
+        instructions: str,
+        criteria: dict[str, str],
+        max_seq_len: int = 4096,
+    ) -> tuple[torch.Tensor, list[str]]:
+        """Pointer scores for a tool menu.
+
+        Menus larger than 8 tools, or menus that do not fit in max_seq_len,
+        are split into chunks of 6 plus abstain. The top two names from each
+        chunk meet in a final pass. A row is not dropped.
+        """
+        opt_keys = list(criteria.keys())
+        if not opt_keys:
+            return torch.tensor([]), []
+        abstain_text = criteria.get("__abstain__", "None of the listed tools fit the user request.")
+        tools = [k for k in opt_keys if k != "__abstain__"]
+        packed = self._encode_choice(state, instructions, criteria, max_seq_len)
+        if len(tools) <= 8 and packed is not None:
+            return self._pointer_logits(*packed)
+
+        winners: list[str] = []
+        for start in range(0, max(len(tools), 1), 6):
+            chunk = tools[start : start + 6]
+            if not chunk:
+                break
+            sub = {k: criteria[k] for k in chunk}
+            sub["__abstain__"] = abstain_text
+            sub_pack = self._encode_choice(state, instructions, sub, max_seq_len)
+            if sub_pack is None:
+                # Last resort: names only, so a huge schema cannot drop the row.
+                sub = {k: k for k in chunk}
+                sub["__abstain__"] = abstain_text
+                sub_pack = self._encode_choice(state, instructions, sub, max_seq_len)
+            if sub_pack is None:
+                winners.extend(chunk[:2])
+                continue
+            logits, keys = self._pointer_logits(*sub_pack)
+            ranked = sorted(
+                ((float(logits[i]), keys[i]) for i in range(len(keys)) if keys[i] != "__abstain__"),
+                reverse=True,
             )
+            winners.extend(name for _, name in ranked[:2])
+        final_keys = list(dict.fromkeys(winners))
+        final = {k: criteria.get(k, k) for k in final_keys}
+        final["__abstain__"] = abstain_text
+        final_pack = self._encode_choice(state, instructions, final, max_seq_len)
+        if final_pack is None:
+            final = {k: k for k in final_keys}
+            final["__abstain__"] = abstain_text
+            final_pack = self._encode_choice(state, instructions, final, max_seq_len)
+        if final_pack is None:
+            keys = list(final)
+            return torch.zeros(len(keys)), keys
+        return self._pointer_logits(*final_pack)
+
+    def _pointer_logits(
+        self,
+        all_toks: list[int],
+        q_span_end: int,
+        opt_span_ends: list[int],
+        opt_keys: list[str],
+    ) -> tuple[torch.Tensor, list[str]]:
 
         device = next(self.parameters()).device
         input_ids = torch.tensor([all_toks], dtype=torch.long, device=device)
@@ -640,7 +708,14 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
         hidden_size=cfg.get("hidden_size", 1024),
         proj_dim=cfg.get("proj_dim", 256),
         use_mock=cfg.get("use_mock", True),
+        allow_mock_fallback=not (path / "adapter_model.safetensors").exists(),
     )
+    adapter = path / "adapter_model.safetensors"
+    if adapter.exists() and not isinstance(model.backbone, MockCausalBackbone):
+        from peft import set_peft_model_state_dict
+        from safetensors.torch import load_file
+
+        set_peft_model_state_dict(model.backbone, load_file(str(adapter)))
 
     weights = torch.load(head_file, map_location=device)
     model.q_proj_head.load_state_dict(weights["q_proj_head"])
@@ -662,3 +737,11 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
     model.to(device)
     model.eval()
     return model, temperature
+
+
+def _from_checkpoint(cls, checkpoint_dir: Path | str, device: str = "cpu"):
+    model, _temperature = load_soro_kev_checkpoint(checkpoint_dir, device=device)
+    return model
+
+
+SoroKevModel.from_checkpoint = classmethod(_from_checkpoint)

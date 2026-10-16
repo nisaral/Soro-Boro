@@ -232,10 +232,7 @@ def main():
     # T4 is Turing sm_75: 16 GB, fp16 tensor cores, no bf16.
     # 2x T4 is launched with torchrun --nproc_per_node=2. Each rank holds the
     # full 0.6B LoRA model. A 4B backbone does not fit this profile.
-    if args.profile == "kaggle_t4" and "4b" in args.base_model.lower():
-        raise SystemExit(
-            "Qwen 4B does not fit a 16 GB T4 with pointer-head activations. Use Qwen/Qwen3-0.6B."
-        )
+    load_in_4bit = "4b" in args.base_model.lower()
     world_size = int(os.environ.get("WORLD_SIZE", "1"))
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     distributed = world_size > 1
@@ -250,7 +247,7 @@ def main():
     # fallback fills the card at batch 4. One record per GPU, accumulate to the
     # same effective batch of 16 across 2 GPUs.
     batch_size = 2 if is_smoke else args.batch_size
-    max_seq_len = 768 if args.profile == "kaggle_t4" else 1024
+    max_seq_len = 1536 if args.profile == "kaggle_t4" else 1024
     if args.profile == "kaggle_t4" and "3.5" in args.base_model:
         if batch_size > 1 and local_rank == 0:
             print(
@@ -290,6 +287,7 @@ def main():
         use_mock=is_smoke,
         torch_dtype=torch.float16 if use_fp16 else torch.float32,
         allow_mock_fallback=is_smoke,
+        load_in_4bit=load_in_4bit and not is_smoke,
     )
     model.to(device)
     if distributed:

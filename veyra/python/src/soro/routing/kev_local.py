@@ -200,10 +200,19 @@ class LocalKevScorer:
                     answers[q_name] = max(q_probs.keys(), key=lambda k: q_probs[k])
 
                 elif q_type in ("noul", "boolean"):
-                    logits = self._neural_model.score_binary(state)
-                    probs = F.softmax(logits, dim=-1).cpu().tolist()
-                    probabilities[q_name] = {"no": float(probs[0]), "yes": float(probs[1])}
-                    answers[q_name] = "yes" if probs[1] > probs[0] else "no"
+                    if criteria and "yes" in criteria and "no" in criteria:
+                        logits, opt_keys = self._neural_model.score_choice_sequence(
+                            state, instructions, criteria, max_seq_len=4096
+                        )
+                        probs = F.softmax(logits, dim=-1).cpu().tolist()
+                        q_probs = {k: float(probs[i]) for i, k in enumerate(opt_keys)}
+                        probabilities[q_name] = q_probs
+                        answers[q_name] = max(q_probs, key=q_probs.get)
+                    else:
+                        logits = self._neural_model.score_binary(state)
+                        probs = F.softmax(logits, dim=-1).cpu().tolist()
+                        probabilities[q_name] = {"no": float(probs[0]), "yes": float(probs[1])}
+                        answers[q_name] = "yes" if probs[1] > probs[0] else "no"
 
                 else:
                     probabilities[q_name] = {}
