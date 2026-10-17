@@ -202,6 +202,15 @@ def _cosine(a: list[float], b: list[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
 
 
+try:
+    import spaces
+    gpu_decorator = spaces.GPU
+except Exception:
+    def gpu_decorator(fn):
+        return fn
+
+
+@gpu_decorator
 def route_query(query: str, alpha: float = 0.10) -> tuple[str, str, str, str, list[list[Any]], str]:
     """Execute System-One pointer routing over all 114 tools with calibrated conformal prediction."""
     start_time = time.perf_counter()

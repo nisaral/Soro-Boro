@@ -94,7 +94,16 @@ export default function ModelShowcaseSection() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href="https://huggingface.co/spaces/nisaralll/soro-kev-router"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-300 shadow-xs transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              Live Space Demo (114 Tools)
+            </a>
             <a
               href="https://huggingface.co/nisaralll"
               target="_blank"

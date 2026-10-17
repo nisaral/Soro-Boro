@@ -23,6 +23,10 @@ pipeline_tag: text-classification
 
 # Soro-Kev-0.8B
 
+[![Interactive Space Demo](https://img.shields.io/badge/Hugging%20Face-Interactive%20Space%20Demo-blue)](https://huggingface.co/spaces/nisaralll/soro-kev-router)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Soro--Boro-black)](https://github.com/nisaral/Soro-Boro)
+[![Dataset](https://img.shields.io/badge/Dataset-Universal%20Tool%20Harness-green)](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
+
 ## Model summary
 
 Soro-Kev-0.8B is a specialized decision model for AI agent tool routing, schema normalization, and execution boundary control. It reads one document (the state: user prompt, conversational history, and available tool schemas) and a set of typed questions about it, and returns a calibrated probability distribution over the options supplied with each question, in a single forward pass and without generating text.
