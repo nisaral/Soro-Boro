@@ -7,11 +7,9 @@ import ModelShowcaseSection from "@/components/ModelShowcaseSection";
 import ExecutionComparison from "@/components/ExecutionComparison";
 import CoreCapabilities from "@/components/CoreCapabilities";
 import DeveloperExperience from "@/components/DeveloperExperience";
-import CurrentStatus from "@/components/CurrentStatus";
 import RoadmapSection from "@/components/RoadmapSection";
 import GithubIcon from "@/components/GithubIcon";
-import { TOOLMISUSE_BENCHMARK_DATA } from "@/lib/benchmarkData";
-import { ArrowRight, BookOpen, Sparkles, Shield, BarChart3, Terminal, CheckCircle2, AlertTriangle, RefreshCw, Cpu } from "lucide-react";
+import { BookOpen, Sparkles, BarChart3, Terminal, Cpu } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -97,115 +95,11 @@ export default function LandingPage() {
         {/* WHY: EXECUTION COMPARISON */}
         <ExecutionComparison />
 
-        {/* CONTROLLED BENCHMARK SECTION (ToolMisuseBench) */}
-        <section className="py-16 sm:py-20 bg-white border-t border-slate-200/80">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mb-10 space-y-2">
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
-                Tier 1 Controlled Baseline Evidence
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
-                Empirical Evaluation on ToolMisuseBench
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Controlled comparison holding model, tools, prompt, task budget, and environment identical across four system arms. Only execution boundary logic varies.
-              </p>
-            </div>
-
-            {/* Benchmark Table */}
-            <div className="technical-card overflow-hidden bg-white border-slate-200/90 shadow-sm mb-6">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono border-collapse">
-                  <thead>
-                    <tr className="bg-slate-900 text-slate-100 border-b border-slate-800">
-                      <th className="py-3 px-4 font-semibold">System Arm</th>
-                      <th className="py-3 px-4 font-semibold text-right">Task Success</th>
-                      <th className="py-3 px-4 font-semibold text-right">Boundary Recovery</th>
-                      <th className="py-3 px-4 font-semibold text-right">Unsafe Retries</th>
-                      <th className="py-3 px-4 font-semibold text-right">Agent Re-plans</th>
-                      <th className="py-3 px-4 font-semibold text-right">Verdict</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {TOOLMISUSE_BENCHMARK_DATA.map((row, idx) => {
-                      const isSoroBoro = row.arm === "soro_boro" || row.arm === "soro";
-                      return (
-                        <tr key={idx} className={isSoroBoro ? "bg-emerald-50/50 font-semibold text-slate-900" : "hover:bg-slate-50 text-slate-700"}>
-                          <td className="py-3.5 px-4 font-sans font-medium">
-                            <div className="flex items-center gap-2">
-                              {isSoroBoro && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
-                              <span>{row.name}</span>
-                            </div>
-                            <span className="text-[11px] text-slate-500 font-normal font-sans block mt-0.5">
-                              {row.description}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right">
-                            <span className={isSoroBoro ? "text-emerald-700 font-bold text-sm" : "text-slate-600"}>
-                              {row.task_success_rate.toFixed(1)}%
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right">
-                            <span className={isSoroBoro ? "text-emerald-700 font-bold" : "text-slate-400"}>
-                              {row.boundary_recovery_rate.toFixed(1)}%
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right">
-                            <span className={row.unsafe_retries > 0 ? "text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200" : "text-emerald-600"}>
-                              {row.unsafe_retries}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right text-slate-800">
-                            {row.agent_replans}
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-sans">
-                            <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
-                              isSoroBoro
-                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                                : row.status === "UNSAFE"
-                                ? "bg-rose-100 text-rose-800 border border-rose-200"
-                                : "bg-slate-100 text-slate-700 border border-slate-200"
-                            }`}>
-                              {row.status}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Metric Callouts */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200/80">
-                <div className="text-2xl font-bold text-emerald-800">+25.0%</div>
-                <div className="text-xs text-emerald-900 font-medium mt-0.5">Absolute Success Gain</div>
-                <p className="text-[11px] text-emerald-700 mt-1">41.7% task success vs 16.7% raw agent on identical fault-injected conditions.</p>
-              </div>
-              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
-                <div className="text-2xl font-bold text-slate-900">15 Re-plans</div>
-                <div className="text-xs text-slate-800 font-medium mt-0.5">Agent Reasoning Cycles Avoided</div>
-                <p className="text-[11px] text-slate-600 mt-1">Boundary recovered schema coercions and idempotent transient faults invisibly.</p>
-              </div>
-              <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200/80">
-                <div className="text-2xl font-bold text-emerald-800">0 Unsafe Retries</div>
-                <div className="text-xs text-emerald-900 font-medium mt-0.5">Strict Safety Invariant</div>
-                <p className="text-[11px] text-emerald-700 mt-1">Naive retry double-charges. Soro verifies or abstains. ToolMisuse +25pp is quarantined — see Benchmarks.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* HOW: CORE CAPABILITIES */}
         <CoreCapabilities />
 
         {/* DEVELOPER EXPERIENCE & CODE */}
         <DeveloperExperience />
-
-        {/* EVIDENCE: WHAT'S WORKING TODAY */}
-        <CurrentStatus />
 
         {/* ROADMAP */}
         <RoadmapSection />
