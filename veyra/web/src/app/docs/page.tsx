@@ -62,25 +62,32 @@ export default function DocsPage() {
               {/* Section 2: Public API */}
               <section id="public-api" className="technical-card p-6 sm:p-8 bg-white space-y-4">
                 <div className="flex items-center gap-2 text-xs font-mono text-slate-500 font-semibold">
-                  <Code2 className="w-4 h-4 text-slate-700" /> 2. Unified Public API
+                  <Code2 className="w-4 h-4 text-slate-700" /> 2. Unified Public API &amp; Harness
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  One entry point (`from soro import Soro`)
+                  One entry point (`from soro.harness.pipeline import SoroHarness`)
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Register a catalog, route an utterance, wrap mutations:
+                  Load pretrained Hugging Face models (`nisaralll/soro-kev-4b` or `0.8b`), route queries, auto-repair arguments, and guard execution:
                 </p>
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-lg font-mono text-xs border border-slate-800 leading-relaxed">
-                  <pre>{`from soro import Soro, SideEffectClass
+                  <pre>{`from soro.harness.pipeline import SoroHarness
 
-soro = Soro()
+# Load pretrained System-One pointer router from Hugging Face
+harness = SoroHarness.from_pretrained("nisaralll/soro-kev-4b")
 
-@soro.tool(side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION, verify=verify_charge)
-def process_payment(customer_id: str, amount: float) -> dict:
-    return {"status": "success", "tx_id": "tx_9921"}
+@harness.tool(description="Process customer refund", side_effect="mutation")
+def process_refund(order_id: str, amount: float) -> dict:
+    return {"status": "ok", "order_id": order_id, "amount": amount}
 
-decision = soro.route("charge customer 102 ninety nine dollars")
-result = process_payment(customer_id="cust_102", amount=99.0)`}</pre>
+# Single-prefill conformal routing in ~413ms (NF4)
+decision = harness.route("Please refund $99.00 for order ORD-102")
+print("Action:", decision.action)          # "EXECUTE"
+print("Tool:", decision.selected_tool)     # "process_refund"
+
+# Execute with auto argument repair & loop-guard
+outcome = harness.execute("process_refund", {"orderId": "ORD-102", "amount": "99.00"})
+print("Outcome:", outcome.data)`}</pre>
                 </div>
               </section>
 

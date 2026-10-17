@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroExecutionVisual from "@/components/HeroExecutionVisual";
 import InteractiveDemo from "@/components/InteractiveDemo";
+import ModelShowcaseSection from "@/components/ModelShowcaseSection";
 import ExecutionComparison from "@/components/ExecutionComparison";
 import CoreCapabilities from "@/components/CoreCapabilities";
 import DeveloperExperience from "@/components/DeveloperExperience";
@@ -10,7 +11,7 @@ import CurrentStatus from "@/components/CurrentStatus";
 import RoadmapSection from "@/components/RoadmapSection";
 import GithubIcon from "@/components/GithubIcon";
 import { TOOLMISUSE_BENCHMARK_DATA } from "@/lib/benchmarkData";
-import { ArrowRight, BookOpen, Sparkles, Shield, BarChart3, Terminal, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
+import { ArrowRight, BookOpen, Sparkles, Shield, BarChart3, Terminal, CheckCircle2, AlertTriangle, RefreshCw, Cpu } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -25,30 +26,37 @@ export default function LandingPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-mono text-slate-700">
                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Soro-Boro v0.1 — Consequential Write Execution Boundary</span>
+                <span className="font-semibold text-emerald-800">Soro-Kev 4B &amp; 0.8B Models Live</span>
                 <span className="text-slate-400">|</span>
-                <span className="text-slate-500">Apache-2.0</span>
+                <span className="text-slate-600">Conformal System-One Tool Routing &amp; Execution Boundary</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-[1.1]">
-                Consequential agent writes. <br className="hidden sm:inline" />
+                System-One tool routing. <br className="hidden sm:inline" />
                 Zero blind retries. <br className="hidden sm:inline" />
-                Auditable outcomes.
+                Zero hallucinated tools.
               </h1>
 
               {/* Tagline & Subtitle */}
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-                Soro-Boro prevents unsafe retries of consequential agent writes and gives teams a clear, auditable outcome when the result is uncertain.
+                Soro combines sub-100ms conformal pointer routing with deterministic execution guards. Route 50+ tool schemas in a single prefill pass without token-by-token JSON generation.
               </p>
 
               {/* Primary & Secondary CTAs */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <a
-                  href="#demo"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-md transition-all cursor-pointer"
+                  href="#models"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 shadow-md transition-all cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <Cpu className="w-4 h-4 text-white" />
+                  Explore Models &amp; Weights
+                </a>
+                <a
+                  href="#demo"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 shadow-xs transition-all cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4 text-emerald-500" />
                   Interactive Simulator
                 </a>
                 <Link
@@ -82,6 +90,9 @@ export default function LandingPage() {
 
         {/* INTERACTIVE FAILURE MODE SIMULATOR */}
         <InteractiveDemo />
+
+        {/* TRAINED SORO-KEV MODELS & HUGGING FACE RELEASES */}
+        <ModelShowcaseSection />
 
         {/* WHY: EXECUTION COMPARISON */}
         <ExecutionComparison />

@@ -4,10 +4,34 @@ import { useState } from "react";
 import { Check, Copy, Terminal, Play, Code2, Server, GitFork } from "lucide-react";
 
 export default function DeveloperExperience() {
-  const [activeTab, setActiveTab] = useState<"python" | "reconciler" | "wal" | "cli">("python");
+  const [activeTab, setActiveTab] = useState<"harness" | "python" | "reconciler" | "wal" | "cli">("harness");
   const [copied, setCopied] = useState(false);
 
   const snippets = {
+    harness: `# Soro Unified Harness: Route -> Repair -> Guard
+from soro.harness.pipeline import SoroHarness
+
+# Load 4B or 0.8B pretrained model from Hugging Face
+harness = SoroHarness.from_pretrained("nisaralll/soro-kev-4b")
+
+@harness.tool(description="Look up customer order details", side_effect="read_only")
+def get_order_status(order_id: str) -> dict:
+    return {"order_id": order_id, "customer_email": "alice@acme.com", "shipment_id": "SHP-901"}
+
+@harness.tool(description="Cancel pending warehouse shipment", side_effect="mutation")
+def cancel_shipment(shipment_id: str) -> dict:
+    return {"shipment_id": shipment_id, "cancelled": True}
+
+# 1. Conformal Route: single prefill pointer pass (413ms NF4)
+decision = harness.route("Check order ORD-774")
+print(decision.action, decision.selected_tool)  # "EXECUTE", "get_order_status"
+
+# 2. Multi-Step Workflow with Automatic Context Chaining:
+trace = harness.run_workflow(
+    "Look up order ORD-774, then cancel its shipment."
+)
+`,
+
     python: `# Soro-Boro: Wrap consequential mutations with durable boundary
 from soro_boro import soro_wrap, SideEffectClass, OperationIdentity
 
@@ -112,6 +136,16 @@ $ pytest python/tests/test_soro_boro_adversarial.py -v
               {/* Tabs */}
               <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/60 px-4 py-2">
                 <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setActiveTab("harness")}
+                    className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
+                      activeTab === "harness"
+                        ? "bg-slate-800 text-emerald-400 font-semibold"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    SoroHarness
+                  </button>
                   <button
                     onClick={() => setActiveTab("python")}
                     className={`px-3 py-1 text-xs font-mono rounded transition-colors ${

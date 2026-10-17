@@ -14,6 +14,10 @@ import {
   Layers,
   ArrowRight,
   Info,
+  Cpu,
+  Zap,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react";
 
 export default function BenchmarksPage() {
@@ -68,6 +72,153 @@ export default function BenchmarksPage() {
               <div>
                 <strong className="font-semibold block mb-0.5">Finite-Sample Rule of Three Bound:</strong>
                 Zero duplicate effects in 700 at-risk trials per system (2,800 trials across 4 targets) yields a 95% upper confidence bound of &le; 0.43% (2.9957 / 700). Pre-commit drops cannot produce duplicates and are excluded from the risk denominator.
+              </div>
+            </div>
+          </div>
+
+          {/* SORO-KEV SYSTEM-ONE NEURAL ROUTER BENCHMARK */}
+          <div className="technical-card p-6 sm:p-8 bg-white mb-12 shadow-sm border border-slate-200 rounded-xl">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-6">
+              <div>
+                <span className="text-xs font-mono font-semibold text-emerald-600 uppercase tracking-wider flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5" />
+                  System-One Pointer Models · Empirical Holdout &amp; BFCL Evaluation
+                </span>
+                <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+                  Soro-Kev 4B &amp; 0.8B vs. Jared Palmer Kev &amp; Heuristic Baseline
+                </h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://huggingface.co/nisaralll/soro-kev-4b"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-mono px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold flex items-center gap-1 hover:bg-emerald-100 transition-colors"
+                >
+                  <span>4B on Hub</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                <a
+                  href="https://huggingface.co/nisaralll/soro-kev-0.8b"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-mono px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 font-semibold flex items-center gap-1 hover:bg-blue-100 transition-colors"
+                >
+                  <span>0.8B on Hub</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed mb-6">
+              Tested on RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs. Models compute hidden-state dot product pointer scoring in a single forward pass without token-by-token JSON generation.
+            </p>
+
+            {/* Benchmark Table */}
+            <div className="overflow-x-auto mb-6">
+              <table className="w-full text-left text-xs font-mono border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
+                    <th className="py-2.5 px-3 font-semibold">Evaluation Metric / Slice</th>
+                    <th className="py-2.5 px-3 font-semibold">Heuristic</th>
+                    <th className="py-2.5 px-3 font-semibold">Jared Palmer Kev-0.8B</th>
+                    <th className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/50">Soro-Kev-0.8B</th>
+                    <th className="py-2.5 px-3 font-semibold text-emerald-700 bg-emerald-100/60 font-bold">
+                      Soro-Kev-4B (Flagship)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">Zero-Shot Route Accuracy (200 test rows)</td>
+                    <td className="py-2.5 px-3 text-slate-500">47.50%</td>
+                    <td className="py-2.5 px-3 text-slate-400">—</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">84.50%</td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-700 bg-emerald-100/30">89.00%</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">External Human Holdout Accuracy (200 rows)</td>
+                    <td className="py-2.5 px-3 text-slate-500">60.50%</td>
+                    <td className="py-2.5 px-3 text-slate-700">75.00%</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">89.00%</td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-700 bg-emerald-100/30">94.50%</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">BFCL Multiple Accuracy (34 rows)</td>
+                    <td className="py-2.5 px-3 text-slate-500">97.06%</td>
+                    <td className="py-2.5 px-3 text-slate-700">100.0%</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">100.0%</td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-700 bg-emerald-100/30">100.0%</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">BFCL Live Multiple Accuracy (33 rows)</td>
+                    <td className="py-2.5 px-3 text-slate-500">75.76%</td>
+                    <td className="py-2.5 px-3 text-slate-700">69.70%</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">96.97%</td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-700 bg-emerald-100/30">96.97%</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">BFCL Irrelevance Abstention (33 rows)</td>
+                    <td className="py-2.5 px-3 text-red-500">3.03%</td>
+                    <td className="py-2.5 px-3 text-slate-700">81.82%</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">57.58%</td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-700 bg-emerald-100/30">75.76%</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">Argument Key Normalization Rate</td>
+                    <td className="py-2.5 px-3 text-slate-500">42.50%</td>
+                    <td className="py-2.5 px-3 text-slate-400">—</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">99.00%</td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-700 bg-emerald-100/30">100.0%</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">Median Latency (Prefill Only)</td>
+                    <td className="py-2.5 px-3 text-slate-500">0.31 ms</td>
+                    <td className="py-2.5 px-3 text-slate-700">110.95 ms</td>
+                    <td className="py-2.5 px-3 font-semibold text-emerald-600 bg-emerald-50/30">80.01 ms</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-100/30">413.18 ms</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-medium text-slate-900">Peak GPU VRAM</td>
+                    <td className="py-2.5 px-3 text-slate-500">0 MB</td>
+                    <td className="py-2.5 px-3 text-slate-700">1,612 MB</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-50/30">1,563 MB</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-emerald-100/30">4,048 MB (NF4)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Schema Format Breakdown */}
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div className="text-[11px] font-mono font-semibold text-slate-700 mb-2">
+                Soro-Kev-4B Accuracy by Schema Format (200-Row External Human Slice):
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-xs font-mono">
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-slate-500 text-[10px]">Agent Skill</div>
+                  <div className="font-bold text-emerald-700">100.0%</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-slate-500 text-[10px]">GraphQL RPC</div>
+                  <div className="font-bold text-emerald-700">96.8%</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-slate-500 text-[10px]">REST / OpenAPI</div>
+                  <div className="font-bold text-emerald-700">96.2%</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-slate-500 text-[10px]">Mixed Catalogs</div>
+                  <div className="font-bold text-emerald-700">94.6%</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-slate-500 text-[10px]">MCP JSON</div>
+                  <div className="font-bold text-emerald-700">94.4%</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-slate-500 text-[10px]">Python Sig</div>
+                  <div className="font-bold text-emerald-700">87.8%</div>
+                </div>
               </div>
             </div>
           </div>

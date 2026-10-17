@@ -10,6 +10,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Overview", icon: Cpu },
+    { href: "/#models", label: "Models & Hub", icon: Sparkles },
     { href: "/benchmarks", label: "Benchmarks", icon: BarChart3 },
     { href: "/dashboard", label: "Live Console", icon: Terminal },
     { href: "/architecture", label: "Architecture", icon: Layers },
