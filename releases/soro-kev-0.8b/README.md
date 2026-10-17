@@ -2,31 +2,35 @@
 license: apache-2.0
 base_model: Qwen/Qwen3.5-0.8B-Base
 tags:
+  - decision-model
   - tool-calling
   - function-calling
   - mcp
   - model-context-protocol
-  - agent-harness
   - pointer-network
   - conformal-prediction
   - system-one
+  - multiple-choice
+  - calibration
+  - typesafe
+  - agent-harness
   - edge-ai
-  - on-device
+  - qwen3.5
 datasets:
   - nisaralll/soro-universal-tool-harness
 pipeline_tag: text-classification
 ---
 
-# ⚡ Soro-Kev-0.8B: Ultra-Fast Edge Tool Router
+# Soro-Kev-0.8B: Ultra-Fast Edge Tool Router
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Base Model](https://img.shields.io/badge/Base_Model-Qwen3.5--0.8B-purple.svg)](https://huggingface.co/Qwen/Qwen3.5-0.8B-Base)
 [![Dataset](https://img.shields.io/badge/Dataset-soro--universal--tool--harness-green.svg)](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
 [![GitHub](https://img.shields.io/badge/GitHub-Soro--Boro-black.svg)](https://github.com/nisaral/Soro-Boro)
 
-**Soro-Kev-0.8B** is an ultra-fast, sub-100ms **System-One Pointer Model** designed for edge devices, local AI assistants, MCP servers, and high-throughput routing pipelines.
+Soro-Kev-0.8B is an ultra-fast, sub-100ms System-One Pointer Model designed for edge devices, local AI assistants, MCP servers, and high-throughput routing pipelines.
 
-Built on `Qwen/Qwen3.5-0.8B-Base`, it predicts tool selections and resolves schema arguments in a **single forward prefill** pass using hidden-state pointer attention, without generating text or slow JSON tokens.
+Built on `Qwen/Qwen3.5-0.8B-Base`, it predicts tool selections and resolves schema arguments in a single forward prefill pass using hidden-state pointer attention, without generating text or slow JSON tokens.
 
 ```text
 User Request + Candidate Tool Schemas
@@ -43,17 +47,17 @@ User Request + Candidate Tool Schemas
 
 ---
 
-## ⚡ Highlights
+## Technical Specifications
 
-- 🏎️ **Ultra-Fast Edge Latency**: **~80 ms** on consumer laptop GPU (sub-30ms on Linux kernels).
-- 💾 **Tiny Footprint**: Only **1,563 MB VRAM** peak footprint. Runs effortlessly alongside small LLMs on single GPUs or edge chips.
-- 🛡️ **Zero Hallucination**: Only points to registered tools. Cannot invent nonexistent tool names.
-- 📐 **Calibrated Decision Threshold**: Uses split conformal prediction (`calibrated_q_hat = 0.9518`).
-- 🔌 **Universal Compatibility**: Works with MCP tools, Python signatures, REST/OpenAPI, and Agent Skills (`SKILL.md`).
+- **Edge Latency**: ~80 ms on consumer laptop GPU (sub-30ms on Linux kernels).
+- **VRAM Footprint**: ~1,563 MB peak VRAM. Runs effortlessly alongside small LLMs on single GPUs or edge devices.
+- **Zero Hallucination**: Points directly to registered tool candidates; cannot generate fictional names.
+- **Calibrated Decision Set**: Uses split conformal prediction (`calibrated_q_hat = 0.9518`).
+- **Universal Schema Support**: Compatible with MCP tools, Python signatures, REST/OpenAPI, and Agent Skills (`SKILL.md`).
 
 ---
 
-## 📦 Quickstart
+## Quickstart
 
 ```python
 from soro.harness.pipeline import SoroHarness
@@ -81,16 +85,16 @@ print("Result:", res.data)
 
 ---
 
-## 📊 Benchmark Results
+## Benchmark Results
 
-Evaluated on an **NVIDIA GeForce RTX 4050 Laptop GPU** and **Kaggle T4 GPUs** using seed-42 slices (100 calibration / 200 test rows).
+Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU and Kaggle T4 GPUs using seed-42 slices (100 calibration / 200 test rows).
 
-| Benchmark Split | Heuristic Baseline | Jared Palmer Kev-0.8B | **Soro-Kev-0.8B** |
+| Benchmark Split | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-0.8B |
 | :--- | :--- | :--- | :--- |
 | **Zero-Shot Routing Accuracy** | 47.50% | — | **84.50%** |
 | **Zero-Shot Conformal Coverage** (Target: 90%) | 89.50% | — | **89.00%** |
 | **Zero-Shot Mean Set Size** | 4.39 | — | **1.17** |
-| **External Human Routing Accuracy** | 60.50% | 75.0% | **89.00%** |
+| **External Human Routing Accuracy** | 60.50% | 75.00% | **89.00%** |
 | **BFCL Multiple (34 rows)** | 97.06% | 100.0% | **100.0%** |
 | **BFCL Live Multiple (33 rows)** | 75.76% | 69.70% | **96.97%** |
 | **BFCL Irrelevance Abstain (33 rows)** | 3.03% | 81.82% | **57.58%** |
@@ -100,6 +104,15 @@ Evaluated on an **NVIDIA GeForce RTX 4050 Laptop GPU** and **Kaggle T4 GPUs** us
 
 ---
 
-## 📜 License
+## Citation & License
 
-Released under the **Apache-2.0 License**.
+Released under the Apache-2.0 License.
+
+```bibtex
+@software{soro_kev_2026,
+  author = {Keyush Nisar},
+  title = {Soro-Kev: System-One Conformal Tool Router and Execution Boundary},
+  year = {2026},
+  url = {https://github.com/nisaral/Soro-Boro}
+}
+```

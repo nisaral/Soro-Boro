@@ -10,23 +10,24 @@ tags:
   - agent-harness
   - conformal-prediction
   - pointer-network
+  - decision-model
 size_categories:
   - 10K<n<100K
 ---
 
-# 📚 Soro Universal Tool Harness Dataset
+# Soro Universal Tool Harness Dataset
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Models](https://img.shields.io/badge/Trained_Models-Soro--Kev--4B_&_0.8B-purple.svg)](https://huggingface.co/nisaralll/soro-kev-4b)
 [![GitHub](https://img.shields.io/badge/GitHub-Soro--Boro-black.svg)](https://github.com/nisaral/Soro-Boro)
 
-The **Soro Universal Tool Harness** dataset contains high-quality, multi-format routing, argument repair, and safety classification records designed for training and calibrating System-One pointer routers.
+The Soro Universal Tool Harness dataset contains high-quality, multi-format routing, argument repair, and safety classification records designed for training and calibrating System-One pointer routers.
 
-Unlike standard function-calling datasets that train models to emit token-by-token JSON strings, this dataset formats agent tasks as **System-One Pointer Queries** over explicit option lists, enabling zero-hallucination routing and split-conformal coverage guarantees.
+Unlike standard function-calling datasets that train models to emit token-by-token JSON strings, this dataset formats agent tasks as System-One Pointer Queries over explicit option lists, enabling zero-hallucination routing and split-conformal coverage guarantees.
 
 ---
 
-## 📁 Files & Split Breakdown
+## Files & Split Breakdown
 
 | Split File | Rows | Delexicalized (`op_N`) | Real-World & Human Held-Out |
 | :--- | :--- | :--- | :--- |
@@ -36,7 +37,7 @@ Unlike standard function-calling datasets that train models to emit token-by-tok
 
 ---
 
-## 🛠️ Supported Schema Formats
+## Supported Schema Formats
 
 The dataset balances 6 diverse tool declaration formats to prevent syntactic overfitting:
 
@@ -49,7 +50,7 @@ The dataset balances 6 diverse tool declaration formats to prevent syntactic ove
 
 ---
 
-## 🎯 Task Questions in Each Row
+## Task Questions in Each Row
 
 Each row provides a user state and query alongside options for:
 
@@ -62,13 +63,12 @@ Each row provides a user state and query alongside options for:
 
 ---
 
-## 💻 Loading with Hugging Face Datasets
+## Loading with Hugging Face Datasets
 
 ```python
 from datasets import load_dataset
 
 dataset = load_dataset("nisaralll/soro-universal-tool-harness")
-
 print(dataset["train"][0])
 ```
 
@@ -94,6 +94,6 @@ with open(file_path, "r", encoding="utf-8") as f:
 
 ---
 
-## 📜 License
+## Citation & License
 
-Released under the **Apache-2.0 License**.
+Released under the Apache-2.0 License.
