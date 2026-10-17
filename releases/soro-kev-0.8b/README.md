@@ -235,16 +235,17 @@ If you use Soro-Kev or Universal Tool Harness in your research or production sys
 
 @article{mo2025livemcpbench,
   author = {Mo, Guozhao and others},
-  title = {LiveMCPBench: Benchmarking Large Language Models on Live Model Context Protocol Ecosystems},
-  journal = {arXiv preprint arXiv:2502.13886},
+  title = {LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools?},
+  journal = {arXiv preprint arXiv:2508.01780},
   year = {2025}
 }
 
-@article{when2call2024,
-  author = {NVIDIA Research},
-  title = {When2Call: Measuring When Agents Should Call Tools},
-  journal = {arXiv preprint arXiv:2410.16540},
-  year = {2024}
+@inproceedings{ross2025when2call,
+  author = {Ross, Hayley and Mahabaleshwarkar, Ameya Sunil and Suhara, Yoshi},
+  title = {When2Call: When (not) to Call Tools},
+  booktitle = {Proceedings of the 2025 Conference of the North American Chapter of the Association for Computational Linguistics (NAACL)},
+  year = {2025}
 }
 ```
+
 
