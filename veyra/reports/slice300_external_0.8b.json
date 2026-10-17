@@ -1,0 +1,60 @@
+{
+  "backend": "Neural SoroKevModel (C:\\Users\\nisar\\OneDrive\\Desktop\\EB-JEPA\\veyra\\runs\\kaggle_0.8b_results\\soro_kev_0.8b)",
+  "n_cal_samples": 100,
+  "n_test_samples": 200,
+  "overall_route_accuracy": 0.89,
+  "permutation_flip_rate": 0.05,
+  "by_format": {
+    "mcp_json": {
+      "total": 36,
+      "accuracy": 0.9722
+    },
+    "mixed_heterogeneous": {
+      "total": 37,
+      "accuracy": 0.8919
+    },
+    "agent_skill": {
+      "total": 29,
+      "accuracy": 0.8621
+    },
+    "rest_openapi": {
+      "total": 26,
+      "accuracy": 0.9615
+    },
+    "graphql_rpc": {
+      "total": 31,
+      "accuracy": 0.9032
+    },
+    "python_sig": {
+      "total": 41,
+      "accuracy": 0.7805
+    }
+  },
+  "by_delexicalized": {
+    "delexicalized_accuracy": 0.0,
+    "named_accuracy": 0.89
+  },
+  "conformal_calibration": {
+    "target_coverage": 0.9,
+    "calibrated_q_hat": 0.9813,
+    "inclusion_threshold": 0.0187,
+    "empirical_coverage": 0.955,
+    "wilson_95_ci": [
+      0.9167,
+      0.9761
+    ],
+    "mean_set_size": 1.18,
+    "median_set_size": 1.0,
+    "singleton_rate": 0.865,
+    "action_distribution": {
+      "EXECUTE_share": 0.875,
+      "ASK_share": 0.075,
+      "ABSTAIN_share": 0.05
+    }
+  },
+  "auxiliary_tasks": {
+    "arg_mapping_accuracy": 1.0,
+    "missing_required_detection_accuracy": 0.84,
+    "is_mutation_detection_accuracy": 0.975
+  }
+}

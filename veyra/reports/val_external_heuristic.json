@@ -1,0 +1,60 @@
+{
+  "backend": "Heuristic Fallback",
+  "n_cal_samples": 300,
+  "n_test_samples": 900,
+  "overall_route_accuracy": 0.4833,
+  "permutation_flip_rate": 0.0,
+  "by_format": {
+    "mixed_heterogeneous": {
+      "total": 153,
+      "accuracy": 0.4771
+    },
+    "python_sig": {
+      "total": 143,
+      "accuracy": 0.4825
+    },
+    "graphql_rpc": {
+      "total": 145,
+      "accuracy": 0.5241
+    },
+    "rest_openapi": {
+      "total": 165,
+      "accuracy": 0.4848
+    },
+    "agent_skill": {
+      "total": 147,
+      "accuracy": 0.4762
+    },
+    "mcp_json": {
+      "total": 147,
+      "accuracy": 0.4558
+    }
+  },
+  "by_delexicalized": {
+    "delexicalized_accuracy": 0.0,
+    "named_accuracy": 0.4833
+  },
+  "conformal_calibration": {
+    "target_coverage": 0.9,
+    "calibrated_q_hat": 0.8786,
+    "inclusion_threshold": 0.1214,
+    "empirical_coverage": 0.8556,
+    "wilson_95_ci": [
+      0.8311,
+      0.877
+    ],
+    "mean_set_size": 3.78,
+    "median_set_size": 4.0,
+    "singleton_rate": 0.03,
+    "action_distribution": {
+      "EXECUTE_share": 0.03,
+      "ASK_share": 0.97,
+      "ABSTAIN_share": 0.0
+    }
+  },
+  "auxiliary_tasks": {
+    "arg_mapping_accuracy": 0.5256,
+    "missing_required_detection_accuracy": 0.7156,
+    "is_mutation_detection_accuracy": 0.9267
+  }
+}

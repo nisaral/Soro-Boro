@@ -1,0 +1,26 @@
+{
+  "soro": {
+    "n": 48,
+    "tool_accuracy": 0.7708333333333334,
+    "abstain_accuracy": 0.8125,
+    "by_file": {
+      "BFCL_v3_multiple.json": 1.0,
+      "BFCL_v3_live_multiple.json": 0.5,
+      "BFCL_v3_irrelevance.json": 0.8125
+    },
+    "by_file_counts": {
+      "BFCL_v3_multiple.json": [
+        16,
+        16
+      ],
+      "BFCL_v3_live_multiple.json": [
+        8,
+        16
+      ],
+      "BFCL_v3_irrelevance.json": [
+        13,
+        16
+      ]
+    }
+  }
+}

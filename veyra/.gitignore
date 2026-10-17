@@ -1,0 +1,59 @@
+# build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+/veyra
+/dist/
+/build/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.local
+eval_lab/out/
+# keep PLAN_RUN_RESULTS if we want it committed — ignore other lab dumps
+!eval_lab/out/PLAN_RUN_RESULTS.json
+
+# local caches + run data
+bench_toolmisuse_official/
+.cache/
+runs/
+data/
+out/**
+!out/gate1_leaderboard.md
+!out/dev/
+!out/test/
+out/dev/**
+out/test/**
+!out/dev/comparison.md
+!out/dev/comparison.png
+!out/dev/results.json
+!out/test/comparison.md
+!out/test/comparison.png
+!out/test/results.json
+!out/test/verdict.json
+!out/kev/
+out/kev/**
+!out/kev/comparison.md
+!out/kev/comparison.png
+!out/kev/results.json
+*.db
+*.sqlite
+
+# editor / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# scratch and ephemeral experiment dumps
+scratch/
+python/scratch_*.py
+python/raw_tools_*.json
+python/src/out/
+audit_summary*.md

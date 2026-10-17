@@ -1,0 +1,3 @@
+[submodule "third_party/MCPAgentBench"]
+	path = third_party/MCPAgentBench
+	url = https://github.com/Brunestuder/MCPAgentBench.git

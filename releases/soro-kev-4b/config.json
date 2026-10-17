@@ -1,0 +1,15 @@
+{
+  "model_name": "Qwen/Qwen3-4B",
+  "proj_dim": 256,
+  "hidden_size": 2560,
+  "use_mock": false,
+  "learnable_temperature": 0.07087826728820801,
+  "training_q_hat": 0.9154288843274117,
+  "calibrated_q_hat": 0.8066,
+  "calibration": {
+    "split": "val_zeroshot.jsonl seed-42 shuffle, 100 calibration / 200 test",
+    "q_hat": 0.8066,
+    "external_human_q_hat": 0.845,
+    "note": "calibrated_q_hat is the 100-row seed-42 zero-shot slice, not the full 2,220-row file."
+  }
+}

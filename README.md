@@ -1,124 +1,133 @@
 # Soro
 
-> **The Type-Safe MCP & Agent Tool Harness.**
-> Stop runaway LLM duplicate tool loops, auto-repair broken JSON arguments, and audit MCP servers for reliability.
+System-One tool router, argument repair, and an execution boundary for MCP servers, REST endpoints, SKILL.md plugins, Python functions, and GraphQL.
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![CI](https://github.com/nisaral/Soro-Boro/actions/workflows/ci.yml/badge.svg)](https://github.com/nisaral/Soro-Boro/actions)
-
----
-
-## Why Soro?
-
-When AI agents use tools in production, three things routinely break:
-1. **Runaway LLM Duplicate Loops**: An LLM gets confused or loops across conversational turns, repeatedly calling `charge_card()` or `create_ticket()` with the same parameters.
-2. **Brittle Argument Formatting**: The LLM passes `"49.99"` instead of `49.99`, `'{"items": [1, 2]}'` as a raw string instead of a dictionary, or `orderId` instead of `order_id`, causing runtime `TypeError` crashes.
-3. **Unchecked MCP Tool Servers**: Third-party Model Context Protocol (MCP) servers omit safety hints (`readOnlyHint`, `idempotentHint`), causing constant approval popup fatigue in Cursor / Claude Desktop or blind retries during network hiccups.
-
-**Soro solves all three in a unified, lightweight package.**
-
----
-
-## 3 Core Features
-
-### 1. `soro-audit` — Test Any MCP Server in 10 Seconds
-A standalone CLI chaos and schema linter for Model Context Protocol servers. It connects over `stdio`, tests schemas, verifies behavior in an isolated sandbox, and outputs instant patches.
-
-```bash
-# Run schema and annotation audit on any server
-soro-audit --stdio "npx -y @modelcontextprotocol/server-filesystem /tmp" --dry-run
-
-# Run dynamic behavioral verification
-soro-audit --stdio "node dist/index.js" --markdown audit_summary.md
-```
-
-> **Real-World Census**: We audited **359 public MCP servers** ([see census report](reports/mcp_live_census_report.json)) and found that **over 40% omit `readOnlyHint`**, causing AI desktop clients to prompt for user approval on harmless search queries. We generated instant fix patches for servers like [Datadog](reports/patch_datadog_mcp_server.diff) and [DuckDuckGo](reports/patch_duckduckgo_mcp_server.diff).
-
----
-
-### 2. `@soro_wrap` — Stop LLM Double-Calls & Retry Double-Writes
-Add a 1-line decorator to any tool. Soro automatically caches successful writes in a 120-second sliding loop guard and guards against network timeout double-writes:
-
-```python
-from soro import soro_wrap
-
-@soro_wrap(side_effect="mutation")
-def refund_customer(order_id: str, amount: float):
-    return stripe.Refund.create(charge=order_id, amount=int(amount * 100))
-
-# Turn 1: Normal execution
-res1 = refund_customer("ord_101", 50.0)
-
-# Turn 2: LLM gets stuck in a loop and calls it again with identical arguments
-res2 = refund_customer("ord_101", 50.0)
-# -> Stopped automatically! Returns PREVENTED_DUPLICATE with cached result.
-```
-
----
-
-### 3. `SoroHarness` — Route -> Repair -> Guard in 5 Lines
-A complete, type-safe pipeline that routes natural language queries, auto-repairs LLM argument types, and executes with loop guard protection:
-
-```python
-from soro import SoroHarness
-
-harness = SoroHarness()
-
-@harness.tool(description="Process customer refund", side_effect="mutation")
-def refund(order_id: str, amount: float, reason: str = "customer_request"):
-    return {"status": "ok", "order_id": order_id, "amount": amount}
-
-# 1. Automatic Argument Repair: Coerces strings to floats & camelCase to snake_case!
-res = harness.execute("refund", {"orderId": "ord_882", "amount": "99.50"})
-print(res.data)
-# {'status': 'ok', 'order_id': 'ord_882', 'amount': 99.5}
-
-# 2. Natural Language Routing + Auto-Repair + Loop-Guard:
-res = harness.run("Please refund order ord_99 for 25 dollars", {"orderId": "ord_99", "amount": "25"})
-```
-
----
-
-## Installation
-
-```bash
-# Install Soro tool harness & boundary SDK
-pip install -e "./python[dev]"
-
-# Or run the standalone zero-dependency MCP auditor directly
-pip install soro-audit
-```
-
----
-
-## Pipeline Architecture
+`Soro-Kev` does not generate a tool call. One prefill packs the user state and the listed tools. A pointer scores the question-end hidden state against each option-end hidden state:
 
 ```text
-User / Agent Query
-        │
-        ▼
-┌────────────────────────────────────────────────────────┐
-│  1. ROUTE: Local Conformal Router (Fast Shortlisting)  │
-│  2. REPAIR: Auto-Coerce Types & JSON Schema (Kev)      │
-│  3. GUARD: Soro-Boro Boundary & 120s Loop Guard        │
-└────────────────────────────────────────────────────────┘
-        │
-   Protected External Execution (API / SQL / MCP / HTTP)
+state + question
+  [0] tool_a: schema
+  [1] tool_b: schema
+  [2] __abstain__: none of these
+        |
+        h_q  ·  h_opt   /  temperature
+        |
+        softmax  ->  one distribution over the list
+        |
+        split conformal set S
+          |S|=1 and not abstain  -> EXECUTE
+          |S| is abstain or empty -> ABSTAIN
+          otherwise                -> ASK
 ```
 
----
+A name that is not in the list cannot be chosen. There is no JSON to parse.
 
-## Repository Structure
+Multi-tool requests are still one pointer per clause. Tools whose raw logit beats `__abstain__` can form a plan. The harness runs reads before mutations, copies returned fields into later arguments, and stops with `ASK` when a required field is still empty. `@soro_wrap` blocks a duplicate mutation inside 120 seconds and treats a dropped provider ack as an unknown result instead of a blind retry.
 
-- `python/src/soro/harness/`: Unified `SoroHarness` pipeline (`Route -> Repair -> Guard`).
-- `python/src/soro_boro/`: Execution boundary engine (`@soro_wrap`, atomic claim store, intent minting).
-- `python/src/soro/cli_audit.py`: `soro-audit` MCP server linter and behavioral sandbox verifier.
-- `reports/`: Real findings across 359 MCP servers (`mcp_live_census_report.json` and generated patches).
-- `web/`: Next.js interactive architecture visualization and simulator demo.
+## Quickstart
 
----
+```python
+from soro.harness.pipeline import SoroHarness
+
+harness = SoroHarness.from_pretrained("nisaralll/soro-kev-4b")
+
+@harness.tool(description="Look up a customer order", side_effect="read_only")
+def get_order_status(order_id: str) -> dict:
+    return {"order_id": order_id, "customer_email": "alice@acme.com", "shipment_id": "SHP-901"}
+
+@harness.tool(description="Cancel a warehouse shipment", side_effect="mutation")
+def cancel_shipment(shipment_id: str) -> dict:
+    return {"shipment_id": shipment_id, "cancelled": True}
+
+harness.register_rest(
+    endpoint="/invoices/{invoice_id}",
+    method="GET",
+    description="Fetch an invoice",
+    parameters={"invoice_id": str},
+)
+harness.register_skill(
+    "deploy_skill",
+    description="Deploy a service version",
+    triggers=["deploy"],
+    parameters={"service": str, "version": str},
+    side_effect="mutation",
+)
+
+print(harness.route("look up order ORD-774").action)
+print(harness.run_workflow(
+    "Look up order ORD-774, then cancel its shipment."
+))
+```
+
+A local folder works: `SoroHarness.from_pretrained("releases/soro-kev-4b")`. A Hub id is downloaded with `snapshot_download`. CUDA with `bitsandbytes` loads the 4B checkpoint as NF4. Otherwise the loader uses bf16, then fp16.
+
+`soro-audit` lints an MCP server over stdio. From `veyra/`:
+
+```text
+soro-audit --stdio "npx -y @modelcontextprotocol/server-filesystem /tmp" --dry-run
+```
+
+## What was measured
+
+These are local RTX 4050 runs. They are not an official Berkeley Function Calling leaderboard submission. The official board scores full AST and executable calls. The BFCL numbers below are tool-name accuracy on our converted rows.
+
+Seed-42 slice, 100 calibration rows and 200 test rows, shared by all three columns.
+
+| `val_zeroshot.jsonl` | Heuristic | Soro-Kev-0.8B | Soro-Kev-4B |
+|---|---|---|---|
+| Route accuracy | 47.50% | 84.50% | 89.00% |
+| Coverage (target 90%) | 89.50% | 89.00% | 93.00% |
+| Mean set size | 4.39 | 1.17 | 1.11 |
+| Argument mapping | 42.50% | 99.00% | 99.00% |
+| Missing-argument detection | 50.00% | 85.50% | 71.00% |
+| Mutation classification | 63.00% | 88.50% | 92.50% |
+
+| `val_external_human.jsonl` | Heuristic | Soro-Kev-0.8B | Soro-Kev-4B |
+|---|---|---|---|
+| Route accuracy | 60.50% | 89.00% | 94.50% |
+| Coverage | 95.50% | 95.50% | 95.00% |
+| Mean set size | 4.18 | 1.18 | 1.07 |
+| Argument mapping | 52.00% | 100% | 100% |
+
+4B external format accuracy on that 200-row slice: MCP JSON 94.4% (36), mixed 94.6% (37), agent skill 100% (29), REST 96.2% (26), GraphQL 96.8% (31), Python signature 87.8% (41).
+
+The unshuffled 0.8B file, 1,920 test rows, is a different split: 80.99% route, 96.56% argument mapping, 3.33% permutation flip, mean set size 1.16. Do not put it in the same row as the 200-row 4B number.
+
+BFCL converted slice, seed 42, 34 multiple / 33 live multiple / 33 irrelevance:
+
+| | Heuristic | Soro-Kev-0.8B | Soro-Kev-4B |
+|---|---|---|---|
+| multiple | 97.06% | 100% | 100% |
+| live multiple | 75.76% | 96.97% | 96.97% |
+| irrelevance abstain | 3.03% | 57.58% | 75.76% |
+
+Decision models on the same 100 BFCL rows plus 60 external rows, one prefill each:
+
+| | Heuristic | Kev-0.8B | Soro-Kev-0.8B | Soro-Kev-4B |
+|---|---|---|---|---|
+| multiple | 100% | 100% | 100% | 100% |
+| live multiple | 84.8% | 69.7% | 97.0% | 97.0% |
+| irrelevance abstain | 3.0% | 81.8% | 57.6% | 75.8% |
+| external 60 | 36.7% | 75.0% | 83.3% | 85.0% |
+| median latency | 0.31 ms | 111 ms | 80 ms | 413 ms |
+| peak VRAM | 0 | 1,612 MB | 1,563 MB | 4,048 MB |
+
+Kev-4B, Kev-9B, and Kev-27B were not run. Their weights are not on this laptop.
+
+Harness checks on this machine: 4B passed the shipment/email dataflow chain, the unlabeled Jira-versus-Linear ask, the `sev1` incident choice, the missing-amount halt, the "do not cancel" negation, and the 25-tool haystack including a soufflé abstain. 0.8B missed `list_incidents` on that haystack.
+
+## Reproduce
+
+```text
+cd veyra
+pip install -e "./python[dev]"
+python training/evaluate_benchmark.py --backend neural --checkpoint runs/soro_kev_qwen3_4b_best --max-eval-rows 300 --val-data data/soro_kev_dataset/val_zeroshot.jsonl
+python training/benchmark_decision_models.py
+python ../scripts/publish_to_huggingface.py --dry-run
+```
+
+Upload is `python scripts/publish_to_huggingface.py` from the repo root after `HF_TOKEN` is set. `--dry-run` does not upload.
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE) for details.
+Apache-2.0.
