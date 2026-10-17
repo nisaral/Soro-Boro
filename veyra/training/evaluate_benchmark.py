@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 from pathlib import Path
 from typing import Any
 
@@ -30,16 +31,18 @@ def calibrate_split(
     cal_records: list[dict[str, Any]],
     scorer: LocalKevScorer,
     alpha: float = 0.10,
+    turn_fn: Any = None,
 ) -> tuple[float, float]:
     """Compute exact non-conformity order-statistic quantile on calibration records."""
     nonconf_scores: list[float] = []
+    ask = turn_fn or scorer.evaluate_turn
 
     for r in cal_records:
         state = r["state"]
         q_dict = r["questions"]
         route_gold = q_dict["tool_route"]["label"]
 
-        turn_res = scorer.evaluate_turn(state, q_dict)
+        turn_res = ask(r) if turn_fn else ask(state, q_dict)
         route_probs = turn_res.get("probabilities", {}).get("tool_route", {})
 
         p_gold = float(route_probs.get(route_gold, 0.0))
@@ -60,6 +63,7 @@ def evaluate_test_split(
     q_hat: float,
     threshold: float,
     alpha: float = 0.10,
+    turn_fn: Any = None,
 ) -> dict[str, Any]:
     """Evaluate empirical coverage, set size |S|, and accuracy metrics on test split."""
     n_test = len(test_records)
@@ -87,7 +91,7 @@ def evaluate_test_split(
     mut_correct = 0
     aux_totals: dict[str, int] = {"arg": 0, "missing": 0, "mut": 0}
 
-    for r in test_records:
+    for row_i, r in enumerate(test_records, start=1):
         state = r["state"]
         fmt = r.get("format", "mcp_json")
         is_delex = r.get("delexicalized", False)
@@ -100,7 +104,9 @@ def evaluate_test_split(
         delex_key = "delexicalized" if is_delex else "named"
         by_delex[delex_key]["total"] += 1
 
-        turn_res = scorer.evaluate_turn(state, q_dict)
+        turn_res = turn_fn(r) if turn_fn else scorer.evaluate_turn(state, q_dict)
+        if row_i % 50 == 0:
+            print(f"scored {row_i}/{len(test_records)}", flush=True)
         probs_dict = turn_res.get("probabilities", {})
         answers_dict = turn_res.get("answers", {})
 
@@ -133,13 +139,14 @@ def evaluate_test_split(
         if route_gold in prediction_set:
             conformal_covered += 1
 
-        # Action mapping
-        if sz == 1:
-            actions_count["EXECUTE"] += 1
-        elif 2 <= sz <= 8:
-            actions_count["ASK"] += 1
-        else:
+        # A singleton whose only member is abstain is not an execution.
+        actionable = [name for name in prediction_set if name != "__abstain__"]
+        if not prediction_set or prediction_set == ["__abstain__"] or not actionable:
             actions_count["ABSTAIN"] += 1
+        elif len(actionable) == 1:
+            actions_count["EXECUTE"] += 1
+        else:
+            actions_count["ASK"] += 1
 
         # 4. Arg Mapping
         if "arg_mapping" in q_dict:
@@ -218,6 +225,10 @@ def main():
     parser.add_argument("--cal-size", type=int, default=300)
     parser.add_argument("--backend", type=str, default="auto", choices=["auto", "neural", "heuristic"])
     parser.add_argument("--checkpoint", type=str, default=None)
+    parser.add_argument("--logit-cache", type=str, default=None, help="JSONL of per-row probabilities. Reused when complete.")
+    parser.add_argument("--batch-size", type=int, default=4)
+    parser.add_argument("--max-seq-len", type=int, default=1024)
+    parser.add_argument("--max-eval-rows", type=int, default=0, help="After the seed-42 shuffle, keep this many rows. 300 means 100 calibration and 200 test.")
     args = parser.parse_args()
 
     val_path = Path(args.val_data)
@@ -229,10 +240,24 @@ def main():
         for line in f:
             val_records.append(json.loads(line))
 
+    random.Random(42).shuffle(val_records)
+    if args.max_eval_rows and args.max_eval_rows < len(val_records):
+        val_records = val_records[: args.max_eval_rows]
     total_records = len(val_records)
-    cal_size = min(args.cal_size, total_records // 4) if total_records < args.cal_size * 2 else args.cal_size
+    if args.max_eval_rows:
+        cal_size = max(1, total_records // 3)
+    else:
+        cal_size = min(args.cal_size, total_records // 4) if total_records < args.cal_size * 2 else args.cal_size
     cal_records = val_records[:cal_size]
     test_records = val_records[cal_size:]
+
+    cache: dict[str, dict[str, Any]] = {}
+    cache_path = Path(args.logit_cache) if args.logit_cache else None
+    if cache_path is not None and cache_path.exists():
+        with cache_path.open(encoding="utf-8") as handle:
+            for line in handle:
+                row = json.loads(line)
+                cache[str(row["id"])] = row["turn"]
 
     scorer = LocalKevScorer(run=args.checkpoint, backend=args.backend)
 
@@ -242,12 +267,31 @@ def main():
     print("=" * 70)
     print(f"Loaded {total_records} records: Split into {len(cal_records)} Calibration / {len(test_records)} Test records.")
 
+    def fill_cache(records: list[dict[str, Any]]) -> None:
+        missing = [row for row in records if str(row.get("id")) not in cache]
+        for start in range(0, len(missing), max(1, args.batch_size)):
+            chunk = missing[start : start + args.batch_size]
+            turns = scorer.predict_batch(chunk, max_seq_len=args.max_seq_len)
+            for row, turn in zip(chunk, turns):
+                cache[str(row.get("id"))] = turn
+            print(f"cached {min(start + len(chunk), len(missing))}/{len(missing)}", flush=True)
+
+    fill_cache(cal_records + test_records)
+
+    def remember(record: dict[str, Any]) -> dict[str, Any]:
+        return cache[str(record.get("id"))]
+
     print(f"Calibrating non-conformity quantile q_hat on {len(cal_records)} calibration records (alpha = {args.alpha:.2f})...")
-    q_hat, threshold = calibrate_split(cal_records, scorer, alpha=args.alpha)
+    q_hat, threshold = calibrate_split(cal_records, scorer, alpha=args.alpha, turn_fn=remember)
     print(f"Calibration Complete: q_hat = {q_hat:.4f} | Inclusion Threshold = {threshold:.4f} (p >= {threshold:.4f})")
 
     print(f"Evaluating test split across {len(test_records)} records...")
-    report = evaluate_test_split(test_records, scorer, q_hat, threshold, alpha=args.alpha)
+    report = evaluate_test_split(test_records, scorer, q_hat, threshold, alpha=args.alpha, turn_fn=remember)
+    if cache_path is not None:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        with cache_path.open("w", encoding="utf-8") as handle:
+            for key, turn in cache.items():
+                handle.write(json.dumps({"id": key, "turn": turn}) + "\n")
     report["n_cal_samples"] = len(cal_records)
 
     # Print clean summary table

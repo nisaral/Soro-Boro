@@ -1,4 +1,7 @@
 **/__pycache__/
+releases/**/*.safetensors
+releases/**/head.pt
+releases/**/*.jsonl
 *.pyc
 .pytest_cache/
 veyra/dist/

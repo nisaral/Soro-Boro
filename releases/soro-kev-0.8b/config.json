@@ -1,0 +1,19 @@
+{
+  "model_name": "Qwen/Qwen3.5-0.8B-Base",
+  "proj_dim": 256,
+  "hidden_size": 1024,
+  "use_mock": false,
+  "learnable_temperature": 0.0754871740937233,
+  "training_q_hat": 0.5813057124614716,
+  "calibrated_q_hat": 0.9518,
+  "calibration": {
+    "split": "val_zeroshot.jsonl seed-42 shuffle, 100 calibration / 200 test",
+    "q_hat": 0.9518,
+    "external_human_q_hat": 0.9813,
+    "full_file_unshuffled_1920_test": {
+      "route_accuracy": 0.8099,
+      "q_hat": 0.9457
+    },
+    "note": "calibrated_q_hat is the 100-row seed-42 slice. The 1,920-row unshuffled run is recorded separately."
+  }
+}

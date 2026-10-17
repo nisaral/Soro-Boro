@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 import sys
 from collections import defaultdict
@@ -45,6 +46,30 @@ def load_rows(path: Path, files: set[str] | None, limit: int, per_file: int) -> 
             if limit and len(rows) >= limit:
                 break
     return rows
+
+
+def stratified_sample(rows: list[dict], n: int, seed: int) -> list[dict]:
+    by_file: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        by_file[row.get("bfcl_file") or ""].append(row)
+    rng = random.Random(seed)
+    for group in by_file.values():
+        rng.shuffle(group)
+    picked: list[dict] = []
+    index = 0
+    names = list(by_file)
+    while len(picked) < n:
+        added = False
+        for name in names:
+            if index < len(by_file[name]):
+                picked.append(by_file[name][index])
+                added = True
+                if len(picked) >= n:
+                    break
+        if not added:
+            break
+        index += 1
+    return picked
 
 
 def load_soro(ckpt: Path) -> SoroKevModel:
@@ -156,7 +181,10 @@ def score_generative(model_name: str, rows: list[dict]) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Compare Soro to generative tool callers on the same rows")
     parser.add_argument("--data", type=str, default=str(ROOT / "data" / "bfcl" / "soro" / "bfcl_routing.jsonl"))
-    parser.add_argument("--checkpoint", type=str, required=True)
+    parser.add_argument("--checkpoint", type=str, default="")
+    parser.add_argument("--heuristic", action="store_true")
+    parser.add_argument("--sample", type=int, default=0, help="Stratified sample size across the selected files.")
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--limit", type=int, default=0, help="Max routing rows after dropping single-tool files. 0 means all.")
     parser.add_argument("--per-file", type=int, default=0, help="Cap rows from each BFCL file. 0 means no per-file cap.")
     parser.add_argument("--files", type=str, default="BFCL_v3_multiple.json,BFCL_v3_live_multiple.json,BFCL_v3_irrelevance.json")
@@ -164,9 +192,37 @@ def main() -> None:
     parser.add_argument("--report", type=str, default=str(ROOT / "reports" / "bfcl_compare.json"))
     args = parser.parse_args()
     files = {part.strip() for part in args.files.split(",") if part.strip()}
-    rows = load_rows(Path(args.data), files, args.limit, args.per_file)
+    rows = load_rows(Path(args.data), files, 0 if args.sample else args.limit, 0 if args.sample else args.per_file)
+    if args.sample:
+        rows = stratified_sample(rows, args.sample, args.seed)
     print(f"scoring {len(rows)} non-trivial BFCL rows", flush=True)
-    report = {"soro": score_soro(load_soro(Path(args.checkpoint)), rows)}
+    report: dict = {"n": len(rows), "seed": args.seed}
+    if args.checkpoint:
+        from soro.routing.kev_local import LocalKevScorer
+        scorer = LocalKevScorer(run=args.checkpoint, backend="neural", device="cuda" if torch.cuda.is_available() else "cpu")
+        if not scorer.load():
+            raise SystemExit(scorer.error)
+        report["soro"] = score_soro(scorer._neural_model, rows)
+    if args.heuristic:
+        from soro.routing.kev_local import LocalKevScorer
+        heuristic = LocalKevScorer(backend="heuristic")
+        hit = 0
+        by_file: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+        for row in rows:
+            q = row["questions"]["tool_route"]
+            probs = heuristic.probabilities(row["state"], q["criteria"])
+            pred = max(probs, key=probs.get) if probs else None
+            golds = row.get("gold_functions") or []
+            label = q["label"]
+            ok = pred in golds if golds else pred == label
+            hit += int(ok)
+            by_file[row.get("bfcl_file") or ""][0] += int(ok)
+            by_file[row.get("bfcl_file") or ""][1] += 1
+        report["heuristic"] = {
+            "n": len(rows),
+            "tool_accuracy": hit / max(len(rows), 1),
+            "by_file": {k: v[0] / v[1] for k, v in by_file.items()},
+        }
     for name in [part.strip() for part in args.generative.split(",") if part.strip()]:
         report[name] = score_generative(name, rows)
     out = Path(args.report)

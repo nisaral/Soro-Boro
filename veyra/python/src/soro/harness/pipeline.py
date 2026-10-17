@@ -135,6 +135,23 @@ class SoroHarness:
         self._scorer = scorer or LocalKevScorer()
         self.default_alpha = default_alpha
 
+    @classmethod
+    def from_pretrained(
+        cls,
+        model_id_or_path: str = "nisaralll/soro-kev-4b",
+        device: str = "auto",
+        **kwargs: Any,
+    ) -> "SoroHarness":
+        """Load a local checkpoint directory or a Hugging Face repo id."""
+        import torch
+
+        if device == "auto":
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+        scorer = LocalKevScorer(run=model_id_or_path, backend="neural", device=device)
+        if not scorer.load():
+            raise RuntimeError(scorer.error or f"Could not load {model_id_or_path}")
+        return cls(scorer=scorer, **kwargs)
+
     def tool(
         self,
         name: str | None = None,
@@ -438,6 +455,21 @@ class SoroHarness:
             )
 
         top_tool, top_prob = sorted_by_prob[0]
+        multi_plan = self._multi_tool_plan()
+        if multi_plan:
+            return RouteResult(
+                action="ASK",
+                selected_tool=multi_plan[0],
+                candidates=multi_plan,
+                probabilities=probs,
+                scores=scores_map,
+                alpha=eff_alpha,
+                reason=(
+                    "Ordered multi-tool plan "
+                    + ", ".join(multi_plan)
+                    + f" (intent={getattr(self._scorer, 'last_intent', None)})"
+                ),
+            )
         if top_tool == "__abstain__":
             return RouteResult(
                 action="ABSTAIN",
@@ -499,6 +531,354 @@ class SoroHarness:
             reason=reason,
         )
 
+    def _multi_tool_plan(self) -> list[str]:
+        """Tools whose raw dot beats abstain by enough to clear sigmoid 0.75.
+
+        p_include = sigmoid(z_tool - z_abstain). Softmax is unchanged and still
+        used for single-tool conformal routing. A plan is not executed by route().
+        """
+        include = getattr(self._scorer, "last_include_probs", None) or {}
+        intent = getattr(self._scorer, "last_intent", None)
+        ranked = sorted(
+            ((name, prob) for name, prob in include.items() if name != "__abstain__"),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+        qualifying = [name for name, prob in ranked if prob >= 0.75]
+
+        def category(name: str) -> str:
+            entry = self._tools.get(name)
+            parts = name.lower().replace("-", "_").split("_")
+            verb = "_".join(parts[-2:]) if len(parts) >= 2 else name.lower()
+            side = entry.side_effect if entry is not None else ""
+            return f"{side}:{verb}"
+
+        chosen: list[str] = []
+        seen: set[str] = set()
+        for name in qualifying:
+            cat = category(name)
+            if cat in seen:
+                continue
+            seen.add(cat)
+            chosen.append(name)
+        compound = intent == "multi" or len(chosen) >= 2
+        if compound and len(chosen) >= 2:
+            return chosen
+        return []
+
+    def run_workflow(
+        self,
+        query: str,
+        raw_args: dict[str, Any] | None = None,
+        max_steps: int = 5,
+    ) -> list[dict[str, Any]]:
+        """Execute one tool per request clause, then stop.
+
+        Masking the winners and asking again makes the same clause pick the
+        next issue tracker. A later pass runs only when a read result is
+        required and some clause is still unmatched.
+        """
+        clauses = self._action_clauses(query)
+        trace: list[dict[str, Any]] = []
+        ambiguous = self._ambiguous_clause(clauses)
+        if ambiguous is not None:
+            trace.append({
+                "action": "ASK",
+                "status": "ASK",
+                "tool": None,
+                "candidates": ambiguous,
+                "plan": ambiguous,
+                "reason": "Two tools in the same category match this clause",
+                "stopped": True,
+            })
+            return trace
+        plan = self._plan_from_clauses(clauses)
+        if not plan:
+            trace.append({"action": "ABSTAIN", "status": "ABSTAIN", "plan": [], "stopped": True})
+            return trace
+        context: dict[str, Any] = {}
+        for tool_name in sorted(plan, key=self._execution_rank)[:max_steps]:
+            payload = self._bind_with_context(query, tool_name, context, raw_args)
+            missing = self._missing_required(tool_name, payload)
+            if missing:
+                trace.append({
+                    "action": "ASK",
+                    "status": "ASK",
+                    "tool": tool_name,
+                    "missing": missing,
+                    "missing_required_fields": missing,
+                    "data": payload,
+                    "stopped": True,
+                })
+                break
+            outcome = self.execute(tool_name, payload)
+            data = getattr(outcome, "data", outcome)
+            status = getattr(outcome, "status", "ok")
+            trace.append({
+                "action": "EXECUTE",
+                "status": status,
+                "tool": tool_name,
+                "data": data,
+                "arguments": payload,
+            })
+            if status == "ASK":
+                trace[-1]["missing"] = (data or {}).get("missing", []) if isinstance(data, dict) else []
+                trace[-1]["stopped"] = True
+                break
+            if isinstance(data, dict):
+                for key, value in data.items():
+                    if value not in (None, ""):
+                        context[key] = value
+        return trace
+
+    @staticmethod
+    def _action_clauses(query: str) -> list[str]:
+        parts = [
+            part.strip(" .")
+            for part in re.split(r",|\band\b|\bthen\b|;", query, flags=re.IGNORECASE)
+            if len(part.strip(" .")) > 8
+        ]
+        return parts or [query.strip()]
+
+    @staticmethod
+    def _clause_negated(clause: str) -> bool:
+        return re.search(r"\b(do not|don't|dont|never)\b", clause, flags=re.IGNORECASE) is not None
+
+    def _include_for_text(self, text: str) -> dict[str, float]:
+        options = {name: entry.description for name, entry in self._tools.items()}
+        options["__abstain__"] = "None of the listed tools fit the user request."
+        self._scorer.probabilities(text, options)
+        return dict(getattr(self._scorer, "last_include_probs", {}) or {})
+
+    def _span_coverage(self, clause: str, tool_name: str) -> int:
+        entry = self._tools.get(tool_name)
+        if entry is None:
+            return 0
+        spans = re.findall(r"\$\s*\d+(?:\.\d+)?|\bsev\d+\b|\b[A-Z]{2,}[-_][A-Z0-9-]+\b|\bv?\d+(?:\.\d+)+\b", clause, flags=re.I)
+        titled = re.search(r"\btitled\s+(.+)$", clause, flags=re.I)
+        if titled:
+            spans.append(titled.group(1).strip(" ."))
+        covered = 0
+        for span in spans:
+            kind = self._span_kind(span)
+            if any(self._span_fits_parameter(span, kind, name) for name in entry.parameters):
+                covered += 1
+        return covered
+
+    def _ambiguous_clause(self, clauses: list[str]) -> list[str] | None:
+        for clause in clauses:
+            if self._clause_negated(clause):
+                continue
+            grouped: dict[str, list[str]] = {}
+            include = self._include_for_text(clause)
+            raw = dict(getattr(self._scorer, "last_raw_logits", {}) or {})
+            abstain_logit = float(raw.get("__abstain__", 0.0))
+            clause_terms = set(re.findall(r"[a-z0-9]+", clause.lower()))
+            for name, entry in self._tools.items():
+                if float(raw.get(name, float("-inf"))) <= abstain_logit and include.get(name, 0.0) < 0.75:
+                    continue
+                tool_terms = set(re.findall(r"[a-z0-9]+", f"{name} {entry.description}".lower()))
+                if not (clause_terms & tool_terms):
+                    continue
+                grouped.setdefault(self._functional_category(name), []).append(name)
+            for names in grouped.values():
+                if len(names) < 2:
+                    continue
+                coverage = {name: self._span_coverage(clause, name) for name in names}
+                best = max(coverage.values())
+                leaders = [name for name in names if coverage[name] == best]
+                mentioned = [
+                    name for name in leaders
+                    if any(token in clause.lower() for token in name.lower().replace("-", "_").split("_") if len(token) >= 4)
+                ]
+                if len(mentioned) == 1 or len(leaders) == 1:
+                    continue
+                return leaders
+        return None
+
+    def _plan_from_clauses(self, clauses: list[str]) -> list[str]:
+        chosen: list[str] = []
+        used: set[str] = set()
+        single = len([clause for clause in clauses if not self._clause_negated(clause)]) == 1
+        for clause in clauses:
+            if self._clause_negated(clause):
+                continue
+            include = self._include_for_text(clause)
+            raw = dict(getattr(self._scorer, "last_raw_logits", {}) or {})
+            abstain_logit = float(raw.get("__abstain__", 0.0))
+            clause_terms = set(re.findall(r"[a-z0-9]+", clause.lower()))
+            if single:
+                ranked = sorted(
+                    ((name, value) for name, value in raw.items() if name in self._tools and name != "__abstain__"),
+                    key=lambda item: item[1],
+                    reverse=True,
+                )
+                for name, value in ranked:
+                    if value <= abstain_logit:
+                        break
+                    entry = self._tools[name]
+                    tool_terms = set(re.findall(r"[a-z0-9]{4,}", f"{name} {entry.description}".lower()))
+                    if clause_terms & tool_terms:
+                        chosen.append(name)
+                        used.add(self._functional_category(name))
+                        break
+                if chosen:
+                    continue
+            best_name = ""
+            best_score = 0.0
+            for name, prob in include.items():
+                if name not in self._tools or prob < 0.75:
+                    continue
+                category = self._functional_category(name)
+                if category in used:
+                    continue
+                entry = self._tools[name]
+                tool_terms = set(re.findall(r"[a-z0-9]+", f"{name} {entry.description}".lower()))
+                overlap = len(clause_terms & tool_terms)
+                if overlap <= 0:
+                    continue
+                score = overlap + prob + self._span_coverage(clause, name)
+                if score > best_score:
+                    best_name = name
+                    best_score = score
+            if best_name:
+                chosen.append(best_name)
+                used.add(self._functional_category(best_name))
+        return chosen
+
+    def _bind_with_context(
+        self,
+        query: str,
+        tool_name: str,
+        context: dict[str, Any],
+        raw_args: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        payload = dict(raw_args or {})
+        if not payload:
+            payload = self.extract_and_map_arguments(query, tool_name)
+        entry = self._tools[tool_name]
+        for name in entry.parameters:
+            if payload.get(name) not in (None, ""):
+                continue
+            if context.get(name) not in (None, ""):
+                payload[name] = context[name]
+                continue
+            for key, value in context.items():
+                if value in (None, ""):
+                    continue
+                if self._context_key_fits(key, name):
+                    payload[name] = value
+                    break
+            if payload.get(name) in (None, ""):
+                mapped = self._map_context_with_pointer(name, context)
+                if mapped is not None:
+                    payload[name] = mapped
+        return payload
+
+    @staticmethod
+    def _context_key_fits(context_key: str, parameter: str) -> bool:
+        left = set(re.findall(r"[a-z0-9]{5,}", context_key.lower()))
+        right = set(re.findall(r"[a-z0-9]{5,}", parameter.lower()))
+        return bool(left & right)
+
+    def _map_context_with_pointer(self, parameter: str, context: dict[str, Any]) -> Any:
+        usable = {key: value for key, value in context.items() if value not in (None, "")}
+        if not usable or not hasattr(self._scorer, "evaluate_turn"):
+            return None
+        criteria = {key: f"{key} = {value}" for key, value in usable.items()}
+        criteria["__drop__"] = "None of these previous values fill this parameter."
+        decision = self._scorer.evaluate_turn(
+            f"Parameter to fill: {parameter}",
+            {"arg_mapping": {
+                "type": "choice",
+                "instructions": f"Which previous value fills the parameter '{parameter}'?",
+                "criteria": criteria,
+            }},
+        )
+        choice = (decision.get("answers") or {}).get("arg_mapping")
+        if choice in usable:
+            return usable[choice]
+        return None
+
+    def _missing_required(self, tool_name: str, payload: dict[str, Any]) -> list[str]:
+        entry = self._tools.get(tool_name)
+        if entry is None:
+            return []
+        missing = []
+        for name, info in entry.parameters.items():
+            if info.get("default") != inspect.Parameter.empty:
+                continue
+            if payload.get(name) in (None, ""):
+                missing.append(name)
+        return missing
+
+    @staticmethod
+    def _functional_category(name: str) -> str:
+        lowered = name.lower().replace("-", "_")
+        groups = (
+            ("issue", ("incident", "issue", "ticket")),
+            ("deployment", ("rollback", "deploy")),
+            ("notification", ("slack", "email", "sms", "message", "notify")),
+            ("refund", ("refund",)),
+            ("shipment", ("shipment",)),
+            ("order_lookup", ("order_status", "get_order")),
+            ("invoice", ("invoice",)),
+            ("weather", ("weather",)),
+        )
+        group = lowered
+        for category, keys in groups:
+            if any(key in lowered for key in keys):
+                group = category
+                break
+        verb = lowered.split("_", 1)[0]
+        if verb in {"list", "get", "create", "query", "send", "cancel", "issue", "read", "delete", "update"}:
+            return f"{verb}:{group}"
+        return group
+
+    def _plan_for_clauses(
+        self,
+        clauses: list[str],
+        include: dict[str, float],
+        blocked: set[str],
+    ) -> list[str]:
+        """At most one qualifying tool for each clause and each category."""
+        qualifying = [
+            name for name, prob in include.items()
+            if name != "__abstain__" and prob >= 0.75 and name in self._tools
+            and self._functional_category(name) not in blocked
+        ]
+        chosen: list[str] = []
+        used = set(blocked)
+        for clause in clauses:
+            clause_terms = set(re.findall(r"[a-z0-9]+", clause.lower()))
+            best_name = ""
+            best_score = 0.0
+            for name in qualifying:
+                category = self._functional_category(name)
+                if category in used:
+                    continue
+                entry = self._tools[name]
+                tool_terms = set(re.findall(r"[a-z0-9]+", f"{name} {entry.description}".lower()))
+                overlap = len(clause_terms & tool_terms)
+                if overlap <= 0:
+                    continue
+                score = overlap + float(include.get(name, 0.0))
+                if score > best_score:
+                    best_name = name
+                    best_score = score
+            if best_name:
+                chosen.append(best_name)
+                used.add(self._functional_category(best_name))
+        return chosen
+
+    def _execution_rank(self, name: str) -> tuple[int, int]:
+        entry = self._tools.get(name)
+        side = entry.side_effect if entry is not None else None
+        read_first = 0 if side == SideEffectClass.READ_ONLY else 1
+        notify_last = 1 if self._functional_category(name) == "notification" else 0
+        destructive = 1 if side == SideEffectClass.DESTRUCTIVE else 0
+        return (notify_last, read_first, destructive)
+
     # --------------------------------------------------------------------------
     # 2. REPAIR: Rule-Based Coercions + Semantic Key Mapping
     # --------------------------------------------------------------------------
@@ -517,6 +897,7 @@ class SoroHarness:
         spans += re.findall(r"\b[\w.+-]+@[\w.-]+\.\w+\b", query)
         spans += re.findall(r"(?:/|\\)[\w./\\-]+", query)
         spans += re.findall(r"\b\d{4}-\d{2}-\d{2}\b", query)
+        spans += re.findall(r"\$\s*\d+(?:\.\d+)?", query)
         spans += re.findall(r"\b\d+(?:\.\d+)+\b", query)
         spans += re.findall(r"\b[A-Z]{2,}[-_][A-Z0-9-]+\b", query)
         spans += re.findall(r"\bv\d+(?:\.\d+)+\b", query, flags=re.I)
@@ -535,42 +916,77 @@ class SoroHarness:
         if not names or not spans:
             return bound
         for span in spans:
-            criteria = {name: f"Schema parameter: {name}" for name in names if name not in bound}
-            criteria["__drop__"] = "This span is not a parameter value."
-            if len(criteria) <= 1:
-                break
-            decision = self._scorer.evaluate_turn(
-                f"User Request: {query}\nSpan: {span}",
-                {"arg_mapping": {
-                    "type": "choice",
-                    "instructions": f"Which parameter does the value '{span}' fill?",
-                    "criteria": criteria,
-                }},
-            )
-            choice = (decision.get("answers") or {}).get("arg_mapping")
-            shaped = "text"
-            if re.fullmatch(r"v?\d+(?:\.\d+)+", span, flags=re.I):
-                shaped = "version"
-            elif re.fullmatch(r"sev\d+", span, flags=re.I):
-                shaped = "severity"
-            if shaped == "version":
-                for name in names:
-                    if "version" in name and name not in bound:
-                        choice = name
-                        break
-            elif shaped == "severity":
-                for name in names:
-                    if "severity" in name and name not in bound:
-                        choice = name
-                        break
-            elif choice in ("__drop__", None) or (choice in bound):
-                for name in names:
-                    if name not in bound and "version" not in name and "severity" not in name:
-                        choice = name
-                        break
+            kind = self._span_kind(span)
+            allowed = [
+                name for name in names
+                if name not in bound and self._span_fits_parameter(span, kind, name)
+            ]
+            if not allowed:
+                continue
+            if kind == "currency":
+                choice = next(
+                    (name for name in allowed if any(key in name.lower() for key in ("amount", "price", "credit", "total", "usd", "cost"))),
+                    None,
+                )
+            elif kind == "id":
+                choice = next((name for name in allowed if name.lower() == "id" or name.lower().endswith("_id")), None)
+            elif kind == "version":
+                choice = next((name for name in allowed if "version" in name.lower()), None)
+            elif kind == "severity":
+                choice = next((name for name in allowed if "severity" in name.lower()), None)
+            else:
+                criteria = {name: f"Schema parameter: {name}" for name in allowed}
+                criteria["__drop__"] = "This span is not a parameter value."
+                decision = self._scorer.evaluate_turn(
+                    f"User Request: {query}\nSpan: {span}",
+                    {"arg_mapping": {
+                        "type": "choice",
+                        "instructions": f"Which parameter does the value '{span}' fill?",
+                        "criteria": criteria,
+                    }},
+                )
+                choice = (decision.get("answers") or {}).get("arg_mapping")
+                if choice in ("__drop__", None):
+                    choice = None
             if choice and choice in entry.parameters and choice not in bound:
-                bound[choice] = span
+                value: Any = span
+                if kind == "currency":
+                    value = float(re.sub(r"[^0-9.]", "", span))
+                bound[choice] = value
         return self.repair(tool_name, bound)
+
+    @staticmethod
+    def _span_kind(span: str) -> str:
+        if re.search(r"\$\s*\d", span) or re.fullmatch(r"\d+\.\d{2}", span):
+            return "currency"
+        if re.fullmatch(r"[A-Z]{2,}[-_][A-Z0-9-]+", span):
+            return "id"
+        if re.fullmatch(r"v?\d+(?:\.\d+)+", span, flags=re.IGNORECASE):
+            return "version"
+        if re.fullmatch(r"sev\d+", span, flags=re.IGNORECASE):
+            return "severity"
+        return "text"
+
+    @staticmethod
+    def _span_fits_parameter(span: str, kind: str, name: str) -> bool:
+        lowered = name.lower()
+        is_identifier = lowered == "id" or lowered.endswith("_id")
+        if kind == "currency":
+            return not is_identifier and any(
+                key in lowered for key in ("amount", "price", "credit", "total", "usd", "cost", "fee")
+            )
+        if kind == "id":
+            if not is_identifier:
+                return False
+            prefix = span.split("-", 1)[0].lower()
+            if prefix.startswith("ord") and "shipment" in lowered:
+                return False
+            if prefix.startswith("shp") and "order" in lowered and "shipment" not in lowered:
+                return False
+            return True
+        if kind in ("version", "severity"):
+            return kind in lowered
+        return not is_identifier or bool(re.search(r"[A-Za-z]", span))
 
     def repair(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         """Repair and validate proposed arguments against the tool's schema."""
@@ -712,6 +1128,18 @@ class SoroHarness:
         raw_args = dict(arguments or {})
         raw_args.update(extra_kwargs)
         clean_args = self.repair(tool_name, raw_args)
+        missing = self._missing_required(tool_name, clean_args)
+        if missing:
+            from soro_boro.lifecycle import ProviderLifecycleState
+            return TerminalOutcome(
+                status="ASK",
+                data={"missing": missing, "tool": tool_name, "arguments": clean_args},
+                provider_state=ProviderLifecycleState.FAILED,
+                operation_id="",
+                idempotency_key="",
+                audit_hash="",
+                reason=f"Missing required parameters: {missing}",
+            )
 
         return entry.wrapped_fn(**clean_args)
 

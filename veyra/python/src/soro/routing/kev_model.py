@@ -109,6 +109,8 @@ class SoroKevModel(nn.Module):
         self.proj_dim = proj_dim
         self.use_mock = use_mock
         self.tokenizer = None
+        # Training may pass a short cap. Inference never uses a cap under 4096.
+        self.inference_max_seq_len = 4096
 
         if use_mock:
             self.backbone = MockCausalBackbone(vocab_size=2000, hidden_size=128)
@@ -144,18 +146,38 @@ class SoroKevModel(nn.Module):
                     self.tokenizer.pad_token = self.tokenizer.eos_token
 
                 load_kw: dict[str, Any] = {"trust_remote_code": True}
-                if load_in_4bit or "4b" in model_name.lower():
-                    from transformers import BitsAndBytesConfig
-                    load_kw["quantization_config"] = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=torch.float16,
-                    )
-                    load_kw["device_map"] = {"": torch.cuda.current_device() if torch.cuda.is_available() else "cpu"}
-                else:
-                    load_kw["torch_dtype"] = dtype
-                loaded = AutoModel.from_pretrained(model_name, **load_kw)
+                want_4bit = bool(load_in_4bit or ("4b" in model_name.lower() and torch.cuda.is_available()))
+                if want_4bit:
+                    try:
+                        import bitsandbytes  # noqa: F401
+                        from transformers import BitsAndBytesConfig
+                        load_kw["quantization_config"] = BitsAndBytesConfig(
+                            load_in_4bit=True,
+                            bnb_4bit_quant_type="nf4",
+                            bnb_4bit_use_double_quant=True,
+                            bnb_4bit_compute_dtype=torch.float16,
+                        )
+                        load_kw["device_map"] = {"": torch.cuda.current_device()}
+                    except Exception:
+                        want_4bit = False
+                if not want_4bit:
+                    if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+                        load_kw["torch_dtype"] = torch.bfloat16
+                    elif torch.cuda.is_available():
+                        load_kw["torch_dtype"] = torch.float16
+                    else:
+                        load_kw["torch_dtype"] = dtype
+                loaded = None
+                for attn_name in ("sdpa", "eager"):
+                    try:
+                        loaded = AutoModel.from_pretrained(
+                            model_name, attn_implementation=attn_name, **load_kw
+                        )
+                        break
+                    except TypeError:
+                        continue
+                if loaded is None:
+                    loaded = AutoModel.from_pretrained(model_name, **load_kw)
                 use_4bit = bool(load_kw.get("quantization_config"))
                 # Qwen3.5 ships a vision tower this router never uses. Drop it
                 # even in 4-bit, or the T4 is full before the first step.
@@ -262,6 +284,8 @@ class SoroKevModel(nn.Module):
         opt_keys = list(criteria.keys())
         if not opt_keys:
             return torch.tensor([]), []
+        floor = int(getattr(self, "inference_max_seq_len", 4096) or 4096)
+        max_seq_len = max(int(max_seq_len), floor)
         abstain_text = criteria.get("__abstain__", "None of the listed tools fit the user request.")
         tools = [k for k in opt_keys if k != "__abstain__"]
         packed = self._encode_choice(state, instructions, criteria, max_seq_len)
@@ -277,7 +301,6 @@ class SoroKevModel(nn.Module):
             sub["__abstain__"] = abstain_text
             sub_pack = self._encode_choice(state, instructions, sub, max_seq_len)
             if sub_pack is None:
-                # Last resort: names only, so a huge schema cannot drop the row.
                 sub = {k: k for k in chunk}
                 sub["__abstain__"] = abstain_text
                 sub_pack = self._encode_choice(state, instructions, sub, max_seq_len)
@@ -301,6 +324,7 @@ class SoroKevModel(nn.Module):
         if final_pack is None:
             keys = list(final)
             return torch.zeros(len(keys)), keys
+        # The decision logits are only this championship pass, not chunk abstain scores.
         return self._pointer_logits(*final_pack)
 
     def _pointer_logits(
@@ -331,7 +355,19 @@ class SoroKevModel(nn.Module):
 
         scale = 1.0 / math.sqrt(self.proj_dim)
         temp = torch.exp(self.log_temp) + 1e-4
-        logits = torch.matmul(k_mat, q_vec.squeeze(0)) * scale / temp  # (K,)
+        raw_dots = torch.matmul(k_mat, q_vec.squeeze(0))
+        logits = raw_dots * scale / temp  # (K,)
+        intent_logits = self.intent_head(q_vec).squeeze(0)
+        intent_names = ("single", "multi", "none")
+        intent_idx = int(torch.argmax(intent_logits).item())
+        self._last_route = {
+            "raw_logits": raw_dots.detach(),
+            "scaled_logits": logits.detach(),
+            "keys": list(opt_keys),
+            "intent_logits": intent_logits.detach(),
+            "intent": intent_names[intent_idx] if intent_idx < len(intent_names) else "single",
+            "temperature": float(temp.detach().item()),
+        }
         return logits, opt_keys
 
     def score_binary(self, state: str) -> torch.Tensor:
@@ -537,6 +573,7 @@ class SoroKevModel(nn.Module):
         intent_hits = 0
 
         route_logits_list = []
+        row_predictions: list[dict[str, Any]] = []
 
         for i in range(B):
             mp = meta_packed[i]
@@ -638,6 +675,28 @@ class SoroKevModel(nn.Module):
                 if torch.argmax(logits_mut).item() == mut_target:
                     mut_hits += 1
 
+            answers: dict[str, Any] = {
+                "tool_route": r_keys[pred_r_idx] if r_keys else None,
+                "tool_route_perm": p_keys[int(torch.argmax(logits_perm).item())] if p_keys else None,
+            }
+            probabilities: dict[str, dict[str, float]] = {
+                "tool_route": {key: float(p_route[idx]) for idx, key in enumerate(r_keys)},
+                "tool_route_perm": {key: float(p_perm[idx]) for idx, key in enumerate(p_keys)},
+            }
+            if mp["q_end_arg"] is not None and mp.get("arg_keys"):
+                answers["arg_mapping"] = mp["arg_keys"][int(torch.argmax(logits_arg).item())]
+            if mp["q_end_miss"] is not None:
+                answers["missing_required"] = "yes" if int(torch.argmax(logits_miss).item()) == 1 else "no"
+                probabilities["missing_required"] = {
+                    "no": float(p_miss[0]), "yes": float(p_miss[1]),
+                }
+            if mp["q_end_mut"] is not None:
+                answers["is_mutation"] = "yes" if int(torch.argmax(logits_mut).item()) == 1 else "no"
+                probabilities["is_mutation"] = {
+                    "no": float(p_mut[0]), "yes": float(p_mut[1]),
+                }
+            row_predictions.append({"probabilities": probabilities, "answers": answers})
+
         loss_route_t = torch.stack(losses_route).mean() if losses_route else torch.tensor(0.0, device=device)
         loss_brier_t = torch.stack(losses_brier).mean() if losses_brier else torch.tensor(0.0, device=device)
         loss_jsd_t = torch.stack(losses_jsd).mean() if losses_jsd else torch.tensor(0.0, device=device)
@@ -670,6 +729,7 @@ class SoroKevModel(nn.Module):
             },
             "logits_route_batch": route_logits_list,
             "kept_indices": kept_indices,
+            "row_predictions": row_predictions,
             "skipped": False,
         }
 
@@ -753,6 +813,9 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
     if "log_temp" in weights:
         model.log_temp.data = weights["log_temp"]
 
+    # A training config may record the 512-token T4 cap. Inference keeps 4096.
+    model.inference_max_seq_len = max(int(cfg.get("max_seq_len", 4096) or 4096), 4096)
+
     temperature = float(torch.exp(model.log_temp).item())
     if temp_file.exists():
         try:
@@ -762,7 +825,15 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
         except Exception:
             pass
 
-    model.to(device)
+    quantized = "4b" in str(getattr(model, "model_name", "")).lower()
+    if quantized and torch.cuda.is_available() and str(device).startswith("cuda"):
+        for head_name in ("q_proj_head", "opt_proj_head", "binary_head", "intent_head"):
+            head = getattr(model, head_name, None)
+            if head is not None:
+                head.to(device)
+        model.log_temp.data = model.log_temp.data.to(device)
+    else:
+        model.to(device)
     model.eval()
     return model, temperature
 

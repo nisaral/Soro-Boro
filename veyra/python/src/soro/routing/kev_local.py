@@ -68,6 +68,12 @@ def resolve_kev_dir(path: str | None = None) -> Path | str:
         p = Path(path)
         if p.exists():
             return p
+        if "/" in path and not path.startswith("models--"):
+            try:
+                from huggingface_hub import snapshot_download
+                return snapshot_download(path)
+            except Exception:
+                return path
         return path
 
     if DEFAULT_KEV_PATH:
@@ -102,6 +108,36 @@ class LocalKevScorer:
         self._neural_model: SoroKevModel | None = None
         self._temperature: float = 1.0
         self._loaded = False
+        self.last_intent: str | None = None
+        self.last_raw_logits: dict[str, float] = {}
+        self.last_intent_logits: dict[str, float] = {}
+        self.last_include_probs: dict[str, float] = {}
+
+    def _remember_route(self, opt_keys: list[str]) -> None:
+        detail = getattr(self._neural_model, "_last_route", None) or {}
+        raw = detail.get("raw_logits")
+        self.last_intent = detail.get("intent")
+        self.last_raw_logits = {}
+        remembered_keys = list(detail.get("keys") or opt_keys)
+        if raw is not None:
+            values = raw.detach().float().cpu().tolist()
+            self.last_raw_logits = {
+                key: float(values[i]) for i, key in enumerate(remembered_keys) if i < len(values)
+            }
+        intent_logits = detail.get("intent_logits")
+        self.last_intent_logits = {}
+        if intent_logits is not None:
+            names = ("single", "multi", "none")
+            vals = intent_logits.detach().float().cpu().tolist()
+            self.last_intent_logits = {names[i]: float(vals[i]) for i in range(min(len(names), len(vals)))}
+        abstain = self.last_raw_logits.get("__abstain__")
+        self.last_include_probs = {}
+        if abstain is not None:
+            for name, value in self.last_raw_logits.items():
+                if name == "__abstain__":
+                    continue
+                gap = value - abstain
+                self.last_include_probs[name] = 1.0 / (1.0 + math.exp(-gap))
 
     def load(self) -> bool:
         if self._loaded:
@@ -194,10 +230,12 @@ class LocalKevScorer:
                         continue
 
                     logits, opt_keys = self._neural_model.score_choice_sequence(state, instructions, criteria)
-                    probs = F.softmax(logits / max(self._temperature, 1e-4), dim=-1).cpu().tolist()
+                    # score_choice_sequence already divides by the learned temperature.
+                    probs = F.softmax(logits, dim=-1).cpu().tolist()
                     q_probs = {k: float(probs[i]) for i, k in enumerate(opt_keys)}
                     probabilities[q_name] = q_probs
                     answers[q_name] = max(q_probs.keys(), key=lambda k: q_probs[k])
+                    self._remember_route(opt_keys)
 
                 elif q_type in ("noul", "boolean"):
                     if criteria and "yes" in criteria and "no" in criteria:
@@ -277,6 +315,31 @@ class LocalKevScorer:
                 answers[q_name] = None
 
         return {"probabilities": probabilities, "answers": answers}
+
+    def predict_batch(
+        self,
+        records: list[dict[str, Any]],
+        max_seq_len: int = 1024,
+    ) -> list[dict[str, Any]]:
+        """Score several dataset rows in one packed forward. Skipped rows fall back."""
+        if not records:
+            return []
+        if not (self.load() and self._neural_model is not None):
+            return [self.evaluate_turn(row["state"], row["questions"]) for row in records]
+        with torch.inference_mode():
+            out = self._neural_model.forward_batch(records, max_seq_len=max_seq_len)
+        if out.get("skipped"):
+            return [self.evaluate_turn(row["state"], row["questions"]) for row in records]
+        predictions = list(out.get("row_predictions") or [])
+        kept = list(out.get("kept_indices") or [])
+        by_index = {index: predictions[pos] for pos, index in enumerate(kept) if pos < len(predictions)}
+        turns = []
+        for index, row in enumerate(records):
+            if index in by_index:
+                turns.append(by_index[index])
+            else:
+                turns.append(self.evaluate_turn(row["state"], row["questions"]))
+        return turns
 
     def probabilities(self, query: str, options: dict[str, str]) -> dict[str, float]:
         """Convenience method for tool choice probabilities."""
