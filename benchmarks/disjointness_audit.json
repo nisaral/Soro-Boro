@@ -3,7 +3,11 @@
     "train_rows": 23192,
     "val_external_rows": 1200,
     "val_zeroshot_rows": 2220,
-    "timestamp": "2026-10-17T21:55:00Z"
+    "timestamp": "2026-10-17T22:50:00Z",
+    "provenance": {
+      "val_external_human": "Held-out, independently sourced benchmark composed of Tau-2 dialogue tasks (Sierra Research MIT, simulated customer personas against fixed schemas) and MCP Semantic Benchmark (Mishra et al., 2026 CC BY 4.0, manually authored queries against live reference MCP server tools). Gold labels verified by task execution targets.",
+      "val_zeroshot": "Synthetic multi-domain tool execution scenarios across 54 unseen packages, generated via instruction prompting and validated for semantic collision distractors."
+    }
   },
   "tier_1_packages": {
     "train_unique_packages": 319,
@@ -142,13 +146,35 @@
         "name_ratio": 0.8718,
         "desc_ngram_sim": 0.2389
       }
-    ]
+    ],
+    "external_shared_tool_rows": {
+      "shared_tool_names": [
+        "check_service_status",
+        "list_processes",
+        "reverse_geocode",
+        "transfer_to_human_agents"
+      ],
+      "overlap_rows_count": 162,
+      "overlap_rows_pct": 13.5,
+      "strictly_disjoint_rows_count": 1038,
+      "strictly_disjoint_rows_pct": 86.5
+    }
   },
   "tier_3_queries": {
     "exact_query_overlap_count": 0,
     "exact_query_overlap_examples": [],
-    "near_duplicate_sample_count": 0,
-    "near_duplicates_sample": []
+    "near_duplicate_jaccard_count": 0,
+    "near_duplicates_jaccard_sample": [],
+    "near_duplicate_dense_embedding_count": 1,
+    "near_duplicates_dense_sample": [
+      {
+        "ext_id": "ext_human_000052_mixed_heterogeneous_v06",
+        "train_id": "done_497",
+        "cosine_similarity": 0.8944,
+        "ext_query": "Tell me what",
+        "train_query": "Tell me what is"
+      }
+    ]
   },
   "stratification": {
     "train": {

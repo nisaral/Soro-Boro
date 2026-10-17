@@ -1,0 +1,267 @@
+{
+  "BM25_Calibrated": {
+    "overall_accuracy": 0.5867,
+    "non_abstain_accuracy": 0.6272,
+    "abstain_accuracy": 0.2667,
+    "misclassification_rate": 0.4133,
+    "stratification_tool_names": {
+      "strictly_disjoint_tools": {
+        "count": 1038,
+        "accuracy": 0.5829
+      },
+      "shared_name_tools": {
+        "count": 162,
+        "accuracy": 0.6111
+      }
+    },
+    "per_package": {
+      "mcp_benchmark/system_mcp": {
+        "accuracy": 0.6459,
+        "total": 370
+      },
+      "tau2/telecom": {
+        "accuracy": 0.5294,
+        "total": 85
+      },
+      "mcp_benchmark/geo_mcp": {
+        "accuracy": 0.5632,
+        "total": 364
+      },
+      "mcp_benchmark/media_mcp": {
+        "accuracy": 0.5651,
+        "total": 361
+      },
+      "tau2/retail": {
+        "accuracy": 0.55,
+        "total": 20
+      }
+    },
+    "conformal_evaluation": {
+      "num_splits": 100,
+      "cal_size": 500,
+      "nominal_coverage": 0.9,
+      "mean_coverage": 0.8414,
+      "std_coverage": 0.0235,
+      "mean_set_size": 4.3202,
+      "std_set_size": 0.207,
+      "mean_q_hat": 0.9802,
+      "action_distribution": {
+        "ASK": 0.8453,
+        "ABSTAIN": 0.113,
+        "EXECUTE": 0.0417
+      }
+    }
+  },
+  "Dense_Cosine_Calibrated": {
+    "overall_accuracy": 0.4867,
+    "non_abstain_accuracy": 0.4554,
+    "abstain_accuracy": 0.7333,
+    "misclassification_rate": 0.5133,
+    "stratification_tool_names": {
+      "strictly_disjoint_tools": {
+        "count": 1038,
+        "accuracy": 0.4788
+      },
+      "shared_name_tools": {
+        "count": 162,
+        "accuracy": 0.537
+      }
+    },
+    "per_package": {
+      "mcp_benchmark/system_mcp": {
+        "accuracy": 0.6081,
+        "total": 370
+      },
+      "tau2/telecom": {
+        "accuracy": 0.2588,
+        "total": 85
+      },
+      "mcp_benchmark/geo_mcp": {
+        "accuracy": 0.4835,
+        "total": 364
+      },
+      "mcp_benchmark/media_mcp": {
+        "accuracy": 0.4155,
+        "total": 361
+      },
+      "tau2/retail": {
+        "accuracy": 0.55,
+        "total": 20
+      }
+    },
+    "conformal_evaluation": {
+      "num_splits": 100,
+      "cal_size": 500,
+      "nominal_coverage": 0.9,
+      "mean_coverage": 0.9017,
+      "std_coverage": 0.0162,
+      "mean_set_size": 4.0893,
+      "std_set_size": 0.1511,
+      "mean_q_hat": 0.9371,
+      "action_distribution": {
+        "ASK": 0.5103,
+        "ABSTAIN": 0.435,
+        "EXECUTE": 0.0547
+      }
+    }
+  },
+  "Cross_Encoder_Calibrated": {
+    "overall_accuracy": 0.5675,
+    "non_abstain_accuracy": 0.5803,
+    "abstain_accuracy": 0.4667,
+    "misclassification_rate": 0.4325,
+    "stratification_tool_names": {
+      "strictly_disjoint_tools": {
+        "count": 1038,
+        "accuracy": 0.578
+      },
+      "shared_name_tools": {
+        "count": 162,
+        "accuracy": 0.5
+      }
+    },
+    "per_package": {
+      "mcp_benchmark/system_mcp": {
+        "accuracy": 0.6324,
+        "total": 370
+      },
+      "tau2/telecom": {
+        "accuracy": 0.3059,
+        "total": 85
+      },
+      "mcp_benchmark/geo_mcp": {
+        "accuracy": 0.5632,
+        "total": 364
+      },
+      "mcp_benchmark/media_mcp": {
+        "accuracy": 0.5762,
+        "total": 361
+      },
+      "tau2/retail": {
+        "accuracy": 0.4,
+        "total": 20
+      }
+    },
+    "conformal_evaluation": {
+      "num_splits": 100,
+      "cal_size": 500,
+      "nominal_coverage": 0.9,
+      "mean_coverage": 0.881,
+      "std_coverage": 0.0139,
+      "mean_set_size": 4.2401,
+      "std_set_size": 0.1754,
+      "mean_q_hat": 0.9793,
+      "action_distribution": {
+        "ASK": 0.6646,
+        "ABSTAIN": 0.2669,
+        "EXECUTE": 0.0685
+      }
+    }
+  },
+  "Option_Logits_Untrained": {
+    "overall_accuracy": 0.5892,
+    "non_abstain_accuracy": 0.6028,
+    "abstain_accuracy": 0.4815,
+    "misclassification_rate": 0.4108,
+    "stratification_tool_names": {
+      "strictly_disjoint_tools": {
+        "count": 1038,
+        "accuracy": 0.5954
+      },
+      "shared_name_tools": {
+        "count": 162,
+        "accuracy": 0.5494
+      }
+    },
+    "per_package": {
+      "mcp_benchmark/system_mcp": {
+        "accuracy": 0.6622,
+        "total": 370
+      },
+      "tau2/telecom": {
+        "accuracy": 0.4118,
+        "total": 85
+      },
+      "mcp_benchmark/geo_mcp": {
+        "accuracy": 0.5577,
+        "total": 364
+      },
+      "mcp_benchmark/media_mcp": {
+        "accuracy": 0.5928,
+        "total": 361
+      },
+      "tau2/retail": {
+        "accuracy": 0.5,
+        "total": 20
+      }
+    },
+    "conformal_evaluation": {
+      "num_splits": 100,
+      "cal_size": 500,
+      "nominal_coverage": 0.9,
+      "mean_coverage": 0.8998,
+      "std_coverage": 0.0194,
+      "mean_set_size": 3.0131,
+      "std_set_size": 0.1251,
+      "mean_q_hat": 0.8827,
+      "action_distribution": {
+        "ASK": 0.6227,
+        "ABSTAIN": 0.2264,
+        "EXECUTE": 0.1509
+      }
+    }
+  },
+  "Soro_Kev_SystemOne": {
+    "overall_accuracy": 0.5267,
+    "non_abstain_accuracy": 0.5859,
+    "abstain_accuracy": 0.0593,
+    "misclassification_rate": 0.4733,
+    "stratification_tool_names": {
+      "strictly_disjoint_tools": {
+        "count": 1038,
+        "accuracy": 0.5173
+      },
+      "shared_name_tools": {
+        "count": 162,
+        "accuracy": 0.5864
+      }
+    },
+    "per_package": {
+      "mcp_benchmark/system_mcp": {
+        "accuracy": 0.627,
+        "total": 370
+      },
+      "tau2/telecom": {
+        "accuracy": 0.2118,
+        "total": 85
+      },
+      "mcp_benchmark/geo_mcp": {
+        "accuracy": 0.5632,
+        "total": 364
+      },
+      "mcp_benchmark/media_mcp": {
+        "accuracy": 0.4598,
+        "total": 361
+      },
+      "tau2/retail": {
+        "accuracy": 0.55,
+        "total": 20
+      }
+    },
+    "conformal_evaluation": {
+      "num_splits": 100,
+      "cal_size": 500,
+      "nominal_coverage": 0.9,
+      "mean_coverage": 0.9034,
+      "std_coverage": 0.0175,
+      "mean_set_size": 3.7829,
+      "std_set_size": 0.1176,
+      "mean_q_hat": 0.8838,
+      "action_distribution": {
+        "ASK": 0.9228,
+        "EXECUTE": 0.0509,
+        "ABSTAIN": 0.0262
+      }
+    }
+  }
+}

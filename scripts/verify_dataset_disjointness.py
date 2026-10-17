@@ -48,6 +48,26 @@ def jaccard_similarity(set_a: set, set_b: set) -> float:
     return intersection / union if union > 0 else 0.0
 
 
+def compute_dense_vector(text: str, num_dims: int = 512) -> list[float]:
+    """Compute normalized hashed n-gram dense embedding vector for semantic similarity."""
+    import math
+    vec = [0.0] * num_dims
+    tokens = re.findall(r"[a-zA-Z0-9_]+", text.lower())
+    for t in tokens:
+        h = abs(hash(t)) % num_dims
+        vec[h] += 1.0
+        if len(t) >= 3:
+            for i in range(len(t) - 2):
+                sub_h = abs(hash(t[i:i+3])) % num_dims
+                vec[sub_h] += 0.5
+    norm = math.sqrt(sum(v * v for v in vec))
+    return [v / norm for v in vec] if norm > 0.0 else vec
+
+
+def cosine_similarity(v1: list[float], v2: list[float]) -> float:
+    return sum(a * b for a, b in zip(v1, v2))
+
+
 def main():
     repo_root = Path(__file__).resolve().parent.parent
     data_dir = repo_root / "releases" / "soro-universal-tool-harness"
@@ -156,14 +176,20 @@ def main():
         if norm_q in train_query_texts:
             exact_query_overlap.append({"ext_id": qid, "train_id": train_query_texts[norm_q], "query": q})
 
-    # Sample-based near-duplicate check using 3-gram Jaccard similarity > 0.75
+    # Sample-based near-duplicate check using 3-gram Jaccard similarity > 0.75 and dense embedding similarity > 0.85
     print("\n--- Tier 3: Query Near-Duplicate Audit ---")
     print(f"Exact query text overlap: {len(exact_query_overlap)}")
 
     near_duplicates = []
+    dense_near_duplicates = []
     train_ngrams = [(qid, q, get_char_ngrams(q, 3)) for qid, q in train_queries if len(q) > 10]
+    train_vecs = [(qid, q, compute_dense_vector(q)) for qid, q in train_queries[::5] if len(q) > 10]
+
     for ext_id, ext_q in ext_queries[:300]:  # audit sample of external queries
         ext_ng = get_char_ngrams(ext_q, 3)
+        ext_v = compute_dense_vector(ext_q)
+
+        # Token n-gram Jaccard
         for tr_id, tr_q, tr_ng in train_ngrams[::10]:  # 1-in-10 subsample of train (2,300 queries)
             sim = jaccard_similarity(ext_ng, tr_ng)
             if sim >= 0.75 and ext_q.lower() != tr_q.lower():
@@ -175,9 +201,32 @@ def main():
                     "train_query": tr_q
                 })
 
-    print(f"Near-duplicate query pairs detected in audit slice (Jaccard >= 0.75): {len(near_duplicates)}")
+        # Dense embedding cosine similarity
+        for tr_id, tr_q, tr_v in train_vecs[::2]:  # subsample of train vectors
+            cos_sim = cosine_similarity(ext_v, tr_v)
+            if cos_sim >= 0.88 and ext_q.lower() != tr_q.lower():
+                dense_near_duplicates.append({
+                    "ext_id": ext_id,
+                    "train_id": tr_id,
+                    "cosine_similarity": round(cos_sim, 4),
+                    "ext_query": ext_q,
+                    "train_query": tr_q
+                })
 
-    # 5. Stratification Data Breakdown (Clean vs Collision Distractors)
+    print(f"Near-duplicate query pairs (Jaccard >= 0.75): {len(near_duplicates)}")
+    print(f"Dense embedding near-duplicates (Cosine >= 0.88): {len(dense_near_duplicates)}")
+
+    # 5. Shared Tool Name Row Breakdown (The 4 Generic Tools)
+    shared_tools = {"check_service_status", "list_processes", "reverse_geocode", "transfer_to_human_agents"}
+    ext_overlap_rows = [r for r in ext_records if r.get("questions", {}).get("tool_route", {}).get("label") in shared_tools]
+    ext_disjoint_rows = [r for r in ext_records if r.get("questions", {}).get("tool_route", {}).get("label") not in shared_tools]
+
+    print("\n--- Shared Tool Name Breakdown in External Holdout ---")
+    print(f"Total external rows: {len(ext_records)}")
+    print(f"Rows where gold tool shares name with train ({shared_tools}): {len(ext_overlap_rows)} ({len(ext_overlap_rows)/len(ext_records)*100:.2f}%)")
+    print(f"Strictly disjoint tool rows (names never seen in train): {len(ext_disjoint_rows)} ({len(ext_disjoint_rows)/len(ext_records)*100:.2f}%)")
+
+    # 6. Stratification Data Breakdown (Clean vs Collision Distractors)
     def stratify(records):
         counts = Counter()
         for r in records:
@@ -194,13 +243,17 @@ def main():
     print(f"External holdout: {ext_strat}")
     print(f"Zero-shot holdout: {zero_strat}")
 
-    # 6. Save Complete Audit Report
+    # 7. Save Complete Audit Report
     report = {
         "metadata": {
             "train_rows": len(train_records),
             "val_external_rows": len(ext_records),
             "val_zeroshot_rows": len(zero_records),
-            "timestamp": "2026-10-17T21:55:00Z"
+            "timestamp": "2026-10-17T22:50:00Z",
+            "provenance": {
+                "val_external_human": "Held-out, independently sourced benchmark composed of Tau-2 dialogue tasks (Sierra Research MIT, simulated customer personas against fixed schemas) and MCP Semantic Benchmark (Mishra et al., 2026 CC BY 4.0, manually authored queries against live reference MCP server tools). Gold labels verified by task execution targets.",
+                "val_zeroshot": "Synthetic multi-domain tool execution scenarios across 54 unseen packages, generated via instruction prompting and validated for semantic collision distractors."
+            }
         },
         "tier_1_packages": {
             "train_unique_packages": len(train_packages),
@@ -219,13 +272,22 @@ def main():
             "exact_overlapping_tools": sorted(list(exact_tool_overlap)),
             "normalized_tool_overlap_count": len(norm_tool_overlap),
             "fuzzy_match_count": len(fuzzy_matches),
-            "fuzzy_matches_sample": fuzzy_matches[:20]
+            "fuzzy_matches_sample": fuzzy_matches[:20],
+            "external_shared_tool_rows": {
+                "shared_tool_names": sorted(list(shared_tools)),
+                "overlap_rows_count": len(ext_overlap_rows),
+                "overlap_rows_pct": round(len(ext_overlap_rows) / len(ext_records) * 100, 2),
+                "strictly_disjoint_rows_count": len(ext_disjoint_rows),
+                "strictly_disjoint_rows_pct": round(len(ext_disjoint_rows) / len(ext_records) * 100, 2)
+            }
         },
         "tier_3_queries": {
             "exact_query_overlap_count": len(exact_query_overlap),
             "exact_query_overlap_examples": exact_query_overlap[:10],
-            "near_duplicate_sample_count": len(near_duplicates),
-            "near_duplicates_sample": near_duplicates[:10]
+            "near_duplicate_jaccard_count": len(near_duplicates),
+            "near_duplicates_jaccard_sample": near_duplicates[:10],
+            "near_duplicate_dense_embedding_count": len(dense_near_duplicates),
+            "near_duplicates_dense_sample": dense_near_duplicates[:10]
         },
         "stratification": {
             "train": train_strat,

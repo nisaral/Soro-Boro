@@ -67,6 +67,18 @@ class RouteResult:
     def __bool__(self) -> bool:
         return bool(self.candidates)
 
+    @property
+    def tool_name(self) -> str | None:
+        return self.selected_tool
+
+    @property
+    def candidate_set(self) -> list[str]:
+        return self.candidates
+
+    @property
+    def is_safe(self) -> bool:
+        return self.action == "EXECUTE"
+
 
 def _split_tokens(name: str) -> set[str]:
     clean = re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
@@ -126,6 +138,7 @@ class SoroHarness:
         wal_path: str | None = None,
         scorer: LocalKevScorer | None = None,
         default_alpha: float = 0.10,
+        **kwargs: Any,
     ):
         self.dedupe_mode = dedupe_mode
         self.window_sec = window_sec
@@ -134,6 +147,7 @@ class SoroHarness:
         self._tools: dict[str, ToolEntry] = {}
         self._scorer = scorer or LocalKevScorer()
         self.default_alpha = default_alpha
+        self.kwargs = kwargs
 
     @classmethod
     def from_pretrained(
@@ -382,10 +396,25 @@ class SoroHarness:
     def route(
         self,
         query: str,
+        candidates: list[dict[str, Any]] | dict[str, str] | None = None,
         top_k: int = 3,
         alpha: float | None = None,
+        **kwargs: Any,
     ) -> RouteResult:
         """2-stage Conformal Router returning calibrated prediction set S and action."""
+        if candidates is not None:
+            if isinstance(candidates, list):
+                for cand in candidates:
+                    if isinstance(cand, dict):
+                        c_name = cand.get("name", "")
+                        c_desc = cand.get("description", "")
+                        c_params = cand.get("parameters", {})
+                        c_side = cand.get("side_effect", "read_only")
+                        self.register_action(c_name, c_desc, c_params, lambda **kw: {"status": "mock", **kw}, side_effect=c_side)
+            elif isinstance(candidates, dict):
+                for c_name, c_desc in candidates.items():
+                    self.register_action(c_name, str(c_desc), {}, lambda **kw: {"status": "mock", **kw})
+
         if not self._tools:
             return RouteResult(
                 action="ABSTAIN",
