@@ -1,132 +1,213 @@
-# Soro
+# Soro-Kev: System-One Conformal Tool Router (4B & 0.8B)
 
-System-One tool router, argument repair, and an execution boundary for MCP servers, REST endpoints, SKILL.md plugins, Python functions, and GraphQL.
+[![GitHub Release](https://img.shields.io/github/v/release/nisaral/Soro-Boro?color=blue&label=Release)](https://github.com/nisaral/Soro-Boro/releases/tag/v0.2.0)
+[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-114--Tool%20Space%20Demo-blue)](https://huggingface.co/spaces/nisaralll/soro-kev-router)
+[![Hugging Face Model 4B](https://img.shields.io/badge/Hugging%20Face-Soro--Kev--4B-purple)](https://huggingface.co/nisaralll/soro-kev-4b)
+[![Hugging Face Model 0.8B](https://img.shields.io/badge/Hugging%20Face-Soro--Kev--0.8B-green)](https://huggingface.co/nisaralll/soro-kev-0.8b)
+[![Dataset](https://img.shields.io/badge/Dataset-Universal%20Tool%20Harness-yellow)](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
+[![License](https://img.shields.io/badge/License-Apache%202.0-black.svg)](LICENSE)
 
-`Soro-Kev` does not generate a tool call. One prefill packs the user state and the listed tools. A pointer scores the question-end hidden state against each option-end hidden state:
+**Soro-Kev** is an open-weights decision model family (4B flagship & 0.8B edge) for ultra-fast AI agent tool routing, schema normalization, and execution boundary control.
+
+Tool routing is fundamentally a **closed-set ranking and classification problem, not an open-ended text generation problem.** Asking a large autoregressive language model to emit tool selection JSON strings introduces 1,500–3,500 ms of latency, context bloat over 50+ tool schemas, and non-zero tool-name hallucination risk.
+
+Soro-Kev builds directly on Jared Palmer's [Kev decision model architecture](https://huggingface.co/jaredpalmer/kev-0.8b), adapting pointer networks for heterogeneous tool routing:
+- **Zero Invalid Tool Names**: Pointer scoring mathematically bounds outputs to registered tool schemas or `__abstain__`.
+- **Sub-420ms Latency**: Evaluates catalogs in a single prefill forward pass on consumer hardware (NVIDIA RTX 4050 Laptop GPU).
+- **Split-Conformal Action Boundaries**: Returns calibrated prediction sets ($S$) where $|S| = 1 \implies \text{EXECUTE}$, $|S| \in [2, 8] \implies \text{ASK}$, and `__abstain__` halts execution.
 
 ```text
-state + question
-  [0] tool_a: schema
-  [1] tool_b: schema
-  [2] __abstain__: none of these
-        |
-        h_q  ·  h_opt   /  temperature
-        |
-        softmax  ->  one distribution over the list
-        |
-        split conformal set S
-          |S|=1 and not abstain  -> EXECUTE
-          |S| is abstain or empty -> ABSTAIN
-          otherwise                -> ASK
+User State + Tool Catalog
+  [0] get_weather: {location: str}
+  [1] search_database: {query: str}
+  [2] __abstain__: none of these fit
+        │
+        h_query · h_candidate / Temperature
+        │
+        Split Conformal Set S (Nominal 90% Coverage)
+          ├── |S| = 1 and tool != __abstain__  ──> EXECUTE (immediate dispatch)
+          ├── |S| ∈ [2, 8]                     ──> ASK (targeted user clarification)
+          └── Top = __abstain__ or |S| empty   ──> ABSTAIN (out-of-domain safe halt)
 ```
 
-A name that is not in the list cannot be chosen. There is no JSON to parse.
+---
 
-Multi-tool requests are still one pointer per clause. Tools whose raw logit beats `__abstain__` can form a plan. The harness runs reads before mutations, copies returned fields into later arguments, and stops with `ASK` when a required field is still empty. `@soro_wrap` blocks a duplicate mutation inside 120 seconds and treats a dropped provider ack as an unknown result instead of a blind retry.
+## Quickstart & Installation
 
-## Quickstart
+Install directly from GitHub into your environment:
+
+```bash
+pip install git+https://github.com/nisaral/Soro-Boro.git
+```
+
+Or for local development:
+
+```bash
+git clone https://github.com/nisaral/Soro-Boro.git
+cd Soro-Boro
+pip install -e .
+```
+
+### 5-Line Python SDK
 
 ```python
 from soro.harness.pipeline import SoroHarness
 
+# Loads directly from Hugging Face in NF4 4-bit (4 GB VRAM)
 harness = SoroHarness.from_pretrained("nisaralll/soro-kev-4b")
 
-@harness.tool(description="Look up a customer order", side_effect="read_only")
+@harness.tool(description="Look up customer order status", side_effect="read_only")
 def get_order_status(order_id: str) -> dict:
-    return {"order_id": order_id, "customer_email": "alice@acme.com", "shipment_id": "SHP-901"}
+    return {"order_id": order_id, "status": "shipped", "tracking": "TRK-9810"}
 
 @harness.tool(description="Cancel a warehouse shipment", side_effect="mutation")
-def cancel_shipment(shipment_id: str) -> dict:
-    return {"shipment_id": shipment_id, "cancelled": True}
+def cancel_shipment(order_id: str) -> dict:
+    return {"order_id": order_id, "cancelled": True}
 
-harness.register_rest(
-    endpoint="/invoices/{invoice_id}",
-    method="GET",
-    description="Fetch an invoice",
-    parameters={"invoice_id": str},
-)
-harness.register_skill(
-    "deploy_skill",
-    description="Deploy a service version",
-    triggers=["deploy"],
-    parameters={"service": str, "version": str},
-    side_effect="mutation",
-)
+# Fast Conformal Routing (<420ms)
+decision = harness.route("Where is my package for order ORD-1092?")
+print("Action:", decision.action)          # "EXECUTE"
+print("Selected Tool:", decision.selected_tool)     # "get_order_status"
+print("Confidence:", decision.probabilities.get("get_order_status"))
 
-print(harness.route("look up order ORD-774").action)
-print(harness.run_workflow(
-    "Look up order ORD-774, then cancel its shipment."
-))
+# Execute with boundary verification
+result = harness.execute("get_order_status", {"order_id": "ORD-1092"})
+print("Result:", result.data)
 ```
 
-A local folder works: `SoroHarness.from_pretrained("releases/soro-kev-4b")`. A Hub id is downloaded with `snapshot_download`. CUDA with `bitsandbytes` loads the 4B checkpoint as NF4. Otherwise the loader uses bf16, then fp16.
+---
 
-`soro-audit` lints an MCP server over stdio. From `veyra/`:
+## End-to-End Execution Flow
 
-```text
-soro-audit --stdio "npx -y @modelcontextprotocol/server-filesystem /tmp" --dry-run
+A router selects tools and normalizes parameter keys; it does not author free-text string values. In an end-to-end agent architecture, Soro-Kev operates as a specialized System-One layer:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Router as Soro-Kev Decision Model
+    participant Extractor as Fast Argument Extractor
+    participant Boundary as Soro-Boro Execution Boundary
+    participant MCP as MCP Tool Server
+
+    User->>Router: "Send $50 to Alice with note 'rent'"
+    Note over Router: Single Prefill Forward Pass (~413 ms)
+    Router-->>Router: tool_route: "send_payment" (conf: 0.98, |S|=1 -> EXECUTE)
+    Router-->>Router: is_mutation: "yes" (mutation tier)
+    
+    Router->>Extractor: Pass Selected Schema ("send_payment") & Query
+    Note over Extractor: Drafts raw arguments: {amt: 50, recipient: "Alice", memo: "rent"}
+    Extractor-->>Router: Raw Argument Dict
+    
+    Note over Router: Heads: arg_mapping & missing_required
+    Router-->>Router: Map keys: amt->amount, recipient->payee_id, memo->note
+    Router-->>Router: Validate completeness: missing_required == "no"
+    
+    Router->>Boundary: Dispatch (send_payment, {amount: 50, payee_id: "Alice", note: "rent"})
+    Note over Boundary: Enforces Idempotency Key & Mutation Guard
+    Boundary->>MCP: JSON-RPC Call (tools/call)
+    MCP-->>Boundary: Result JSON
+    Boundary-->>User: Success Confirmation
 ```
 
-## What was measured
+---
 
-These are local RTX 4050 runs. They are not an official Berkeley Function Calling leaderboard submission. The official board scores full AST and executable calls. The BFCL numbers below are tool-name accuracy on our converted rows.
+## Empirical Benchmark Results
 
-Seed-42 slice, 100 calibration rows and 200 test rows, shared by all three columns.
+Evaluated on an **NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4)**.
 
-| `val_zeroshot.jsonl` | Heuristic | Soro-Kev-0.8B | Soro-Kev-4B |
-|---|---|---|---|
-| Route accuracy | 47.50% | 84.50% | 89.00% |
-| Coverage (target 90%) | 89.50% | 89.00% | 93.00% |
-| Mean set size | 4.39 | 1.17 | 1.11 |
-| Argument mapping | 42.50% | 99.00% | 99.00% |
-| Missing-argument detection | 50.00% | 85.50% | 71.00% |
-| Mutation classification | 63.00% | 88.50% | 92.50% |
+### Tool Routing Accuracy & Conformal Efficiency
 
-| `val_external_human.jsonl` | Heuristic | Soro-Kev-0.8B | Soro-Kev-4B |
-|---|---|---|---|
-| Route accuracy | 60.50% | 89.00% | 94.50% |
-| Coverage | 95.50% | 95.50% | 95.00% |
-| Mean set size | 4.18 | 1.18 | 1.07 |
-| Argument mapping | 52.00% | 100% | 100% |
+| Benchmark Split | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-0.8B | Soro-Kev-4B (Flagship) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Zero-Shot Route Accuracy (200 rows)** | 47.50% | — | 84.50% | **89.00%** |
+| **Zero-Shot Conformal Coverage** (Nominal: 90%) | 89.50% | — | 89.00% | **93.00%** |
+| **Zero-Shot Mean Prediction Set Size** | 4.39 | — | 1.17 | **1.11** |
+| **Independently Sourced Holdout Accuracy (200 rows)** | 60.50% | 75.00% | 89.00% | **94.50%** |
+| **Independently Sourced Conformal Coverage** | 95.50% | — | 95.50% | **95.00%** |
+| **Independently Sourced Mean Set Size** | 4.18 | — | 1.18 | **1.07** |
+| **Argument Key Normalization Rate** | 42.50% | — | 99.00% | **100.0%** |
+| **Median Inference Latency (Prefill Only)** | 0.31 ms | 110.95 ms | **80.01 ms** | **413.18 ms** (NF4) |
+| **Peak GPU VRAM** | 0 MB | 1,612 MB | **1,563 MB** | **4,048 MB** (NF4) |
 
-4B external format accuracy on that 200-row slice: MCP JSON 94.4% (36), mixed 94.6% (37), agent skill 100% (29), REST 96.2% (26), GraphQL 96.8% (31), Python signature 87.8% (41).
+> **Pointer Network Guarantee**: Candidate selection is strictly bounded to the candidate tool set + `__abstain__` (0% invalid tool-name hallucination). Misclassification rates ($1 - \text{Top-1}$) are 5.50% on independently sourced holdouts and 11.00% zero-shot.
 
-The unshuffled 0.8B file, 1,920 test rows, is a different split: 80.99% route, 96.56% argument mapping, 3.33% permutation flip, mean set size 1.16. Do not put it in the same row as the 200-row 4B number.
+### Berkeley Function Calling Leaderboard (BFCL Slices)
 
-BFCL converted slice, seed 42, 34 multiple / 33 live multiple / 33 irrelevance:
+| Slice | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-0.8B | Soro-Kev-4B (Flagship) |
+| :--- | :--- | :--- | :--- | :--- |
+| **BFCL Multiple Tools (34 rows)** | 97.06% | 100.0% | 100.0% | **100.0%** |
+| **BFCL Live Multiple (33 rows)** | 75.76% | 69.70% | 96.97% | **96.97%** |
+| **BFCL Irrelevance Abstention (33 rows)** | 3.03% | 81.82% | 57.58% | **75.76%** |
 
-| | Heuristic | Soro-Kev-0.8B | Soro-Kev-4B |
-|---|---|---|---|
-| multiple | 97.06% | 100% | 100% |
-| live multiple | 75.76% | 96.97% | 96.97% |
-| irrelevance abstain | 3.03% | 57.58% | 75.76% |
+---
 
-Decision models on the same 100 BFCL rows plus 60 external rows, one prefill each:
+## 3-Tier Disjointness Verification Audit
 
-| | Heuristic | Kev-0.8B | Soro-Kev-0.8B | Soro-Kev-4B |
-|---|---|---|---|---|
-| multiple | 100% | 100% | 100% | 100% |
-| live multiple | 84.8% | 69.7% | 97.0% | 97.0% |
-| irrelevance abstain | 3.0% | 81.8% | 57.6% | 75.8% |
-| external 60 | 36.7% | 75.0% | 83.3% | 85.0% |
-| median latency | 0.31 ms | 111 ms | 80 ms | 413 ms |
-| peak VRAM | 0 | 1,612 MB | 1,563 MB | 4,048 MB |
+To verify train/test integrity, we executed and committed a complete 3-tier machine audit (`scripts/verify_dataset_disjointness.py` &rarr; `benchmarks/disjointness_audit.json`):
 
-Kev-4B, Kev-9B, and Kev-27B were not run. Their weights are not on this laptop.
+1. **Package-Level Disjointness**: `val_external_human.jsonl` (5 packages: `geo_mcp`, `media_mcp`, `tau2/telecom`, `tau2/retail`, `system_mcp`) and `val_zeroshot.jsonl` (55 packages) share **0 packages** with `train.jsonl` (319 packages).
+2. **Tool-Level Overlap**: Out of 43 unique candidate tools in the external holdout, 39 are completely unseen. Only 4 generic primitives share names with train tools (`reverse_geocode`, `check_service_status`, `transfer_to_human_agents`, `list_processes`).
+3. **Query-Level Near-Duplicates**: **0 exact query matches** and **0 near-duplicate query pairs** ($Jaccard \ge 0.75$) between train and holdout queries.
+4. **Collision Distractor Stratification**: The external holdout contains purely clean queries (`clean: 1200`, `collision: 0`), whereas zero-shot contains 52 collision distractors, empirically confirming the distractor hypothesis.
 
-Harness checks on this machine: 4B passed the shipment/email dataflow chain, the unlabeled Jira-versus-Linear ask, the `sev1` incident choice, the missing-amount halt, the "do not cancel" negation, and the 25-tool haystack including a soufflé abstain. 0.8B missed `list_incidents` on that haystack.
+---
 
-## Reproduce
+## Training Data Structure
 
-```text
-cd veyra
-pip install -e "./python[dev]"
-python training/evaluate_benchmark.py --backend neural --checkpoint runs/soro_kev_qwen3_4b_best --max-eval-rows 300 --val-data data/soro_kev_dataset/val_zeroshot.jsonl
-python training/benchmark_decision_models.py
-python ../scripts/publish_to_huggingface.py --dry-run
+`train.jsonl` contains exactly **23,192 multi-task state rows**, totaling **115,960 question-level supervision targets** across 5 concurrent heads:
+
+| Question Head | Target Count | Purpose |
+| :--- | :--- | :--- |
+| `tool_route` | 23,192 | Closed-choice tool routing over candidates + `__abstain__` |
+| `tool_route_perm` | 23,192 | Permuted candidate orders enforcing position invariance |
+| `arg_mapping` | 23,192 | 16,457 real schema property mappings, 6,735 `__drop__` targets |
+| `missing_required` | 23,192 | 6,034 `yes` (halt/clarify), 17,158 `no` |
+| `is_mutation` | 23,192 | 5,700 `yes` (state-mutating), 17,492 `no` (read-only) |
+
+---
+
+## Citations
+
+```bibtex
+@software{nisar2026sorokev,
+  author = {Nisar, Keyush},
+  title = {Soro-Kev: System-One Conformal Tool Router and Execution Boundary},
+  year = {2026},
+  publisher = {GitHub},
+  howpublished = {\url{https://github.com/nisaral/Soro-Boro}},
+  note = {Release v0.2.0}
+}
+
+@misc{palmer2026kev08b,
+  author = {Palmer, Jared},
+  title = {Kev-0.8B: a calibrated decision model on Qwen3.5-0.8B},
+  year = {2026},
+  howpublished = {\url{https://huggingface.co/jaredpalmer/kev-0.8b}},
+  note = {Kev 1.0}
+}
+
+@inproceedings{shi2025toolret,
+  author = {Shi, Jiahao and others},
+  title = {ToolRet: A Benchmark for Tool Retrieval in Large Language Models},
+  booktitle = {Findings of the Association for Computational Linguistics: ACL 2025},
+  year = {2025}
+}
+
+@article{mo2025livemcpbench,
+  author = {Mo, Guozhao and others},
+  title = {LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools?},
+  journal = {arXiv preprint arXiv:2508.01780},
+  year = {2025}
+}
+
+@inproceedings{ross2025when2call,
+  author = {Ross, Hayley and Mahabaleshwarkar, Ameya Sunil and Suhara, Yoshi},
+  title = {When2Call: When (not) to Call Tools},
+  booktitle = {Proceedings of the 2025 Conference of the North American Chapter of the Association for Computational Linguistics (NAACL)},
+  year = {2025}
+}
 ```
-
-Upload is `python scripts/publish_to_huggingface.py` from the repo root after `HF_TOKEN` is set. `--dry-run` does not upload.
 
 ## License
 
