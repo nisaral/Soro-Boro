@@ -20,66 +20,78 @@ datasets:
 pipeline_tag: text-classification
 ---
 
-# Soro-Kev-4B: System-One Conformal Tool Router
+# Soro-Kev-4B
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Base Model](https://img.shields.io/badge/Base_Model-Qwen3--4B-purple.svg)](https://huggingface.co/Qwen/Qwen3-4B)
-[![Dataset](https://img.shields.io/badge/Dataset-soro--universal--tool--harness-green.svg)](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
-[![GitHub](https://img.shields.io/badge/GitHub-Soro--Boro-black.svg)](https://github.com/nisaral/Soro-Boro)
+## Model summary
 
-Soro-Kev-4B is a high-accuracy, ultra-fast System-One Pointer Model for AI agents, Model Context Protocol (MCP) servers, REST APIs, and developer toolchains.
+Soro-Kev-4B is a flagship decision model for AI agent tool routing, multi-protocol schema normalization, and execution boundary control. It reads one document (the state: user prompt, conversational history, and registered tool schemas) and a set of typed questions about it, and returns a calibrated probability distribution over the options supplied with each question, in a single forward pass and without generating text.
 
-Instead of generating multi-token JSON strings that consume context window tokens and risk hallucinating tool names, Soro-Kev uses a single forward prefill pass over candidate tools. It computes dot-product attention between question-end hidden states and option-end hidden states, applying split conformal prediction to guarantee calibrated decision-making.
+It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev model cards (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-4B is fine-tuned specifically on the multi-protocol Universal Tool Harness, raising tool routing accuracy to 89.00% zero-shot and 94.50% on external human holdouts.
 
-```text
-User Request + Registered Tool Schemas
-            │
-            ▼  [Single Forward Prefill — 413ms on RTX 4050 / T4]
-    Hidden State Dot-Product: h_query · h_tool / T
-            │
-            ▼
-    Softmax-LAC Conformal Prediction Set S:
-    ├── |S| = 1 and tool != __abstain__  ──▶  EXECUTE (Immediate safe action)
-    ├── |S| in [2, 8]                    ──▶  ASK     (Targeted clarification)
-    └── |S| is empty or __abstain__      ──▶  ABSTAIN (Safe out-of-domain rejection)
-```
+It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qwen3-4B`. In 4-bit NF4 quantization, it operates in ~4,048 MB VRAM with a median prefill latency of ~413 ms on an RTX 4050 Laptop GPU or Kaggle T4 GPU. It is intended for production AI agents, complex Model Context Protocol (MCP) tool catalogs (50+ tools), and backend API routing engines where generative LLM JSON hallucinations and latency overhead cannot be tolerated.
 
 ---
 
-## Comparison: Generative LLM vs. Soro-Kev-4B
+## Model details
 
-| Dimension | Generative LLM Tool Calling | Soro-Kev-4B (System-One Pointer) |
-| :--- | :--- | :--- |
-| **Inference Mechanism** | Multi-token JSON autoregression | Single prefill hidden-state dot product |
-| **Median Latency** | 1,500 ms – 4,000 ms | ~413 ms (NF4 on RTX 4050 / T4) |
-| **Tool Name Hallucinations** | Possible when catalog is large | 0% (Mathematically constrained to catalog) |
-| **Catalog Scalability (50+ tools)** | Token bloat & degraded attention | Pre-filters and scores without context penalty |
-| **Out-of-Domain Safety** | Frequently forces closest tool | Calibrated abstention (`__abstain__`) |
-| **Execution Loop Guard** | None (agent can re-trigger loops) | 120s duplicate mutation loop guard |
-| **VRAM Footprint** | 8 GB – 16 GB VRAM | ~4,048 MB VRAM (NF4 via bitsandbytes) |
-
----
-
-## Installation
-
-```bash
-pip install "git+https://github.com/nisaral/Soro-Boro.git#subdirectory=veyra/python"
-# Or install dependencies directly:
-pip install torch transformers peft bitsandbytes accelerate
-```
+| Field | Detail |
+| :--- | :--- |
+| **Developer** | Keyush Nisar ([github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro)) |
+| **Model type** | Decision model: causal language-model backbone run prefill-only, with a pointer head over candidate options |
+| **Backbone** | `Qwen/Qwen3-4B`: 36 layers, multi-head attention; frozen |
+| **Adapter** | LoRA, rank 16, $\alpha$ 32, on attention projections and MLP layers |
+| **Head** | Pointer head ($d=2560$): hidden-state projections score each option's closing token against the question's final token ($h_{query} \cdot h_{option} / T$) |
+| **Precision** | Trained in bf16/fp16; served in NF4 4-bit (~4,048 MB VRAM) or fp16 (~8,200 MB VRAM); evaluated in fp32 |
+| **Context length** | States of up to 32,768 tokens; training states were at most 4,096 tokens |
+| **Validated context** | 8,192 tokens |
+| **Calibration** | Learned temperature ($T = 1.62$) and split-conformal quantile ($q_{hat} = 0.8066$ at $1 - \alpha = 0.90$) |
+| **Languages** | English (tool schemas, OpenAPI specs, MCP JSON-RPC, Python docstrings) |
+| **License** | Apache-2.0 |
+| **Version** | Soro-Kev 1.0 (release `v0.2.0`, 2026-10-17) |
+| **Base Kev Ancestor** | Derived from pointer network methodology of [jaredpalmer/kev-0.8b](https://huggingface.co/jaredpalmer/kev-0.8b) |
 
 ---
 
-## Use Cases & Code Examples
+## Input and Question Types
 
-### 1. Python Agent Tool Routing & Execution
+Soro-Kev-4B evaluates a state and any number of named questions across three typed categories:
 
-Define standard Python functions with side-effect annotations. Soro routes natural language to the correct tool, auto-coerces arguments, and executes safely:
+| Type | Options | Output | Intended Purpose |
+| :--- | :--- | :--- | :--- |
+| **choice (`tool_route`)** | 1–255 candidate tool schemas + `__abstain__` | Probability per tool, top tool, and conformal prediction set $S$ | Selects the single correct tool to execute, or abstains |
+| **choice (`arg_mapping`)** | Schema property keys + `__drop__` | Probability distribution over candidate property names | Maps unrecognized LLM argument keys to target schema parameters |
+| **noul (`missing_required`)** | `yes` / `no` with descriptions | Probability that required arguments are missing | Determines whether harness must ask user before calling tool |
+| **noul (`is_mutation`)** | `yes` / `no` with descriptions | Probability that action mutates external state | Classifies side-effect tier when MCP tool annotations are absent |
+
+Each question is evaluated as its own forward path branching from the shared state hidden representation; questions cannot cross-contaminate one another, and the state prefix is computed once and cached.
+
+---
+
+## Intended Uses
+
+- **Production AI Agent Tool Routing**: Selecting tools from large catalogs (50+ schemas) in single-pass inference without prompt token generation bloat.
+- **Model Context Protocol (MCP) Server Gateways**: High-accuracy routing across heterogeneous tool protocols (MCP JSON, REST APIs, GraphQL, Python callables).
+- **Conformal Action Boundary**: Generating calibrated prediction sets ($S$) where $|S| = 1$ triggers `EXECUTE`, $|S| \in [2, 8]$ triggers targeted `ASK` clarification, and `__abstain__` safely halts execution.
+- **Out-of-Domain Rejection**: Calibrated abstention (75.76% on BFCL irrelevance slices) preventing agents from forcing tool executions on conversational or irrelevant queries.
+- **Duplicate Mutation Protection**: Enforcing the 0-duplicate execution invariant under network transport faults when paired with the Soro-Boro execution boundary.
+
+## Out-of-Scope Uses
+
+- **Text generation, conversation, or creative writing**: The model runs in prefill-only mode and has no generative token decode loop.
+- **Open-ended text synthesis**: The model selects and normalizes schemas; it does not author free-form documents.
+- **Fully autonomous execution of high-risk actions**: Critical financial or destructive operations should always require operator confirmation (`ASK` / human-in-the-loop).
+- **Languages other than English**: Non-English tool descriptions and prompts are not validated.
+
+---
+
+## How to Use
+
+### 1. High-Level Python SDK (Soro Harness)
 
 ```python
 from soro.harness.pipeline import SoroHarness
 
-# Loads directly from Hugging Face in NF4 quantization
+# Loads directly from Hugging Face in NF4 quantization (4 GB VRAM)
 harness = SoroHarness.from_pretrained("nisaralll/soro-kev-4b")
 
 @harness.tool(description="Look up customer order details", side_effect="read_only")
@@ -96,166 +108,125 @@ print("Decision Action:", decision.action)          # "EXECUTE"
 print("Selected Tool:", decision.selected_tool)     # "get_order_status"
 print("Confidence:", decision.probabilities.get("get_order_status"))
 
-# Execute with Automatic Argument Coercion (strings, casing, types)
+# Execute with Automatic Argument Coercion
 result = harness.execute("get_order_status", {"order_id": "ORD-1092"})
 print("Execution Result:", result.data)
 ```
 
----
-
-### 2. Out-of-Domain Abstention & Ambiguity Clarification
-
-Prevent unintended tool execution when a user asks something outside the toolset or when two tools match equally:
+### 2. Low-Level In-Process Scorer
 
 ```python
-# Query outside the catalog (e.g. recipe request on order catalog)
-decision = harness.route("Can you give me a recipe for chocolate cake?")
-print(decision.action)          # "ABSTAIN"
-print(decision.selected_tool)   # None
-print(decision.reason)          # "Neural scorer abstained"
+from soro.routing.kev_local import LocalKevScorer
 
-# Ambiguous query matching multiple tools (e.g. Jira vs Linear)
-harness.register_action("jira_create_issue", "Create issue ticket in Jira", {"title": str})
-harness.register_action("linear_create_issue", "Create issue ticket in Linear", {"title": str})
+scorer = LocalKevScorer(run="nisaralll/soro-kev-4b", backend="neural")
+scorer.load()
 
-ambiguous = harness.route("Create a bug ticket for login error")
-print(ambiguous.action)       # "ASK"
-print(ambiguous.candidates)   # ["jira_create_issue", "linear_create_issue"]
+state = "User Request: Check available disk storage in /var/log"
+questions = {
+    "tool_route": {
+        "type": "choice",
+        "instructions": "Which tool should execute for this request?",
+        "criteria": {
+            "get_disk_usage": "Return total, used, and available disk storage for path.",
+            "list_processes": "List active system processes and PIDs.",
+            "__abstain__": "None of the listed tools fit."
+        }
+    }
+}
+
+result = scorer.evaluate_turn(state, questions)
+print(result["answers"]["tool_route"])  # "get_disk_usage"
 ```
 
 ---
 
-### 3. Model Context Protocol (MCP) Server Integration
+## Training Data
 
-Bind and route tools exposed by any standard MCP server over stdio or HTTP:
+Soro-Kev-4B was trained on the `nisaralll/soro-universal-tool-harness` collection across four distinct protocol domains:
 
-```python
-from soro.harness.pipeline import SoroHarness
+| Stage | Records | Content & Protocol Families |
+| :--- | :--- | :--- |
+| **Stage 1: Multi-Protocol Tool Routing** | 24,180 | Real and synthetic tool catalogs: MCP JSON-RPC schemas (System, Filesystem, Memory, Fetch, SQLite), OpenAPI v3 / REST operations (Stripe, GitHub REST, Petstore), Agent Skills (`SKILL.md` format from Tau2 Telecom), and Python signatures. Option orders shuffled with negative `__abstain__` distractors. |
+| **Stage 2: Schema Repair & Argument Mapping** | 8,450 | Mapping malformed or unrecognized LLM parameter keys (`client_id`, `usr`, `key`) to ground truth schema property names, plus `__drop__` targets for hallucinated parameters. |
+| **Stage 3: Side-Effect & Mutation Classification** | 5,200 | Binary classification of mutating vs read-only operations across unannotated tools to verify execution safety boundaries. |
 
-harness = SoroHarness.from_pretrained("nisaralll/soro-kev-4b")
-
-# Register from MCP JSON Schema
-harness.register_mcp_tool(
-    name="filesystem_read_file",
-    description="Read complete content of a file from filesystem",
-    parameters={
-        "type": "object",
-        "properties": {"path": {"type": "string"}},
-        "required": ["path"]
-    },
-    fn=lambda path: {"content": f"Mock file content of {path}"},
-    side_effect="read_only"
-)
-
-res = harness.route("Read the configuration from /etc/hosts")
-print(res.selected_tool)  # "filesystem_read_file"
-```
+Evaluation suites (BFCL converted holdout, external human queries, and 200-row zero-shot holdouts) were strictly excluded from training.
 
 ---
 
-### 4. Multi-Tool Workflow Chaining with Context Dataflow
+## Evaluation Results
 
-Chain multi-clause queries automatically. Soro extracts outputs from read operations and feeds them forward into subsequent mutations:
+Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs in fp32 mode at the calibrated temperature ($T = 1.62$).
 
-```python
-# Multi-clause query: read order, then cancel shipment
-trace = harness.run_workflow(
-    "Check order ORD-774, and if pending cancel its warehouse shipment."
-)
+### Tool Routing Accuracy & Conformal Efficiency
 
-for step in trace:
-    print(f"[{step['action']}] Tool: {step.get('tool')} -> Output: {step.get('data')}")
-```
-
----
-
-### 5. Pure PyTorch & Transformers Loading
-
-Load the checkpoint without the harness wrapper:
-
-```python
-import torch
-from transformers import AutoTokenizer, AutoModel, BitsAndBytesConfig
-from peft import PeftModel
-from huggingface_hub import snapshot_download
-
-repo_id = "nisaralll/soro-kev-4b"
-weights_dir = snapshot_download(repo_id)
-
-# 1. Load backbone in 4-bit NF4
-bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.float16,
-)
-tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B", trust_remote_code=True)
-base_model = AutoModel.from_pretrained("Qwen/Qwen3-4B", quantization_config=bnb_config, device_map="auto")
-
-# 2. Attach PEFT LoRA adapter
-model = PeftModel.from_pretrained(base_model, weights_dir)
-
-# 3. Load Pointer Scoring Head
-head_weights = torch.load(f"{weights_dir}/head.pt", map_location="cuda")
-print("Soro-Kev-4B initialized successfully.")
-```
-
----
-
-## Evaluation & Benchmark Results
-
-Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs using seed-42 slices (100 calibration / 200 test rows).
-
-### Zero-Shot & External Human Benchmark
-
-| Benchmark Split | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-4B |
+| Benchmark Split | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-4B (Flagship) |
 | :--- | :--- | :--- | :--- |
-| **Zero-Shot Routing Accuracy** | 47.50% | — | **89.00%** |
-| **Zero-Shot Conformal Coverage** (Target: 90%) | 89.50% | — | **93.00%** |
-| **Zero-Shot Mean Set Size** | 4.39 | — | **1.11** |
-| **External Human Routing Accuracy** | 60.50% | 75.00% | **94.50%** |
+| **Zero-Shot Route Accuracy (200 rows)** | 47.50% | — | **89.00%** |
+| **Zero-Shot Conformal Coverage** (Nominal: 90%) | 89.50% | — | **93.00%** |
+| **Zero-Shot Mean Prediction Set Size** | 4.39 | — | **1.11** |
+| **External Human Route Accuracy (200 rows)** | 60.50% | 75.00% | **94.50%** |
 | **External Human Conformal Coverage** | 95.50% | — | **95.00%** |
-| **External Human Mean Set Size** | 4.18 | — | **1.07** |
-| **Argument Key Normalization** | 42.50% | — | **100.0%** |
+| **External Human Mean Prediction Set Size** | 4.18 | — | **1.07** |
+| **Argument Key Normalization Rate** | 42.50% | — | **100.0%** |
+| **Median Inference Latency (Prefill Only)** | 0.31 ms | 110.95 ms | **413.18 ms** (NF4) |
+| **Peak GPU VRAM** | 0 MB | 1,612 MB | **4,048 MB** (NF4) |
 
-### BFCL Routing Benchmark (Converted Slice)
+### Berkeley Function Calling Leaderboard (BFCL Slices)
 
-| Category (100 rows total) | Heuristic | Jared Palmer Kev-0.8B | Soro-Kev-4B |
+| Slice | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-4B (Flagship) |
 | :--- | :--- | :--- | :--- |
-| **Multiple Tools (34 rows)** | 97.06% | 100.0% | **100.0%** |
-| **Live Multiple (33 rows)** | 75.76% | 69.70% | **96.97%** |
-| **Irrelevance / Out-of-Domain (33 rows)** | 3.03% | 81.82% | **75.76%** |
+| **BFCL Multiple Tools (34 rows)** | 97.06% | 100.0% | **100.0%** |
+| **BFCL Live Multiple (33 rows)** | 75.76% | 69.70% | **96.97%** |
+| **BFCL Irrelevance Abstention (33 rows)** | 3.03% | 81.82% | **75.76%** |
 
-### Accuracy by Schema Format (200-row External Slice)
+### Accuracy by Schema Format (200-Row External Human Slice)
 
 - **Agent Skills (`SKILL.md`)**: 100.0% (29/29)
 - **GraphQL RPC**: 96.8% (30/31)
 - **REST / OpenAPI**: 96.2% (25/26)
-- **Mixed / Heterogeneous**: 94.6% (35/37)
+- **Mixed / Heterogeneous Catalogs**: 94.6% (35/37)
 - **MCP JSON-RPC**: 94.4% (34/36)
 - **Python Signatures**: 87.8% (36/41)
 
 ---
 
-## Model Details & Calibration
+## Limitations and Trade-Offs
 
-- **Base Architecture**: `Qwen/Qwen3-4B`
-- **Adapter**: LoRA ($r=16, \alpha=32$) trained on Universal Tool Harness
-- **Scoring Head**: Question-to-Option pointer network ($d=2560$)
-- **Conformal Calibration**: Split-conformal quantile `calibrated_q_hat = 0.8066` ($1 - \alpha = 0.90$)
-- **Inference Latency**: Median 413 ms (RTX 4050 NF4)
-- **VRAM Requirements**: 4,048 MB (NF4) / 8,200 MB (FP16)
+- **Higher VRAM than 0.8B**: Soro-Kev-4B requires ~4,048 MB in NF4 4-bit quantization, making Soro-Kev-0.8B preferable for memory-constrained edge devices (<2 GB VRAM).
+- **Prefill Latency**: Median prefill latency is ~413 ms in NF4 on laptop hardware; for sub-100ms ultra-low latency, use Soro-Kev-0.8B (~80 ms).
+- **No generative argument synthesis**: Soro-Kev normalizes and routes arguments; it does not author free-form open-ended text strings.
+- **Option order sensitivity**: While option order is randomized during training, slight score variances ($< 1.5\%$) can occur based on option presentation order.
 
 ---
 
-## Citation & License
+## Provenance and Reproducibility
 
-Released under the Apache-2.0 License.
+- **Repository**: [github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro) (release tag `v0.2.0`)
+- **Trained Checkpoint**: Adapter weights and `head.pt` with learned temperature ($T = 1.62$)
+- **Harness Dataset**: [huggingface.co/datasets/nisaralll/soro-universal-tool-harness](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
+
+---
+
+## Citations
+
+If you use Soro-Kev in your research or production systems, please cite both Soro-Kev and the underlying Kev decision model architecture:
 
 ```bibtex
-@software{soro_kev_2026,
-  author = {Keyush Nisar},
+@software{nisar2026sorokev,
+  author = {Nisar, Keyush},
   title = {Soro-Kev: System-One Conformal Tool Router and Execution Boundary},
   year = {2026},
-  url = {https://github.com/nisaral/Soro-Boro}
+  publisher = {GitHub},
+  howpublished = {\url{https://github.com/nisaral/Soro-Boro}},
+  note = {Release v0.2.0}
+}
+
+@misc{palmer2026kev08b,
+  author = {Palmer, Jared},
+  title = {Kev-0.8B: a calibrated decision model on Qwen3.5-0.8B},
+  year = {2026},
+  howpublished = {\url{https://huggingface.co/jaredpalmer/kev-0.8b}},
+  note = {Kev 1.0}
 }
 ```
