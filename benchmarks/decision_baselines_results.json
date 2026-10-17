@@ -1,0 +1,162 @@
+{
+  "BM25": {
+    "top1_accuracy": 0.55,
+    "conformal_coverage": 0.95,
+    "mean_prediction_set_size": 3.915,
+    "conformal_q_hat": 0.9046,
+    "misclassification_rate": 0.45,
+    "actions_breakdown": {
+      "ASK": 140,
+      "EXECUTE": 27,
+      "ABSTAIN": 33
+    },
+    "stratification": {
+      "clean_rows": {
+        "count": 200,
+        "accuracy": 0.55
+      },
+      "collision_rows": {
+        "count": 0,
+        "accuracy": 0.0
+      }
+    },
+    "cluster_bootstrap_95ci": {
+      "accuracy_95ci": [
+        0.4639,
+        0.6111
+      ],
+      "mean_set_size_95ci": [
+        3.5233,
+        4.1744
+      ]
+    }
+  },
+  "Dense_Cosine": {
+    "top1_accuracy": 0.505,
+    "conformal_coverage": 0.9,
+    "mean_prediction_set_size": 3.53,
+    "conformal_q_hat": 0.8746,
+    "misclassification_rate": 0.495,
+    "actions_breakdown": {
+      "ASK": 168,
+      "EXECUTE": 20,
+      "ABSTAIN": 12
+    },
+    "stratification": {
+      "clean_rows": {
+        "count": 200,
+        "accuracy": 0.505
+      },
+      "collision_rows": {
+        "count": 0,
+        "accuracy": 0.0
+      }
+    },
+    "cluster_bootstrap_95ci": {
+      "accuracy_95ci": [
+        0.4021,
+        0.5625
+      ],
+      "mean_set_size_95ci": [
+        3.3542,
+        3.6734
+      ]
+    }
+  },
+  "Cross_Encoder": {
+    "top1_accuracy": 0.57,
+    "conformal_coverage": 0.905,
+    "mean_prediction_set_size": 3.305,
+    "conformal_q_hat": 0.8787,
+    "misclassification_rate": 0.43,
+    "actions_breakdown": {
+      "ASK": 146,
+      "EXECUTE": 36,
+      "ABSTAIN": 18
+    },
+    "stratification": {
+      "clean_rows": {
+        "count": 200,
+        "accuracy": 0.57
+      },
+      "collision_rows": {
+        "count": 0,
+        "accuracy": 0.0
+      }
+    },
+    "cluster_bootstrap_95ci": {
+      "accuracy_95ci": [
+        0.4444,
+        0.6367
+      ],
+      "mean_set_size_95ci": [
+        3.0103,
+        3.6712
+      ]
+    }
+  },
+  "Option_SFT_Logits": {
+    "top1_accuracy": 0.575,
+    "conformal_coverage": 0.885,
+    "mean_prediction_set_size": 3.155,
+    "conformal_q_hat": 0.8957,
+    "misclassification_rate": 0.425,
+    "actions_breakdown": {
+      "ASK": 163,
+      "EXECUTE": 32,
+      "ABSTAIN": 5
+    },
+    "stratification": {
+      "clean_rows": {
+        "count": 200,
+        "accuracy": 0.575
+      },
+      "collision_rows": {
+        "count": 0,
+        "accuracy": 0.0
+      }
+    },
+    "cluster_bootstrap_95ci": {
+      "accuracy_95ci": [
+        0.4536,
+        0.6394
+      ],
+      "mean_set_size_95ci": [
+        3.0196,
+        3.2423
+      ]
+    }
+  },
+  "Soro_Kev_SystemOne": {
+    "top1_accuracy": 0.49,
+    "conformal_coverage": 0.885,
+    "mean_prediction_set_size": 4.275,
+    "conformal_q_hat": 0.8954,
+    "misclassification_rate": 0.51,
+    "actions_breakdown": {
+      "ASK": 195,
+      "ABSTAIN": 2,
+      "EXECUTE": 3
+    },
+    "stratification": {
+      "clean_rows": {
+        "count": 200,
+        "accuracy": 0.49
+      },
+      "collision_rows": {
+        "count": 0,
+        "accuracy": 0.0
+      }
+    },
+    "cluster_bootstrap_95ci": {
+      "accuracy_95ci": [
+        0.3814,
+        0.5664
+      ],
+      "mean_set_size_95ci": [
+        4.1078,
+        4.413
+      ]
+    }
+  }
+}

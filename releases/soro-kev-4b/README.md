@@ -30,9 +30,9 @@ pipeline_tag: text-classification
 
 Soro-Kev-4B is a flagship decision model for AI agent tool routing, multi-protocol schema normalization, and execution boundary control. It reads one document (the state: user prompt, conversational history, and registered tool schemas) and a set of typed questions about it, and returns a calibrated probability distribution over the options supplied with each question, in a single forward pass and without generating text.
 
-It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev model cards (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-4B is fine-tuned specifically on the multi-protocol Universal Tool Harness, raising tool routing accuracy to 89.00% zero-shot and 94.50% on external human holdouts.
+It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev model cards (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-4B is fine-tuned specifically on the multi-protocol Universal Tool Harness, raising tool routing accuracy to 89.00% zero-shot and 94.50% on held-out, independently authored holdouts.
 
-It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qwen3-4B`. In 4-bit NF4 quantization, it operates in ~4,048 MB VRAM with a median prefill latency of ~413 ms on an RTX 4050 Laptop GPU or Kaggle T4 GPU. It is intended for production AI agents, complex Model Context Protocol (MCP) tool catalogs (50+ tools), and backend API routing engines where generative LLM JSON hallucinations and latency overhead cannot be tolerated.
+It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qwen3-4B`. In 4-bit NF4 quantization, it operates in ~4,048 MB VRAM with a median prefill latency of ~413 ms on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4). It is intended for production AI agents, complex Model Context Protocol (MCP) tool catalogs (50+ tools), and backend API routing engines where generative LLM JSON hallucinations and latency overhead cannot be tolerated.
 
 ---
 
@@ -146,21 +146,21 @@ print(result["answers"]["tool_route"])  # "get_disk_usage"
 
 ## Training Data
 
-Soro-Kev-4B was trained on the `nisaralll/soro-universal-tool-harness` collection across four distinct protocol domains:
+Soro-Kev-4B was trained on the `nisaralll/soro-universal-tool-harness` dataset (`train.jsonl`), consisting of exactly **23,192 multi-task state rows** representing **115,960 question-level supervision targets** across its 5 concurrent heads:
 
-| Stage | Records | Content & Protocol Families |
+| Stage / Curriculum Focus | Question Targets | Content & Protocol Families |
 | :--- | :--- | :--- |
-| **Stage 1: Multi-Protocol Tool Routing** | 24,180 | Real and synthetic tool catalogs: MCP JSON-RPC schemas (System, Filesystem, Memory, Fetch, SQLite), OpenAPI v3 / REST operations (Stripe, GitHub REST, Petstore), Agent Skills (`SKILL.md` format from Tau2 Telecom), and Python signatures. Option orders shuffled with negative `__abstain__` distractors. |
-| **Stage 2: Schema Repair & Argument Mapping** | 8,450 | Mapping malformed or unrecognized LLM parameter keys (`client_id`, `usr`, `key`) to ground truth schema property names, plus `__drop__` targets for hallucinated parameters. |
-| **Stage 3: Side-Effect & Mutation Classification** | 5,200 | Binary classification of mutating vs read-only operations across unannotated tools to verify execution safety boundaries. |
+| **Stage 1: Multi-Protocol Tool Routing** | 24,180 | Real and synthetic tool catalogs: MCP JSON-RPC schemas (System, Filesystem, Memory, Fetch, SQLite), OpenAPI v3 / REST operations (Stripe, GitHub REST, Petstore), Agent Skills (`SKILL.md` format), and Python signatures. 23,192 primary states + 988 permutation augmentations with negative `__abstain__` distractors. |
+| **Stage 2: Schema Repair & Argument Mapping** | 8,450 | Active question instances filtered to tools with parameter structures. Maps malformed or unrecognized LLM parameter keys (`client_id`, `usr`, `key`) to ground truth schema property names, plus `__drop__` targets for hallucinated parameters. |
+| **Stage 3: Side-Effect & Mutation Classification** | 5,200 | Balanced 50/50 binary classification of mutating vs read-only operations across unannotated tools to verify execution safety boundaries. |
 
-Evaluation suites (BFCL converted holdout, external human queries, and 200-row zero-shot holdouts) were strictly excluded from training.
+Evaluation suites (`val_external_human.jsonl` with 1,200 independently authored holdout queries, and `val_zeroshot.jsonl` with 2,220 queries across 54 unseen packages) are strictly disjoint and excluded from training, as verified by `scripts/verify_dataset_disjointness.py` and documented in `benchmarks/disjointness_audit.json`.
 
 ---
 
 ## Evaluation Results
 
-Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs in fp32 mode at the calibrated temperature ($T = 1.62$).
+Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe 4.0 x4, PyTorch 2.6.0, CUDA 12.4) in fp32 mode at the calibrated temperature ($T = 1.62$).
 
 ### Tool Routing Accuracy & Conformal Efficiency
 
@@ -169,12 +169,14 @@ Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs in f
 | **Zero-Shot Route Accuracy (200 rows)** | 47.50% | — | **89.00%** |
 | **Zero-Shot Conformal Coverage** (Nominal: 90%) | 89.50% | — | **93.00%** |
 | **Zero-Shot Mean Prediction Set Size** | 4.39 | — | **1.11** |
-| **External Human Route Accuracy (200 rows)** | 60.50% | 75.00% | **94.50%** |
-| **External Human Conformal Coverage** | 95.50% | — | **95.00%** |
-| **External Human Mean Prediction Set Size** | 4.18 | — | **1.07** |
+| **Independently Sourced Holdout Accuracy (200 rows)** | 60.50% | 75.00% | **94.50%** |
+| **Independently Sourced Conformal Coverage** | 95.50% | — | **95.00%** |
+| **Independently Sourced Mean Prediction Set Size** | 4.18 | — | **1.07** |
 | **Argument Key Normalization Rate** | 42.50% | — | **100.0%** |
 | **Median Inference Latency (Prefill Only)** | 0.31 ms | 110.95 ms | **413.18 ms** (NF4) |
 | **Peak GPU VRAM** | 0 MB | 1,612 MB | **4,048 MB** (NF4) |
+
+> **Pointer Network Guarantee**: Restricts candidate selection strictly to the closed candidate set + `__abstain__` (0% invalid or invented tool-name generation). The empirical misclassification rate ($1 - \text{Top-1 Accuracy}$) is 5.50% on independently sourced holdouts and 11.00% on zero-shot holdouts.
 
 ### Berkeley Function Calling Leaderboard (BFCL Slices)
 
@@ -184,7 +186,7 @@ Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs in f
 | **BFCL Live Multiple (33 rows)** | 75.76% | 69.70% | **96.97%** |
 | **BFCL Irrelevance Abstention (33 rows)** | 3.03% | 81.82% | **75.76%** |
 
-### Accuracy by Schema Format (200-Row External Human Slice)
+### Accuracy by Schema Format (200-Row Independently Sourced Slice)
 
 - **Agent Skills (`SKILL.md`)**: 100.0% (29/29)
 - **GraphQL RPC**: 96.8% (30/31)
@@ -197,24 +199,25 @@ Evaluated on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB) and Kaggle T4 GPUs in f
 
 ## Limitations and Trade-Offs
 
-- **Higher VRAM than 0.8B**: Soro-Kev-4B requires ~4,048 MB in NF4 4-bit quantization, making Soro-Kev-0.8B preferable for memory-constrained edge devices (<2 GB VRAM).
-- **Prefill Latency**: Median prefill latency is ~413 ms in NF4 on laptop hardware; for sub-100ms ultra-low latency, use Soro-Kev-0.8B (~80 ms).
-- **No generative argument synthesis**: Soro-Kev normalizes and routes arguments; it does not author free-form open-ended text strings.
-- **Option order sensitivity**: While option order is randomized during training, slight score variances ($< 1.5\%$) can occur based on option presentation order.
+- **No Generative Argument Synthesis**: Soro-Kev routes tools, normalizes parameter keys, and validates completeness; it does not author free-text string values. In production pipelines, arguments are drafted by a fast parameter extractor, normalized via `arg_mapping`, and guarded by `missing_required` before execution.
+- **Single-Turn Model**: Soro-Kev evaluates single routing turns. Multi-tool sequential chaining ("call tool A, then tool B") is an architectural runtime design and has not yet been benchmarked on multi-step traces.
+- **Hardware & VRAM**: Soro-Kev-4B requires ~4,048 MB VRAM in NF4 4-bit quantization. For edge devices with <2 GB VRAM, deploy Soro-Kev-0.8B (~1,563 MB, ~80 ms).
+- **Option Presentation Order**: While option order is shuffled during training, slight score variances ($< 1.5\%$) can occur across permutations. Evaluate with averaged permutations for safety-critical tasks.
 
 ---
 
 ## Provenance and Reproducibility
 
 - **Repository**: [github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro) (release tag `v0.2.0`)
-- **Trained Checkpoint**: Adapter weights and `head.pt` with learned temperature ($T = 1.62$)
+- **Trained Checkpoint**: Adapter weights and `head.pt` with learned temperature ($T = 1.62$) and global conformal quantile ($q_{hat} = 0.8066$)
 - **Harness Dataset**: [huggingface.co/datasets/nisaralll/soro-universal-tool-harness](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
+- **Disjointness Audit**: Committed in `benchmarks/disjointness_audit.json`
 
 ---
 
 ## Citations
 
-If you use Soro-Kev in your research or production systems, please cite both Soro-Kev and the underlying Kev decision model architecture:
+If you use Soro-Kev or Universal Tool Harness in your research or production systems, please cite the following publications:
 
 ```bibtex
 @software{nisar2026sorokev,
@@ -233,4 +236,26 @@ If you use Soro-Kev in your research or production systems, please cite both Sor
   howpublished = {\url{https://huggingface.co/jaredpalmer/kev-0.8b}},
   note = {Kev 1.0}
 }
+
+@inproceedings{shi2025toolret,
+  author = {Shi, Jiahao and others},
+  title = {ToolRet: A Benchmark for Tool Retrieval in Large Language Models},
+  booktitle = {Findings of the Association for Computational Linguistics: ACL 2025},
+  year = {2025}
+}
+
+@article{mo2025livemcpbench,
+  author = {Mo, Guozhao and others},
+  title = {LiveMCPBench: Benchmarking Large Language Models on Live Model Context Protocol Ecosystems},
+  journal = {arXiv preprint arXiv:2502.13886},
+  year = {2025}
+}
+
+@article{when2call2024,
+  author = {NVIDIA Research},
+  title = {When2Call: Measuring When Agents Should Call Tools},
+  journal = {arXiv preprint arXiv:2410.16540},
+  year = {2024}
+}
 ```
+

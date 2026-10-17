@@ -1,0 +1,166 @@
+{
+  "metadata": {
+    "train_rows": 23192,
+    "val_external_rows": 1200,
+    "val_zeroshot_rows": 2220,
+    "timestamp": "2026-10-17T21:55:00Z"
+  },
+  "tier_1_packages": {
+    "train_unique_packages": 319,
+    "ext_unique_packages": 5,
+    "zero_unique_packages": 55,
+    "ext_overlap_count": 0,
+    "ext_overlap_packages": [],
+    "zero_overlap_count": 0,
+    "zero_overlap_packages": [],
+    "package_disjointness_passed": true
+  },
+  "tier_2_tools": {
+    "train_unique_tools": 21122,
+    "ext_unique_tools": 43,
+    "exact_tool_overlap_count": 4,
+    "exact_overlapping_tools": [
+      "check_service_status",
+      "list_processes",
+      "reverse_geocode",
+      "transfer_to_human_agents"
+    ],
+    "normalized_tool_overlap_count": 4,
+    "fuzzy_match_count": 19,
+    "fuzzy_matches_sample": [
+      {
+        "ext_tool": "cancel_order",
+        "train_tool": "cancelOrder",
+        "name_ratio": 0.9565,
+        "desc_ngram_sim": 0.0362
+      },
+      {
+        "ext_tool": "read_environment_variable",
+        "train_tool": "Get_Environment_Variable",
+        "name_ratio": 0.898,
+        "desc_ngram_sim": 0.1038
+      },
+      {
+        "ext_tool": "read_environment_variable",
+        "train_tool": "Create_Environment_Variable",
+        "name_ratio": 0.9231,
+        "desc_ngram_sim": 0.1198
+      },
+      {
+        "ext_tool": "reverse_geocode",
+        "train_tool": "maps_reverse_geocode",
+        "name_ratio": 0.8571,
+        "desc_ngram_sim": 0.4878
+      },
+      {
+        "ext_tool": "reverse_geocode",
+        "train_tool": "reverse_geocode_tool",
+        "name_ratio": 0.8571,
+        "desc_ngram_sim": 0.1303
+      },
+      {
+        "ext_tool": "get_image_metadata",
+        "train_tool": "get_file_metadata",
+        "name_ratio": 0.8571,
+        "desc_ngram_sim": 0.1254
+      },
+      {
+        "ext_tool": "get_image_metadata",
+        "train_tool": "get_market_metadata",
+        "name_ratio": 0.8649,
+        "desc_ngram_sim": 0.06
+      },
+      {
+        "ext_tool": "resize_image",
+        "train_tool": "resize_page",
+        "name_ratio": 0.8696,
+        "desc_ngram_sim": 0.1074
+      },
+      {
+        "ext_tool": "describe_image",
+        "train_tool": "describeImageUrl",
+        "name_ratio": 0.8667,
+        "desc_ngram_sim": 0.1723
+      },
+      {
+        "ext_tool": "get_line_details",
+        "train_tool": "get_ip_details",
+        "name_ratio": 0.8667,
+        "desc_ngram_sim": 0.0403
+      },
+      {
+        "ext_tool": "get_line_details",
+        "train_tool": "get_icon_details",
+        "name_ratio": 0.875,
+        "desc_ngram_sim": 0.2905
+      },
+      {
+        "ext_tool": "get_line_details",
+        "train_tool": "get_rule_details",
+        "name_ratio": 0.875,
+        "desc_ngram_sim": 0.1781
+      },
+      {
+        "ext_tool": "get_line_details",
+        "train_tool": "get-list-details",
+        "name_ratio": 0.875,
+        "desc_ngram_sim": 0.0741
+      },
+      {
+        "ext_tool": "get_available_plans",
+        "train_tool": "get_available_spaces",
+        "name_ratio": 0.8718,
+        "desc_ngram_sim": 0.2256
+      },
+      {
+        "ext_tool": "exchange_order",
+        "train_tool": "get_change_order",
+        "name_ratio": 0.8667,
+        "desc_ngram_sim": 0.0806
+      },
+      {
+        "ext_tool": "search_products",
+        "train_tool": "search_projects",
+        "name_ratio": 0.8667,
+        "desc_ngram_sim": 0.2568
+      },
+      {
+        "ext_tool": "get_bill_details",
+        "train_tool": "get_ip_details",
+        "name_ratio": 0.8667,
+        "desc_ngram_sim": 0.0446
+      },
+      {
+        "ext_tool": "get_order_details",
+        "train_tool": "get_record_details",
+        "name_ratio": 0.8571,
+        "desc_ngram_sim": 0.0293
+      },
+      {
+        "ext_tool": "get_order_details",
+        "train_tool": "grid_get_order_details",
+        "name_ratio": 0.8718,
+        "desc_ngram_sim": 0.2389
+      }
+    ]
+  },
+  "tier_3_queries": {
+    "exact_query_overlap_count": 0,
+    "exact_query_overlap_examples": [],
+    "near_duplicate_sample_count": 0,
+    "near_duplicates_sample": []
+  },
+  "stratification": {
+    "train": {
+      "clean": 23000,
+      "collision": 192
+    },
+    "val_external_human": {
+      "clean": 1200
+    },
+    "val_zeroshot": {
+      "clean": 2168,
+      "collision": 52
+    }
+  }
+}
