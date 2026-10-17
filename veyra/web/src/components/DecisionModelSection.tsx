@@ -12,7 +12,7 @@ export default function DecisionModelSection() {
             Prediction is separate from execution.
           </h2>
           <p className="text-sm text-slate-600 mt-2">
-            Veyra treats decision models as prediction backends that generate action probability distributions over candidates.
+            Soro treats ranking as a deterministic shortlist. The model never sits on the mutating path.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export default function DecisionModelSection() {
 
           <div className="mt-8 pt-6 border-t border-slate-200/80 text-center">
             <blockquote className="text-xs sm:text-sm text-slate-700 font-medium">
-              &ldquo;Veyra separates prediction from execution. A decision model predicts; policy constrains; the executor acts.&rdquo;
+              &ldquo;Soro-Boro separates prediction from execution. A decision model predicts; policy constrains; the executor acts.&rdquo;
             </blockquote>
           </div>
         </div>

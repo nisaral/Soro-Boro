@@ -1,0 +1,235 @@
+{
+  "public_cached_embeddings": {
+    "status": "ok",
+    "n": 505,
+    "source": "authors cached gemini-embedding-001 + FAISS inner_product",
+    "recall@1": 0.956436,
+    "recall@1_count": 483,
+    "recall@5": 0.99802,
+    "recall@10": 0.99802,
+    "recall@20": 1.0,
+    "paper_table1_flat_top1_count": 483,
+    "delta_vs_paper_top1_count": 0,
+    "match_paper": true
+  },
+  "linucb_sanity": {
+    "linucb_linear": {
+      "updates": 800,
+      "final_avg_regret": 0.0148,
+      "curve": [
+        {
+          "t": 50,
+          "avg_regret": 0.1771,
+          "updates": 50
+        },
+        {
+          "t": 200,
+          "avg_regret": 0.0547,
+          "updates": 200
+        },
+        {
+          "t": 400,
+          "avg_regret": 0.0287,
+          "updates": 400
+        },
+        {
+          "t": 800,
+          "avg_regret": 0.0148,
+          "updates": 800
+        }
+      ],
+      "learned": true
+    },
+    "eps_greedy": {
+      "final_avg_regret": 0.9752,
+      "updates": 800
+    },
+    "thompson": {
+      "final_avg_regret": 0.0223,
+      "updates": 800
+    }
+  },
+  "v2_rerun_k20": {
+    "bm25": {
+      "recall@1": 0.1125,
+      "recall@1_ci95": [
+        0.05,
+        0.1875
+      ],
+      "recall@5": 0.2875,
+      "recall@10": 0.35,
+      "recall@20": 0.4625,
+      "n": 80,
+      "multi_defensible_share": 0.1875,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 12.0869,
+        "coverage": 0.0625,
+        "precision": 1.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 12.0869,
+        "coverage": 0.0625,
+        "precision": 1.0
+      }
+    },
+    "hash_dense": {
+      "recall@1": 0.1125,
+      "recall@1_ci95": [
+        0.05,
+        0.1875
+      ],
+      "recall@5": 0.15,
+      "recall@10": 0.2125,
+      "recall@20": 0.3125,
+      "n": 80,
+      "multi_defensible_share": 0.7375,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      }
+    },
+    "minilm": {
+      "recall@1": 0.325,
+      "recall@1_ci95": [
+        0.225,
+        0.45
+      ],
+      "recall@5": 0.725,
+      "recall@10": 0.8375,
+      "recall@20": 0.8875,
+      "n": 80,
+      "multi_defensible_share": 0.275,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 0.6736,
+        "coverage": 0.0125,
+        "precision": 1.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 0.6736,
+        "coverage": 0.0125,
+        "precision": 1.0
+      }
+    },
+    "hybrid_rrf": {
+      "recall@1": 0.2375,
+      "recall@1_ci95": [
+        0.15,
+        0.325
+      ],
+      "recall@5": 0.55,
+      "recall@10": 0.775,
+      "recall@20": 0.875,
+      "n": 80,
+      "multi_defensible_share": 0.675,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      }
+    }
+  },
+  "paired_mcnemar": {
+    "minilm_vs_bm25": {
+      "b_a_correct_b_wrong": 18,
+      "c_b_correct_a_wrong": 1,
+      "chi2_cc": 13.4737,
+      "exact_p_approx": 7.6e-05
+    },
+    "minilm_vs_hybrid": {
+      "b_a_correct_b_wrong": 13,
+      "c_b_correct_a_wrong": 6,
+      "chi2_cc": 1.8947,
+      "exact_p_approx": 0.167068
+    },
+    "hybrid_vs_bm25": {
+      "b_a_correct_b_wrong": 10,
+      "c_b_correct_a_wrong": 0,
+      "chi2_cc": 8.1,
+      "exact_p_approx": 0.001953
+    }
+  },
+  "margin_calibration": {
+    "dev_n": 40,
+    "test_n": 40,
+    "margin_cutoff_p90": 0.0966,
+    "margin_cutoff_p95": 0.0966,
+    "test_at_frozen_p90": {
+      "coverage": 0.175,
+      "precision": 1.0
+    },
+    "test_at_frozen_p95": {
+      "coverage": 0.175,
+      "precision": 1.0
+    }
+  },
+  "query_likelihood_poison": {
+    "attack": "query_likelihood_stuffing",
+    "decoy": "diceRoll",
+    "n": 79,
+    "bm25": 0.3291,
+    "hash_dense": 0.4177,
+    "minilm": 0.0886
+  },
+  "linucb_v2_fixed": {
+    "n": 80,
+    "updates": 80,
+    "static_avg_regret": 0.675,
+    "adapt_avg_regret": 0.7375,
+    "curve": [
+      {
+        "t": 20,
+        "static_avg_regret": 0.7,
+        "adapt_avg_regret": 0.7,
+        "updates": 20
+      },
+      {
+        "t": 40,
+        "static_avg_regret": 0.65,
+        "adapt_avg_regret": 0.75,
+        "updates": 40
+      },
+      {
+        "t": 60,
+        "static_avg_regret": 0.6667,
+        "adapt_avg_regret": 0.7167,
+        "updates": 60
+      },
+      {
+        "t": 80,
+        "static_avg_regret": 0.675,
+        "adapt_avg_regret": 0.7375,
+        "updates": 80
+      }
+    ]
+  },
+  "kev": {
+    "status": "run separately; 80 * ~6.6s CPU"
+  },
+  "not_done": [
+    "independent second annotator (~100 queries)",
+    "v2b 300-query set from two writers",
+    "bge/e5/gte downloads",
+    "cross-encoder rerank (cached model is NLI, not MS MARCO)",
+    "held-out-tool contrastive fine-tune",
+    "Kev vs Qwen zero-shot on v2 (optional long CPU run)"
+  ]
+}

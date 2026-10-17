@@ -1,0 +1,164 @@
+{
+  "audit_version": "v1.1-quarantined",
+  "date": "2026-10-07",
+  "frozen_thesis_statement": "State-conditional execution resolution can preserve an agent's intended action when the proposed execution path becomes unavailable or degraded.",
+  "approved_headline_wording": "Veyra demonstrates a +20pp held-out Intent Preservation Rate advantage over static resolution on ContinuityBench-v1.",
+  "prohibited_claims": [
+    "Universal efficiency improvement over static resolution (turns/tokens are equal between fair static and Veyra on simple fallbacks)",
+    "Universal benchmark improvement across all agent tools",
+    "TAGE is the best adaptive method (case memory dominates TAGE in optimal candidate recall when unconstrained by memory)",
+    "Veyra is statistically superior merely because 95% CIs do not overlap (exact paired McNemar tests and task-clustered bootstraps required)",
+    "BFCL multi-turn results are authoritative (BFCL has documented external task-quality issues and is secondary only)",
+    "External benchmark results (MCPMark, tau2, MCP-Atlas, ComplexMCP) are final paper-grade evidence (QUARANTINED as PROVISIONAL_UNVERIFIED pending Phase 67-76 official runners)",
+    "Competitor comparisons (AgentWeave, ExpG) are final (QUARANTINED as PROVISIONAL_UNVERIFIED pending pinned repository clone runs)"
+  ],
+  "classified_evidence": [
+    {
+      "experiment": "ContinuityBench-v1.0 Scorecard (N=40 held-out tasks)",
+      "classification": "VALIDATED",
+      "metric": "Intent Preservation Rate (IPR)",
+      "finding": "Veyra 100.0% vs Static 80.0% (+20.0pp lift, 0 unsafe substitutions)",
+      "provenance": "benchmarks/continuitybench/scorecard_results.json"
+    },
+    {
+      "experiment": "Phase 27 Component Ablation (N=40 Scorecard tasks)",
+      "classification": "VALIDATED",
+      "metric": "Incremental IPR Lift",
+      "finding": "Contract filter alone explains 0.0pp; State assertions and freshness limits explain the entire +20.0pp lift",
+      "provenance": "benchmarks/continuitybench/component_ablation_results.json"
+    },
+    {
+      "experiment": "Phase 28 Harder Candidate Set (N=50 tasks x 6 candidates)",
+      "classification": "VALIDATED",
+      "metric": "Valid Selection Rate & Unsafe Substitution Rate",
+      "finding": "Contract-aware resolver achieves 100% valid choice; catalog-ordered static commits 100% unsafe mutating substitutions",
+      "provenance": "benchmarks/continuitybench/harder_candidates_results.json"
+    },
+    {
+      "experiment": "Phase 44 Shared Safety & Baseline Parity (fair_static vs weak_static)",
+      "classification": "VALIDATED",
+      "metric": "Hard Safety Parity",
+      "finding": "fair_static achieves 0 unauthorized actions and 0 side-effect widenings by using shared primitives; isolates dynamic state/freshness advantage",
+      "provenance": "python/src/veyra/core/contract_evaluator.py"
+    },
+    {
+      "experiment": "Phase 45 Statistical Reanalysis (N=100 tasks, 3 seeds)",
+      "classification": "VALIDATED",
+      "metric": "Exact McNemar & Clustered Bootstrap",
+      "finding": "Paired lift +19.0pp (p < 0.0001, Cohen's g = 0.50, bootstrap 95% CI: [+12.0pp, +27.0pp])",
+      "provenance": "benchmarks/final_evidence/statistical_reanalysis_report.json"
+    },
+    {
+      "experiment": "Phase 47 Harder ContinuityBench 300 (100 Held-Out Scorecard Tasks)",
+      "classification": "VALIDATED",
+      "metric": "Scorecard IPR under 13 Mismatch Types",
+      "finding": "Raw 0%, Fair Static 16.0%, Veyra 100.0% (+84.0pp lift, p < 0.00001, 0 unsafe)",
+      "provenance": "benchmarks/continuitybench/results_300_scorecard.json"
+    },
+    {
+      "experiment": "Phase 48 Multi-Valid Candidate Benchmark (N=100 tasks, 2-5 valid)",
+      "classification": "VALIDATED",
+      "metric": "Optimal Choice Recall@1 & Latency",
+      "finding": "Static Priority 30%, Contract+Rel 62%, TAGE 64% (1.5 KB), LinUCB 59%, Case Memory 88% (64.9 us)",
+      "provenance": "benchmarks/final_evidence/multi_valid_results.json"
+    },
+    {
+      "experiment": "Phase 49 Case Memory Leakage & Adversarial Audit",
+      "classification": "VALIDATED",
+      "metric": "Adversarial Invariance & Data Leakage",
+      "finding": "Zero task overlap, zero tag leakage, passes degraded favorite, tenant mismatch, side-effect change, and frequency weighting",
+      "provenance": "benchmarks/final_evidence/case_memory_leakage_audit.json"
+    },
+    {
+      "experiment": "Phase 58 & 59 Large-Catalog Policy Scalability (10 to 100,000 candidates)",
+      "classification": "VALIDATED",
+      "metric": "Microsecond Latency & Throughput",
+      "finding": "1,000 candidates: p50 27.70 us (36,101 ops/sec); 10,000 candidates: 118.90 us; 100,000 candidates: 1.12 ms (sub-millisecond target met)",
+      "provenance": "benchmarks/final_evidence/scalability_and_scale_curve_report.json"
+    },
+    {
+      "experiment": "Phase 51 MCPMark Verified (+30pp reported lift)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Native & Perturbed Task Success",
+      "finding": "Reported +30pp lift quarantined pending Phase 71 official MCPMark runner execution with Docker containers and raw trajectory artifact recording",
+      "provenance": "benchmarks/final_evidence/native_external_benchmarks_report.json"
+    },
+    {
+      "experiment": "Phase 51 tau2-Bench Verified (+22pp reported lift)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Policy & Perturbation Success",
+      "finding": "Reported +22pp lift quarantined pending Phase 72 official tau2-Bench Verified runner execution",
+      "provenance": "benchmarks/final_evidence/native_external_benchmarks_report.json"
+    },
+    {
+      "experiment": "Phase 51 MCP-Atlas (+35pp reported lift)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Task Success & Error Recovery",
+      "finding": "Quarantined pending Phase 74 official MCP-Atlas public server evaluation",
+      "provenance": "benchmarks/final_evidence/native_external_benchmarks_report.json"
+    },
+    {
+      "experiment": "Phase 51 & 57 ComplexMCP (+30pp lift & 1000 tool scale)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Tool Count Scaling Curve",
+      "finding": "Quarantined pending Phase 75 official ComplexMCP Docker runner execution",
+      "provenance": "benchmarks/final_evidence/scalability_and_scale_curve_report.json"
+    },
+    {
+      "experiment": "Phase 51 ToolSandbox (+23.3pp lift)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Sandbox Success",
+      "finding": "Quarantined pending Phase 76 official ToolSandbox environment run",
+      "provenance": "benchmarks/final_evidence/native_external_benchmarks_report.json"
+    },
+    {
+      "experiment": "Phase 53 500-Episode Failure Opportunity Census (57% addressable)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Prevalence & Addressability",
+      "finding": "Quarantined pending Phase 81 trace-backed provenance validation where every episode maps to a raw verifiable model trace",
+      "provenance": "benchmarks/final_evidence/failure_opportunity_census_500.json"
+    },
+    {
+      "experiment": "Phase 54 AgentWeave Competitor Comparison",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Pre-Inference vs Post-Proposal Layering",
+      "finding": "Quarantined pending Phase 78 real cloned repository execution against pinned commit",
+      "provenance": "benchmarks/final_evidence/competitor_and_diagnostics_report.json"
+    },
+    {
+      "experiment": "Phase 55 ExpG Experience Memory Comparison",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Guidance Prompt vs Execution Memory",
+      "finding": "Quarantined pending Phase 79 public ExpG implementation run",
+      "provenance": "benchmarks/final_evidence/competitor_and_diagnostics_report.json"
+    },
+    {
+      "experiment": "Phase 56 ToolFailBench Diagnostic",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Failure Root Cause Taxonomy",
+      "finding": "Quarantined pending official ToolFailBench dataset evaluation",
+      "provenance": "benchmarks/final_evidence/competitor_and_diagnostics_report.json"
+    },
+    {
+      "experiment": "Phase 50 UndoBench 120 Paired Trials (0 duplicate writes)",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "Duplicate Writes & Unsafe Replays",
+      "finding": "Adapter and policy validated; quarantined pending Phase 73 integration with official UndoBench release and environment-state oracle",
+      "provenance": "benchmarks/final_evidence/undobench_evaluation_results.json"
+    },
+    {
+      "experiment": "Real LLM Study ('900 real LLM runs')",
+      "classification": "PROVISIONAL_UNVERIFIED",
+      "metric": "IPR & Replan Rate",
+      "finding": "Quarantined pending Phase 68 fresh real-model study with visible raw model trajectories in artifacts directory",
+      "provenance": "benchmarks/continuitybench/confirmatory_study_results.json"
+    },
+    {
+      "experiment": "Pre-Phase 0 Procedural Generator (1,000 synthetic templated tasks)",
+      "classification": "INVALID / REQUIRES_REPAIR",
+      "metric": "Synthetic Success",
+      "finding": "Procedural repetition across 6 templates generated false precision; superseded and discarded",
+      "provenance": "benchmarks/evidence/evidence_ledger.json"
+    }
+  ]
+}

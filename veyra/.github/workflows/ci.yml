@@ -44,6 +44,7 @@ jobs:
         run: |
           python -m veyra.cli headroom --trials python/tests/data/synthetic_trials.csv --out out/ci_headroom.md
 
+
   wire-format:
     runs-on: ubuntu-latest
     steps:

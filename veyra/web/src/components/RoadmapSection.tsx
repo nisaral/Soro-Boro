@@ -3,49 +3,49 @@ import { CheckCircle2, Clock, ArrowRight, ShieldCheck, Cpu } from "lucide-react"
 export default function RoadmapSection() {
   const roadmapSteps = [
     {
-      week: "Week 1",
-      title: "Core Tool Boundary",
+      week: "Milestone 1",
+      title: "Python Core & Identity",
       status: "COMPLETED",
       items: [
-        "Veyra tool interceptor & @veyra.tool decorator",
-        "7-tier structured failure taxonomy",
-        "Safe argument normalizer (0 semantic guessing)",
-        "Bounded safe retry engine (strict idempotency)",
-        "Tier 0 synthetic validation (200+ cases passed)",
+        "soro_boro package core with @soro_wrap decorator",
+        "OperationIdentity with stable idempotency keys",
+        "Rich ProviderLifecycleState (SUCCEEDED, PENDING, NOT_FOUND)",
+        "Write-Ahead Intent (WAL) with synchronous fsync",
+        "Crash recovery scanner for orphaned in-flight writes",
       ],
     },
     {
-      week: "Week 2",
-      title: "Controlled Benchmark Evidence",
+      week: "Milestone 2",
+      title: "Adversarial Test Suite",
       status: "COMPLETED",
       items: [
-        "ToolMisuseBench 4-way comparative harness",
-        "Raw vs Naive vs Structured vs Veyra comparison",
-        "+25 percentage-point win over raw agent (41.7% vs 16.7%)",
-        "50.0% boundary recovery rate with 0 unsafe retries",
-        "15 agent re-planning cycles eliminated",
+        "5-fault distributed failure test matrix",
+        "Dropped ACK recovery (0 duplicate mutations observed)",
+        "Eventual consistency guard (AMBIGUOUS_DEFERRED safe halt)",
+        "Reconciliation probe failure fail-closed invariant",
+        "6 of 6 adversarial test cases verified via pytest",
       ],
     },
     {
-      week: "Week 3",
-      title: "Real MCP Catalogs & Stress Testing",
+      week: "Milestone 3",
+      title: "Real Provider Integrations",
       status: "IN PROGRESS",
       items: [
-        "Test against 3 real MCP catalogs (Filesystem, GitHub, Postgres)",
-        "Measure real-world latency, schema drift, and timeouts",
-        "Evaluate on MCP-Universe & MCPMark suites",
-        "Benchmark report on production-like fault scenarios",
+        "Stripe Refunds reference mutator with idempotency reuse",
+        "GitHub Issues & incident ticket creation reference",
+        "Postgres / transactional SQL boundary wrapper",
+        "Interactive web simulator with real-time WAL inspection",
       ],
     },
     {
-      week: "Week 4",
-      title: "Release & Routing Laboratory",
+      week: "Milestone 4",
+      title: "Validation & Clearance",
       status: "UPCOMING",
       items: [
-        "PyPI package & open-source GitHub release",
-        "Developer documentation & live MCP tutorials",
-        "Initial routing laboratory: exact cache & value-shape feasibility",
-        "Sequential routing experiments: TAGE-history & process graphs",
+        "Namespace & trademark clearance (PyPI, USPTO, India CGPDTM)",
+        "10-15 interviews with platform teams operating write agents",
+        "Open-source GitHub release with reproducible benchmarks",
+        "Clearance for commercial enterprise deployment",
       ],
     },
   ];
@@ -58,10 +58,10 @@ export default function RoadmapSection() {
             Roadmap & Milestones
           </span>
           <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight mt-3">
-            Frozen 4-week execution roadmap.
+            Grounded execution roadmap.
           </h2>
           <p className="text-sm text-slate-600 mt-2">
-            Build the boundary first. Measure what actually breaks. Automate only what is safely automatable. Learn only from evidence.
+            Build the execution boundary first. Reconcile provider state authoritatively. Protect against eventual consistency false-negatives. Validate with real platform teams.
           </p>
         </div>
 

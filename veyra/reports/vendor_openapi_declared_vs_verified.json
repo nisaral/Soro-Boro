@@ -1,0 +1,223 @@
+{
+  "audit_name": "Declared vs Verified Real Endpoint Sandbox Audit",
+  "total_endpoints_evaluated": 16,
+  "provenance": {
+    "stripe_spec": {
+      "source_url": "https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json",
+      "sha256": "7cff4cc46d0654101a36a3302f7544640f5f73e4f3cad6f264f0e23c19fa1776",
+      "size_bytes": 8317513,
+      "total_post_endpoints": 307,
+      "post_endpoints_declaring_idempotency_key": 0,
+      "download_date": "2026-10-11"
+    },
+    "github_spec": {
+      "source_url": "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json",
+      "sha256": "da3d22e417611cca9a4131dceea89d4d61c3be021b0917f32d9e4422e4fe60f1",
+      "size_bytes": 13018046,
+      "total_endpoints": 1232,
+      "download_date": "2026-10-11"
+    },
+    "petstore_spec": {
+      "source_url": "https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml",
+      "sha256": "e1a2480ffa440e44b981db5b038374214c532ffc92026fd51fb957c88bfbdd88",
+      "size_bytes": 23165,
+      "total_endpoints": 19,
+      "download_date": "2026-10-11"
+    },
+    "audit_scope_note": "Stripe, GitHub, and Petstore findings represent static OpenAPI specification audits of official vendor schemas downloaded from upstream repositories. Live cloud network calls were not performed (no API keys required)."
+  },
+  "endpoints": [
+    {
+      "environment": "@modelcontextprotocol/server-memory",
+      "operation": "create_entities",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "idempotent_write",
+      "state_metric": "entity_node_count",
+      "call_1_state": 1,
+      "raw_replay_state": 1,
+      "soro_replay_state": 1,
+      "is_idempotent_in_practice": true,
+      "notes": "Server-side deduplication merges observations on duplicate entity name."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-memory",
+      "operation": "add_observations",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "idempotent_write",
+      "state_metric": "observations_count",
+      "call_1_state": 1,
+      "raw_replay_state": 1,
+      "soro_replay_state": 1,
+      "is_idempotent_in_practice": true,
+      "notes": "Verified server-side set semantics: replaying identical observation contents is a no-op (addedObservations: [])."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-memory",
+      "operation": "read_graph",
+      "declared_class": "read_only",
+      "verified_class": "read_only",
+      "state_metric": "graph_nodes",
+      "call_1_state": 4,
+      "raw_replay_state": 4,
+      "soro_replay_state": 4,
+      "is_idempotent_in_practice": true,
+      "notes": "Pure inspection; 0 state change."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-memory",
+      "operation": "delete_entities",
+      "declared_class": "idempotent_write",
+      "verified_class": "idempotent_write",
+      "state_metric": "entity_count",
+      "call_1_state": 3,
+      "raw_replay_state": 3,
+      "soro_replay_state": 3,
+      "is_idempotent_in_practice": true,
+      "notes": "Deleting absent entity is a no-op; leaves entity count at 0."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-filesystem",
+      "operation": "write_file",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "idempotent_write",
+      "state_metric": "file_byte_size",
+      "call_1_state": 15,
+      "raw_replay_state": 15,
+      "soro_replay_state": 15,
+      "is_idempotent_in_practice": true,
+      "notes": "Full content overwrite is genuinely idempotent on disk."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-filesystem",
+      "operation": "read_file",
+      "declared_class": "read_only",
+      "verified_class": "read_only",
+      "state_metric": "file_byte_size",
+      "call_1_state": 15,
+      "raw_replay_state": 15,
+      "soro_replay_state": 15,
+      "is_idempotent_in_practice": true,
+      "notes": "Pure file read."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-filesystem",
+      "operation": "list_directory",
+      "declared_class": "read_only",
+      "verified_class": "read_only",
+      "state_metric": "directory_file_count",
+      "call_1_state": 1,
+      "raw_replay_state": 1,
+      "soro_replay_state": 1,
+      "is_idempotent_in_practice": true,
+      "notes": "Pure directory listing."
+    },
+    {
+      "environment": "@modelcontextprotocol/server-filesystem",
+      "operation": "append_file_pattern",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "non_idempotent_mutation",
+      "state_metric": "file_byte_size",
+      "call_1_state": 26,
+      "raw_replay_state": 37,
+      "soro_replay_state": 26,
+      "is_idempotent_in_practice": false,
+      "notes": "Replaying append grows file size cumulatively."
+    },
+    {
+      "environment": "Git Sandbox",
+      "operation": "git_rev_parse",
+      "declared_class": "read_only",
+      "verified_class": "read_only",
+      "state_metric": "head_sha",
+      "call_1_state": "130661900e5d62fd87b27bac8419d89cbb83ace7",
+      "raw_replay_state": "130661900e5d62fd87b27bac8419d89cbb83ace7",
+      "soro_replay_state": "130661900e5d62fd87b27bac8419d89cbb83ace7",
+      "is_idempotent_in_practice": true,
+      "notes": "Read-only ref resolution."
+    },
+    {
+      "environment": "Git Sandbox",
+      "operation": "git_tag_force",
+      "declared_class": "idempotent_write",
+      "verified_class": "idempotent_write",
+      "state_metric": "tag_target_sha",
+      "call_1_state": "130661900e5d62fd87b27bac8419d89cbb83ace7",
+      "raw_replay_state": "130661900e5d62fd87b27bac8419d89cbb83ace7",
+      "soro_replay_state": "130661900e5d62fd87b27bac8419d89cbb83ace7",
+      "is_idempotent_in_practice": true,
+      "notes": "Force tag pointing to target ref is idempotent."
+    },
+    {
+      "environment": "Git Sandbox",
+      "operation": "git_branch_create",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "non_idempotent_mutation",
+      "state_metric": "branch_creation_success",
+      "call_1_state": "created",
+      "raw_replay_state": "error: fatal: a branch named 'feat_1' already e",
+      "soro_replay_state": "checked_and_reused",
+      "is_idempotent_in_practice": false,
+      "notes": "Git branch creation fails if ref already exists; not idempotent without -f."
+    },
+    {
+      "environment": "Git Sandbox",
+      "operation": "git_branch_delete",
+      "declared_class": "idempotent_write",
+      "verified_class": "idempotent_write",
+      "state_metric": "branch_present",
+      "call_1_state": false,
+      "raw_replay_state": false,
+      "soro_replay_state": false,
+      "is_idempotent_in_practice": true,
+      "notes": "Target state is branch absent."
+    },
+    {
+      "environment": "Local REST Ledger (In-memory mock service)",
+      "operation": "POST /charges (No Idempotency-Key)",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "non_idempotent_mutation",
+      "state_metric": "account_charge_count",
+      "call_1_state": 1,
+      "raw_replay_state": 2,
+      "soro_replay_state": 1,
+      "is_idempotent_in_practice": false,
+      "notes": "Replaying POST without idempotency key creates duplicate billing debit."
+    },
+    {
+      "environment": "Local REST Ledger (In-memory mock service)",
+      "operation": "POST /charges (With Idempotency-Key)",
+      "declared_class": "non_idempotent_mutation",
+      "verified_class": "idempotent_write",
+      "state_metric": "ledger_transaction_count",
+      "call_1_state": 1,
+      "raw_replay_state": 1,
+      "soro_replay_state": 1,
+      "is_idempotent_in_practice": true,
+      "notes": "Client idempotency key converts mutating POST into verified idempotent write."
+    },
+    {
+      "environment": "Local REST Ledger (In-memory mock service)",
+      "operation": "PUT /accounts/{id}",
+      "declared_class": "idempotent_write",
+      "verified_class": "idempotent_write",
+      "state_metric": "account_balance",
+      "call_1_state": 250,
+      "raw_replay_state": 250,
+      "soro_replay_state": 250,
+      "is_idempotent_in_practice": true,
+      "notes": "REST PUT explicitly sets exact resource state."
+    },
+    {
+      "environment": "Local REST Ledger (In-memory mock service)",
+      "operation": "DELETE /charges/{id}",
+      "declared_class": "idempotent_write",
+      "verified_class": "idempotent_write",
+      "state_metric": "remaining_charges",
+      "call_1_state": 0,
+      "raw_replay_state": 0,
+      "soro_replay_state": 0,
+      "is_idempotent_in_practice": true,
+      "notes": "Target state is deleted charge absent."
+    }
+  ]
+}

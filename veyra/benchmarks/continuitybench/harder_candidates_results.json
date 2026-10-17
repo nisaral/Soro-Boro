@@ -1,0 +1,33 @@
+{
+  "n_tasks": 50,
+  "results": {
+    "static_first_match": {
+      "valid_selection_rate": "0.0%",
+      "optimal_selection_rate": "0.0%",
+      "wrong_tool_rate": "0.0%",
+      "unsafe_substitution_rate": "100.0%",
+      "stale_selection_rate": "0.0%"
+    },
+    "lexical_similarity": {
+      "valid_selection_rate": "0.0%",
+      "optimal_selection_rate": "0.0%",
+      "wrong_tool_rate": "100.0%",
+      "unsafe_substitution_rate": "0.0%",
+      "stale_selection_rate": "0.0%"
+    },
+    "contract_aware_resolver": {
+      "valid_selection_rate": "100.0%",
+      "optimal_selection_rate": "100.0%",
+      "wrong_tool_rate": "0.0%",
+      "unsafe_substitution_rate": "0.0%",
+      "stale_selection_rate": "0.0%"
+    },
+    "full_veyra": {
+      "valid_selection_rate": "100.0%",
+      "optimal_selection_rate": "100.0%",
+      "wrong_tool_rate": "0.0%",
+      "unsafe_substitution_rate": "0.0%",
+      "stale_selection_rate": "0.0%"
+    }
+  }
+}

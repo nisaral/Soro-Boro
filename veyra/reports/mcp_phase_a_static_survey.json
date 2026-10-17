@@ -1,0 +1,2976 @@
+{
+  "survey_name": "Phase A Static Survey: Public MCP Packages",
+  "conducted_at": "2026-10-12T00:30:00Z",
+  "sample_size": 210,
+  "servers": {
+    "total_audited": 210,
+    "servers_with_any_hints": 97,
+    "servers_completely_unannotated": 113,
+    "unannotated_share": 0.5381,
+    "unannotated_share_percent": 53.81,
+    "unannotated_95_ci": [
+      0.4706,
+      0.6042
+    ]
+  },
+  "tools": {
+    "total_estimated_tools": 5139,
+    "tools_in_unannotated_servers": 1600,
+    "tool_unannotated_share": 0.3113
+  },
+  "spec_defaults_risk_analysis": {
+    "query_tools_total": 1144,
+    "query_tools_unannotated_count": 522,
+    "query_tools_unannotated_rate": 0.4563,
+    "query_tools_unannotated_95_ci": [
+      0.4276,
+      0.4853
+    ],
+    "destructive_tools_total": 119,
+    "destructive_tools_omitted_destructiveHint": 44,
+    "destructive_tools_omitted_rate": 0.3697
+  },
+  "elapsed_seconds": 436.85,
+  "server_details": [
+    {
+      "package": "@0xmonaco/mcp-server",
+      "version": "1.0.80",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 529,
+      "query_tool_count": 63,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@aborruso/ckan-mcp-server",
+      "version": "0.4.129",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 5,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@adhdev/mcp-server",
+      "version": "1.0.81",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@adpharm/mcp-server-filesystem-ro",
+      "version": "0.1.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@agent-infra/mcp-server-browser",
+      "version": "1.2.29",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 31,
+      "query_tool_count": 6,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@agent-inspect/mcp-server",
+      "version": "6.31.20",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 27,
+      "query_tool_count": 16,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@agentage/server-memory",
+      "version": "0.11.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 6,
+      "query_tool_count": 3,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@agentruntime-labs/agentruntime-mcp",
+      "version": "0.3.4",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ahrefs/mcp",
+      "version": "0.0.11",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ai-mentora/mcp-server",
+      "version": "1.0.29",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 64,
+      "query_tool_count": 22,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@aikidosec/mcp",
+      "version": "1.0.28",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 16,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@alchemy/mcp-server",
+      "version": "0.3.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 98,
+      "query_tool_count": 55,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@alfe.ai/github-mcp",
+      "version": "0.3.27",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@amap/amap-maps-mcp-server",
+      "version": "0.0.8",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 12,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@angelogiacco/elevenlabs-mcp-server",
+      "version": "1.0.4",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@apify/actors-mcp-server",
+      "version": "0.17.4",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 70,
+      "query_tool_count": 8,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@arabold/docs-mcp-server",
+      "version": "3.2.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 13,
+      "query_tool_count": 6,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@arc-mcp/xsuaa-auth",
+      "version": "1.1.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@atomicmail/agent-skill-modelcontextprotocol",
+      "version": "0.3.31",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@atomicmail/mcp-modelcontextprotocol",
+      "version": "0.3.31",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@attackforge/mcp-server",
+      "version": "0.3.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@auth0/auth0-mcp-server",
+      "version": "0.1.0-beta.19",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 24,
+      "query_tool_count": 11,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@aventurevc/mcp-server",
+      "version": "0.8.158",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@azure-devops/mcp",
+      "version": "2.10.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@azure/mcp",
+      "version": "3.0.0-beta.50",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@azure/mcp-darwin-arm64",
+      "version": "3.0.0-beta.50",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@azure/mcp-linux-x64",
+      "version": "3.0.0-beta.50",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@azure/mcp-win32-x64",
+      "version": "3.0.0-beta.50",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@battlegrid/mcp-server",
+      "version": "31.2.94",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@benborla29/mcp-server-mysql",
+      "version": "2.0.9",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@bitwarden/mcp-server",
+      "version": "2026.7.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 60,
+      "query_tool_count": 17,
+      "destructive_tool_count": 6
+    },
+    {
+      "package": "@brave/brave-search-mcp-server",
+      "version": "2.1.4",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@bretterer/forge-mcp-server",
+      "version": "0.1.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 12,
+      "query_tool_count": 7,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@browsermcp/mcp",
+      "version": "0.1.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@browserstack/mcp-server",
+      "version": "2.2.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 61,
+      "query_tool_count": 26,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@cap-js/mcp-server",
+      "version": "0.0.7",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@cardor/email-management",
+      "version": "3.1.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@cardor/email-summarizer",
+      "version": "1.3.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@centia-io/mcp-server",
+      "version": "1.0.36",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@claudexor/mcp-server",
+      "version": "4.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 18,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@clipform/mcp-server",
+      "version": "4.2.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 35,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@cloudflare/mcp-server-cloudflare",
+      "version": "0.2.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 105,
+      "query_tool_count": 38,
+      "destructive_tool_count": 18
+    },
+    {
+      "package": "@cmssy/mcp-server",
+      "version": "0.93.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 24,
+      "query_tool_count": 4,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@coinbase/cds-mcp-server",
+      "version": "9.29.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 5,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@contentful/mcp-server",
+      "version": "1.23.18",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@contextflo/postgres-mcp",
+      "version": "0.1.4",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@contextstream/mcp-server",
+      "version": "1.0.20",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@crewhaus/mcp-host",
+      "version": "0.7.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@currents/mcp",
+      "version": "2.6.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@cyanheads/git-mcp-server",
+      "version": "2.15.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@dbx-app/mcp-server",
+      "version": "0.4.115",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@decodo/mcp-server",
+      "version": "1.2.6",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@delorenj/mcp-server-trello",
+      "version": "1.8.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@dialpad/dialtone-mcp-server",
+      "version": "1.5.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@diviops/mcp-server",
+      "version": "1.5.72",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 15,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@doist/todoist-mcp",
+      "version": "13.4.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 50,
+      "query_tool_count": 21,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@doitintl/doit-mcp-server",
+      "version": "2.4.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 135,
+      "query_tool_count": 66,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@dokploy/mcp",
+      "version": "0.30.7",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 605,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@dopplerhq/mcp-server",
+      "version": "1.0.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@drawio/mcp",
+      "version": "1.6.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 8,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@driflyte/mcp-server",
+      "version": "0.1.15",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ehrocks/fe-mcp-server",
+      "version": "1.0.10",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@elgato/mcp-server",
+      "version": "0.1.8",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 51,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@elijahtynes/reliefweb-mcp-server",
+      "version": "2.0.11",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@enfyra/mcp-server",
+      "version": "0.3.11",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 188,
+      "query_tool_count": 31,
+      "destructive_tool_count": 17
+    },
+    {
+      "package": "@ericthered926/duckduckgo-mcp-server",
+      "version": "0.6.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@esaio/esa-mcp-server",
+      "version": "0.14.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@eslint/mcp",
+      "version": "0.3.14",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ezmodo/mcp-server",
+      "version": "0.24.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 119,
+      "query_tool_count": 56,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@fangjunjie/ssh-mcp-server",
+      "version": "1.10.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@fetchling/protocol",
+      "version": "0.1.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ffschrattenecker/tm1-mcp-server",
+      "version": "9.2.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 98,
+      "query_tool_count": 20,
+      "destructive_tool_count": 3
+    },
+    {
+      "package": "@fgv/ts-extras-mcp",
+      "version": "5.1.0-34",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 14,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@get-technology-inc/jamf-docs-mcp-server",
+      "version": "6.0.14",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 25,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@getbourdon/mcp-server",
+      "version": "0.12.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ggui-ai/mcp-server",
+      "version": "0.27.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@goke/mcp",
+      "version": "0.1.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 39,
+      "query_tool_count": 4,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@gongrzhe/server-gmail-autoauth-mcp",
+      "version": "1.1.11",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 21,
+      "query_tool_count": 6,
+      "destructive_tool_count": 4
+    },
+    {
+      "package": "@google-cloud/gcloud-mcp",
+      "version": "0.5.3",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@google-cloud/observability-mcp",
+      "version": "0.2.3",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 15,
+      "query_tool_count": 13,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@google-cloud/storage-mcp",
+      "version": "0.6.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@hasna/todos",
+      "version": "0.17.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 67,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@heroku/mcp-server",
+      "version": "1.2.11",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 42,
+      "query_tool_count": 14,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@hisma/server-puppeteer",
+      "version": "0.6.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 7,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@hostinger/mcp",
+      "version": "2.11.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 12,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@hubspot/mcp-server",
+      "version": "0.4.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 21,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@hugeicons/mcp-server",
+      "version": "0.2.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 16,
+      "query_tool_count": 6,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ibm/ibmi-mcp-server",
+      "version": "0.6.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 14,
+      "query_tool_count": 6,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/figma-mcp",
+      "version": "0.1.4",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 6,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/mailgun-mcp-server",
+      "version": "1.0.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/matthewdailey-mcp-starter",
+      "version": "0.2.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/matthewdailey-rime-mcp",
+      "version": "0.8.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/mcp-starter",
+      "version": "0.2.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/puppeteer-mcp-server",
+      "version": "0.7.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 8,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iflow-mcp/ref-tools-mcp",
+      "version": "3.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ignitionai/mcp-template",
+      "version": "1.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 8,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@iobroker/mcp-server",
+      "version": "1.1.3",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ironbee-ai/devtools",
+      "version": "0.51.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 46,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@irsooti/mcp",
+      "version": "1.0.6",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@ivotoby/openapi-mcp-server",
+      "version": "1.16.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@jsonresume/jsonresume-mcp",
+      "version": "0.2.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 5,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@jsonresume/mcp",
+      "version": "3.0.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@kintone/mcp-server",
+      "version": "1.9.4",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@knip/mcp",
+      "version": "0.0.36",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 5,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@kubun/mcp",
+      "version": "0.17.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@laskarks/mcp-rag-node",
+      "version": "1.1.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@lesto/mcp",
+      "version": "0.2.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 13,
+      "query_tool_count": 7,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@lightsage/mcp-tracker",
+      "version": "0.1.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@magneticwatermelon/mcp-toolkit",
+      "version": "2.0.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 27,
+      "query_tool_count": 0,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@mailjet/mailjet-mcp-server",
+      "version": "1.1.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mantine/mcp-server",
+      "version": "9.7.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mapbox/mcp-server",
+      "version": "0.15.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 10,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mastra/mcp-docs-server",
+      "version": "1.3.6",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 16,
+      "query_tool_count": 7,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@matillion/mcp-server",
+      "version": "1.20.6",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 65,
+      "query_tool_count": 29,
+      "destructive_tool_count": 8
+    },
+    {
+      "package": "@maxhealth.tech/mcp-http",
+      "version": "0.6.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@maz-ui/mcp",
+      "version": "4.9.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 5,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mcp-monorepo/weather",
+      "version": "1.2.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mcp-use/modelcontextprotocol-sdk",
+      "version": "1.24.3-mcp-use.4",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 37,
+      "query_tool_count": 0,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@mcpflow.io/mcp",
+      "version": "3.0.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mdavieds/mcp-tmp-files",
+      "version": "1.1.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@memberjunction/ai-mcp-server",
+      "version": "6.1.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 27,
+      "query_tool_count": 15,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@meshy-ai/meshy-mcp-server",
+      "version": "0.6.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@metamask/device-mcp",
+      "version": "0.4.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@microsoft/clarity-mcp-server",
+      "version": "2.0.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@microsoft/workiq",
+      "version": "1.0.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mintmcp/slack-mcp-server",
+      "version": "0.1.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 10,
+      "query_tool_count": 5,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/client",
+      "version": "2.3.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/codemod",
+      "version": "2.3.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 6,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/conformance",
+      "version": "0.1.16",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/core",
+      "version": "2.3.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/express",
+      "version": "2.0.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/ext-apps",
+      "version": "2.0.3",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 7,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/ext-tasks",
+      "version": "0.2.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/fastify",
+      "version": "2.0.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/hono",
+      "version": "2.0.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/inspector",
+      "version": "2.10.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 6,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/node",
+      "version": "2.1.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/sdk",
+      "version": "1.32.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 34,
+      "query_tool_count": 0,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@modelcontextprotocol/server",
+      "version": "2.3.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-brave-search",
+      "version": "0.6.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-everything",
+      "version": "1.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-filesystem",
+      "version": "1.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-github",
+      "version": "2025.4.8",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 27,
+      "query_tool_count": 14,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-gitlab",
+      "version": "2025.4.25",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 10,
+      "query_tool_count": 2,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-google-maps",
+      "version": "0.6.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 7,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-map",
+      "version": "2.0.3",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-memory",
+      "version": "1.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-pdf",
+      "version": "2.0.3",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-puppeteer",
+      "version": "2025.5.12",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 7,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-sequential-thinking",
+      "version": "1.0.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@modelcontextprotocol/server-slack",
+      "version": "2025.4.25",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 8,
+      "query_tool_count": 5,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mongodb-js/mcp-tools-assistant",
+      "version": "3.0.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mongodb-js/mcp-tools-atlas",
+      "version": "3.0.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 125,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mongodb-js/mcp-tools-mongodb",
+      "version": "3.0.5",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mseep/mcp-typescript-server-starter",
+      "version": "0.1.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mseep/puppeteer-mcp-server",
+      "version": "0.7.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 8,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@mui/mcp",
+      "version": "0.1.7",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@negokaz/excel-mcp-server",
+      "version": "0.12.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@nexus2520/bitbucket-mcp-server",
+      "version": "3.0.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 26,
+      "query_tool_count": 15,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@nexus2520/jira-mcp-server",
+      "version": "1.2.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 7,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@nitrostack/cli",
+      "version": "1.1.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 79,
+      "query_tool_count": 13,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@nocobase/plugin-mcp-server",
+      "version": "2.2.23",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 92,
+      "query_tool_count": 0,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@notionhq/notion-mcp-server",
+      "version": "2.5.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 32,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@octanejs/mcp-server",
+      "version": "0.3.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 7,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@onereach/idw-apps",
+      "version": "0.1.7",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@onozaty/redmine-mcp-server",
+      "version": "1.3.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@openbnb/mcp-server-airbnb",
+      "version": "0.3.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@pandacss/mcp",
+      "version": "2.2.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@pdfgate/mcp-server",
+      "version": "1.4.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 25,
+      "query_tool_count": 5,
+      "destructive_tool_count": 3
+    },
+    {
+      "package": "@phantom/mcp-server",
+      "version": "1.2.9",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@pikku/modelcontextprotocol",
+      "version": "0.12.17",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@pinecone-database/mcp",
+      "version": "0.3.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@pinepaper.studio/mcp-server",
+      "version": "1.6.20",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 222,
+      "query_tool_count": 18,
+      "destructive_tool_count": 4
+    },
+    {
+      "package": "@playwright/mcp",
+      "version": "0.0.83",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@porkbunllc/mcp-server",
+      "version": "0.50.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 122,
+      "query_tool_count": 49,
+      "destructive_tool_count": 10
+    },
+    {
+      "package": "@postman/postman-mcp-server",
+      "version": "2.13.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@processon/mcp-server-processon-node",
+      "version": "1.0.10",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@productbrain/mcp",
+      "version": "0.0.1-beta.10149",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@professional-wiki/mediawiki-mcp-server",
+      "version": "0.19.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 71,
+      "query_tool_count": 14,
+      "destructive_tool_count": 2
+    },
+    {
+      "package": "@qase/mcp-server",
+      "version": "2.7.5",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 54,
+      "query_tool_count": 4,
+      "destructive_tool_count": 13
+    },
+    {
+      "package": "@react-aria/mcp",
+      "version": "1.2.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@regle/mcp-server",
+      "version": "1.29.4",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 9,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@remnux/mcp-server",
+      "version": "0.1.78",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 160,
+      "query_tool_count": 11,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@retell-ai/mcp-server",
+      "version": "6.2.5",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@reventlessdev/rescript-mcp-sdk",
+      "version": "1.0.0-alpha.23",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@roychri/mcp-server-asana",
+      "version": "1.8.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 48,
+      "query_tool_count": 18,
+      "destructive_tool_count": 6
+    },
+    {
+      "package": "@rtorcato/api-mcp",
+      "version": "0.1.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@runpod/mcp-server",
+      "version": "4.2.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 108,
+      "query_tool_count": 42,
+      "destructive_tool_count": 8
+    },
+    {
+      "package": "@salesforce/mcp",
+      "version": "0.30.15",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@sap-ux/fiori-mcp-server",
+      "version": "1.15.9",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@sap/mdk-mcp-server",
+      "version": "0.4.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 10,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@sechel-mcp/mcp-server",
+      "version": "0.3.2",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@sentry/mcp-server",
+      "version": "0.42.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@shopify/dev-mcp",
+      "version": "1.16.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 35,
+      "query_tool_count": 1,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@shortcut/mcp",
+      "version": "0.25.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@shrkcrft/mcp-server",
+      "version": "0.1.0-alpha.32",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 290,
+      "query_tool_count": 231,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@siemens/element-mcp",
+      "version": "51.4.0-v.2.0.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@siemens/ix-mcp",
+      "version": "5.2.1-v.2.0.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@siemens/ix-mcp-react",
+      "version": "5.2.1-v.2.0.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@sigmacomputing/slack-mcp-server",
+      "version": "0.1.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 4,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@smartbear/mcp",
+      "version": "0.42.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 17,
+      "query_tool_count": 0,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@softeria/ms-365-mcp-server",
+      "version": "0.161.1",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 63,
+      "query_tool_count": 9,
+      "destructive_tool_count": 1
+    },
+    {
+      "package": "@solvapay/mcp",
+      "version": "0.4.5",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@stellarwp/learndash-mcp-server",
+      "version": "1.0.2",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 2,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@storybook/mcp",
+      "version": "10.6.1",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 9,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@stripe/mcp",
+      "version": "0.3.3",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@structured-world/gitlab-mcp",
+      "version": "10.1.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 86,
+      "query_tool_count": 3,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@supabase/mcp-server-postgrest",
+      "version": "0.2.0",
+      "has_any_hint": false,
+      "hints": {
+        "readOnlyHint": false,
+        "idempotentHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "estimated_tool_count": 1,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@supabase/mcp-server-supabase",
+      "version": "0.13.0",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 3,
+      "query_tool_count": 0,
+      "destructive_tool_count": 0
+    },
+    {
+      "package": "@superblocksteam/mcp-server",
+      "version": "2.0.170",
+      "has_any_hint": true,
+      "hints": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "estimated_tool_count": 75,
+      "query_tool_count": 54,
+      "destructive_tool_count": 3
+    }
+  ]
+}

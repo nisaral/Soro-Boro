@@ -1,0 +1,41 @@
+{
+  "n_episodes": 500,
+  "inter_annotator_metrics": {
+    "percent_agreement": "89.80%",
+    "cohens_kappa": 0.889,
+    "disagreement_count": 51
+  },
+  "market_opportunity_census": {
+    "veyra_addressable_count": 285,
+    "veyra_addressable_pct": "57.0%",
+    "breakdown_by_addressability": {
+      "Not Addressable": "112 (22.4%)",
+      "Pre-Inference": "71 (14.2%)",
+      "Veyra (Contract)": "70 (14.0%)",
+      "Veyra (State-Conditional)": "61 (12.2%)",
+      "Veyra & Static (Equivalence)": "57 (11.4%)",
+      "Planning / Not Addressable": "32 (6.4%)",
+      "Veyra (Bounded Retry/Fallback)": "28 (5.6%)",
+      "Veyra (Health/Selective)": "25 (5.0%)",
+      "Veyra (Backoff/Replica)": "25 (5.0%)",
+      "Veyra (Transaction Safety)": "19 (3.8%)"
+    }
+  },
+  "taxonomy_frequency": {
+    "tool_discovery": "71 (14.2%)",
+    "argument_schema": "42 (8.4%)",
+    "sequencing": "32 (6.4%)",
+    "state_mismatch": "61 (12.2%)",
+    "authorization": "28 (5.6%)",
+    "tool_availability": "57 (11.4%)",
+    "tool_degradation": "25 (5.0%)",
+    "timeout": "28 (5.6%)",
+    "rate_limit": "25 (5.0%)",
+    "unknown_state": "19 (3.8%)",
+    "semantic_reasoning": "35 (7.0%)",
+    "planning": "33 (6.6%)",
+    "result_misuse": "10 (2.0%)",
+    "tool_skip": "21 (4.2%)",
+    "output_fabrication": "13 (2.6%)"
+  }
+}

@@ -1,0 +1,4 @@
+capability: payment.charge
+side_effect_class: NON_IDEMPOTENT_MUTATION
+verification_tool: verify_charge
+idempotent: false

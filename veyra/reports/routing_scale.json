@@ -1,0 +1,193 @@
+{
+  "invalidated": "Generator used shared boilerplate; 0.28 was an oracle ceiling bug. Use reports/routing_protocol_v1.json.",
+  "seed": 7,
+  "arms": {
+    "50": {
+      "dense": 0.28,
+      "bm25": 0.28,
+      "hybrid": 0.28,
+      "cascade": 0.28,
+      "contrastive": 0.28,
+      "linucb": 0.28,
+      "tage_ensemble": 0.28,
+      "ensemble": 0.28
+    },
+    "100": {
+      "dense": 0.2875,
+      "bm25": 0.3,
+      "hybrid": 0.3,
+      "cascade": 0.3,
+      "contrastive": 0.2875,
+      "linucb": 0.175,
+      "tage_ensemble": 0.2875,
+      "ensemble": 0.2
+    },
+    "300": {
+      "dense": 0.2687,
+      "bm25": 0.3,
+      "hybrid": 0.3,
+      "cascade": 0.3,
+      "contrastive": 0.2625,
+      "linucb": 0.175,
+      "tage_ensemble": 0.2687,
+      "ensemble": 0.2313
+    }
+  },
+  "invariance": {
+    "50": {
+      "named_dense": 0.28,
+      "opaque_dense": 0.28
+    },
+    "100": {
+      "named_dense": 0.2875,
+      "opaque_dense": 0.1562
+    },
+    "300": {
+      "named_dense": 0.2687,
+      "opaque_dense": 0.0437
+    }
+  },
+  "poison": {
+    "50": {
+      "decoy": "git.open_pr_2",
+      "top1_hijack_rate": 0.0
+    },
+    "100": {
+      "decoy": "tickets.close_ticket_5",
+      "top1_hijack_rate": 0.0
+    },
+    "300": {
+      "decoy": "git.open_pr_16",
+      "top1_hijack_rate": 0.0
+    }
+  },
+  "calibration": {
+    "50": {
+      "ece": 0.1532,
+      "brier": 0.2251,
+      "risk_coverage": [
+        {
+          "threshold": 0.08,
+          "coverage": 1.0,
+          "accuracy": 0.28,
+          "risk": 0.72
+        },
+        {
+          "threshold": 0.12,
+          "coverage": 1.0,
+          "accuracy": 0.28,
+          "risk": 0.72
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        }
+      ]
+    },
+    "100": {
+      "ece": 0.1731,
+      "brier": 0.2399,
+      "risk_coverage": [
+        {
+          "threshold": 0.08,
+          "coverage": 1.0,
+          "accuracy": 0.3,
+          "risk": 0.7
+        },
+        {
+          "threshold": 0.12,
+          "coverage": 1.0,
+          "accuracy": 0.3,
+          "risk": 0.7
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        }
+      ]
+    },
+    "300": {
+      "ece": 0.173,
+      "brier": 0.2399,
+      "risk_coverage": [
+        {
+          "threshold": 0.08,
+          "coverage": 1.0,
+          "accuracy": 0.3,
+          "risk": 0.7
+        },
+        {
+          "threshold": 0.12,
+          "coverage": 1.0,
+          "accuracy": 0.3,
+          "risk": 0.7
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.0,
+          "accuracy": 0.0,
+          "risk": 1.0
+        }
+      ]
+    }
+  },
+  "latency_ms": {
+    "50": 2.394,
+    "100": 4.53,
+    "300": 12.931
+  },
+  "kev_0_8b": {
+    "status": "ok",
+    "path": "C:\\Users\\nisar\\.cache\\huggingface\\hub\\models--jaredpalmer--kev-0.8b\\snapshots\\bf75a6a8848ea6960ff2ed108d9ed44c2941174f",
+    "n_tools": 12,
+    "n_queries": 6,
+    "recall_at_1": 1.0,
+    "ms_per_query": 5179.4
+  },
+  "mixed_protocols": {
+    "lookup": "py_lookup",
+    "file": "mcp_fs_read",
+    "pay": "http_charge",
+    "n": 3
+  }
+}

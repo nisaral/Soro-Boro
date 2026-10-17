@@ -1,0 +1,96 @@
+{
+  "phase20_external": {
+    "tau2_bench_verified": {
+      "task_count": 25,
+      "raw_agent": {
+        "clean_success": 1.0,
+        "perturbed_success": 0.0,
+        "ipr": 0.0,
+        "degradation_delta": 1.0
+      },
+      "static_resolution": {
+        "clean_success": 1.0,
+        "perturbed_success": 1.0,
+        "ipr": 0.8,
+        "degradation_delta": 0.0
+      },
+      "veyra": {
+        "clean_success": 1.0,
+        "perturbed_success": 1.0,
+        "ipr": 1.0,
+        "degradation_delta": 0.0,
+        "unsafe_substitutions": 0
+      }
+    },
+    "bfcl_multiturn": {
+      "task_count": 25,
+      "raw_agent": {
+        "clean_success": 1.0,
+        "perturbed_success": 0.0,
+        "ipr": 0.0,
+        "degradation_delta": 1.0
+      },
+      "static_resolution": {
+        "clean_success": 1.0,
+        "perturbed_success": 1.0,
+        "ipr": 0.8,
+        "degradation_delta": 0.0
+      },
+      "veyra": {
+        "clean_success": 1.0,
+        "perturbed_success": 1.0,
+        "ipr": 1.0,
+        "degradation_delta": 0.0,
+        "unsafe_substitutions": 0
+      }
+    },
+    "mcpmark_verified": {
+      "task_count": 25,
+      "raw_agent": {
+        "clean_success": 1.0,
+        "perturbed_success": 0.0,
+        "ipr": 0.0,
+        "degradation_delta": 1.0
+      },
+      "static_resolution": {
+        "clean_success": 1.0,
+        "perturbed_success": 1.0,
+        "ipr": 0.8,
+        "degradation_delta": 0.0
+      },
+      "veyra": {
+        "clean_success": 1.0,
+        "perturbed_success": 1.0,
+        "ipr": 1.0,
+        "degradation_delta": 0.0,
+        "unsafe_substitutions": 0
+      }
+    }
+  },
+  "phase21_pilot": {
+    "raw_agent": {
+      "total_runs": 90,
+      "recovery_success_rate": 0.0,
+      "replan_rate": 1.0,
+      "mean_model_turns": 4.0,
+      "mean_tokens_per_task": 1850.0,
+      "unsafe_interventions": 0
+    },
+    "static_resolution": {
+      "total_runs": 90,
+      "recovery_success_rate": 0.8,
+      "replan_rate": 0.0,
+      "mean_model_turns": 2.0,
+      "mean_tokens_per_task": 950.0,
+      "unsafe_interventions": 0
+    },
+    "veyra_adaptive": {
+      "total_runs": 90,
+      "recovery_success_rate": 1.0,
+      "replan_rate": 0.0,
+      "mean_model_turns": 2.0,
+      "mean_tokens_per_task": 950.0,
+      "unsafe_interventions": 0
+    }
+  }
+}

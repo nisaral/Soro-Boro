@@ -1,0 +1,66 @@
+{
+  "raw_llm": {
+    "resolution_recovery_rate_pct": 0.0,
+    "task_success_rate_pct": 0.0,
+    "category_success_counts": {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "E": 0
+    },
+    "wrong_tool_count": 0,
+    "unsafe_substitutions": 0,
+    "unauthorized_actions": 0,
+    "mean_latency_ms": 0.02,
+    "total_tokens": 50000
+  },
+  "competent_baseline": {
+    "resolution_recovery_rate_pct": 20.0,
+    "task_success_rate_pct": 20.0,
+    "category_success_counts": {
+      "A": 0,
+      "B": 0,
+      "C": 20,
+      "D": 0,
+      "E": 0
+    },
+    "wrong_tool_count": 0,
+    "unsafe_substitutions": 0,
+    "unauthorized_actions": 0,
+    "mean_latency_ms": 0.02,
+    "total_tokens": 50000
+  },
+  "veyra_deterministic": {
+    "resolution_recovery_rate_pct": 100.0,
+    "task_success_rate_pct": 100.0,
+    "category_success_counts": {
+      "A": 20,
+      "B": 20,
+      "C": 20,
+      "D": 20,
+      "E": 20
+    },
+    "wrong_tool_count": 0,
+    "unsafe_substitutions": 0,
+    "unauthorized_actions": 0,
+    "mean_latency_ms": 8.58,
+    "total_tokens": 50000
+  },
+  "oracle": {
+    "resolution_recovery_rate_pct": 100.0,
+    "task_success_rate_pct": 100.0,
+    "category_success_counts": {
+      "A": 20,
+      "B": 20,
+      "C": 20,
+      "D": 20,
+      "E": 20
+    },
+    "wrong_tool_count": 0,
+    "unsafe_substitutions": 0,
+    "unauthorized_actions": 0,
+    "mean_latency_ms": 0.01,
+    "total_tokens": 50000
+  }
+}

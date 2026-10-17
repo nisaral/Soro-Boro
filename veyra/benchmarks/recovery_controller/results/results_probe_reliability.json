@@ -1,0 +1,32 @@
+{
+  "1.0": {
+    "probe_reliability": 1.0,
+    "safe_recovery_rate": "86.0%",
+    "duplicate_effect_rate": "0.0%",
+    "unnecessary_abstention_rate": "0.0%"
+  },
+  "0.99": {
+    "probe_reliability": 0.99,
+    "safe_recovery_rate": "62.0%",
+    "duplicate_effect_rate": "0.0%",
+    "unnecessary_abstention_rate": "24.0%"
+  },
+  "0.95": {
+    "probe_reliability": 0.95,
+    "safe_recovery_rate": "61.0%",
+    "duplicate_effect_rate": "0.0%",
+    "unnecessary_abstention_rate": "26.0%"
+  },
+  "0.9": {
+    "probe_reliability": 0.9,
+    "safe_recovery_rate": "61.0%",
+    "duplicate_effect_rate": "0.0%",
+    "unnecessary_abstention_rate": "25.0%"
+  },
+  "0.8": {
+    "probe_reliability": 0.8,
+    "safe_recovery_rate": "41.0%",
+    "duplicate_effect_rate": "0.0%",
+    "unnecessary_abstention_rate": "47.0%"
+  }
+}

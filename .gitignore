@@ -8,3 +8,17 @@ veyra/dist/
 veyra/out/**/workspaces/
 veyra/out/**/checkpoints/
 veyra/out/**/runs/
+*.zip
+runs/
+.agents/
+plan_review.txt
+node_modules/
+.next/
+*.db
+*.sqlite
+*.wal
+third_party/mcp-semantic-tool-routing-benchmark/
+third_party/mcpmark/
+third_party/tau2-bench/
+third_party/undobench/
+skills-lock.json

@@ -1,4 +1,4 @@
-// Types for Veyra Web Application
+// Types for Soro-Boro Web Application
 
 export interface ExecutionNode {
   id: string;

@@ -1,0 +1,46 @@
+# Veyra Declarative Tool Equivalence & Fallback Configuration
+version: "1.0"
+
+capabilities:
+  # Capability 1: User / Customer Profile Lookups
+  user_lookup:
+    tools:
+      - crm_fetch_user
+      - legacy_get_customer
+      - directory_search_user
+    primary_tool: crm_fetch_user
+    parameter_aliases:
+      crm_fetch_user:
+        uid: user_id
+        account_id: user_id
+      legacy_get_customer:
+        uid: user_id
+        account_id: user_id
+    fallback_chains:
+      crm_fetch_user:
+        - legacy_get_customer
+        - directory_search_user
+    idempotent: true
+    retryable: true
+    risk_class: low
+    permissions:
+      - "read:users"
+
+  # Capability 2: Safe Document Retrieval
+  document_retrieval:
+    tools:
+      - s3_read_file
+      - local_cache_read
+    primary_tool: s3_read_file
+    parameter_aliases:
+      s3_read_file:
+        path: file_path
+        key: file_path
+      local_cache_read:
+        path: file_path
+        key: file_path
+    fallback_chains:
+      s3_read_file:
+        - local_cache_read
+    idempotent: true
+    risk_class: low

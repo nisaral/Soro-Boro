@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "n_iterations": 10000,
+    "cold_start_ms": 0.0115,
+    "runtime_environment": "Python 3.11 Windows 64-bit"
+  },
+  "arms": {
+    "1_direct_call": {
+      "p50_us": 0.1,
+      "p95_us": 0.2,
+      "p99_us": 0.2,
+      "p50_ms": 0.0001,
+      "p99_ms": 0.0002,
+      "mean_latency_us": 0.142,
+      "throughput_calls_sec": 7061643
+    },
+    "2_competent_middleware": {
+      "p50_us": 0.3,
+      "p95_us": 0.3,
+      "p99_us": 0.4,
+      "p50_ms": 0.0003,
+      "p99_ms": 0.0004,
+      "mean_latency_us": 0.289,
+      "throughput_calls_sec": 3455188
+    },
+    "3_static_resolution": {
+      "p50_us": 0.2,
+      "p95_us": 0.2,
+      "p99_us": 0.2,
+      "p50_ms": 0.0002,
+      "p99_ms": 0.0002,
+      "mean_latency_us": 0.156,
+      "throughput_calls_sec": 6408616
+    },
+    "4_full_veyra": {
+      "p50_us": 8.3,
+      "p95_us": 9.3,
+      "p99_us": 10.9,
+      "p50_ms": 0.0083,
+      "p99_ms": 0.0109,
+      "mean_latency_us": 8.361,
+      "throughput_calls_sec": 119602
+    }
+  },
+  "product_verdict": {
+    "veyra_p50_ms": 0.0083,
+    "veyra_p99_ms": 0.0109,
+    "veyra_throughput": 119602,
+    "overhead_vs_typical_network_tool": "Veyra p50 latency is 0.0083 ms (8.3 us). Relative to typical HTTP/MCP tool latency (20ms - 200ms), Veyra overhead is < 0.02% of total execution time."
+  }
+}

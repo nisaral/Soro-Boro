@@ -1,0 +1,863 @@
+{
+  "audit_name": "100-Operation Real MCP Contract Inference Audit",
+  "total_operations_audited": 100,
+  "exact_match_count": 57,
+  "exact_match_rate": 0.57,
+  "safe_direction_error_count": 43,
+  "safe_direction_error_rate": 0.43,
+  "unsafe_direction_error_count": 0,
+  "unsafe_direction_error_rate": 0.0,
+  "safe_direction_examples": [
+    {
+      "tool_id": "write_file",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth idempotent_write. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "copy_file",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth idempotent_write. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "summarize_document",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth read_only. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "execute_sql_query",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth read_only. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "update_database_record",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth idempotent_write. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "aggregate_database_data",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth read_only. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "summarize_research_paper",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth read_only. Results in harmless confirmation prompt."
+    },
+    {
+      "tool_id": "compare_research_papers",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "reason": "Heuristic inferred non_idempotent_mutation (more restrictive) for ground truth read_only. Results in harmless confirmation prompt."
+    }
+  ],
+  "unsafe_direction_examples": [],
+  "audit_rows": [
+    {
+      "tool_id": "read_file",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Reads and returns file contents without modification"
+    },
+    {
+      "tool_id": "write_file",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Overwrites file content; repeated execution with same content leaves identical file state"
+    },
+    {
+      "tool_id": "append_file",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Appends content to file; repeated execution appends multiple times"
+    },
+    {
+      "tool_id": "copy_file",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Copies file to destination; repeated execution overwrites destination with identical content"
+    },
+    {
+      "tool_id": "move_file",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Moves/renames file; second call fails or alters repository structure non-idempotently"
+    },
+    {
+      "tool_id": "delete_file",
+      "inferred": "idempotent_write",
+      "ground_truth": "idempotent_write",
+      "match": true,
+      "category": "match",
+      "rationale": "Deletes file; repeated execution leaves target file absent"
+    },
+    {
+      "tool_id": "list_directory",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Lists directory contents"
+    },
+    {
+      "tool_id": "get_file_metadata",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Retrieves file metadata"
+    },
+    {
+      "tool_id": "extract_pdf_text",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Pure text extraction from document"
+    },
+    {
+      "tool_id": "extract_docx_text",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Pure text extraction from document"
+    },
+    {
+      "tool_id": "summarize_document",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Analysis and summary generation"
+    },
+    {
+      "tool_id": "search_document",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Search within document contents"
+    },
+    {
+      "tool_id": "extract_document_section",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Section retrieval"
+    },
+    {
+      "tool_id": "execute_sql_query",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Explicitly defined as read-only SQL query"
+    },
+    {
+      "tool_id": "inspect_database_schema",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Schema metadata inspection"
+    },
+    {
+      "tool_id": "insert_database_record",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Inserts new row with generated primary key; repeated execution creates duplicate rows"
+    },
+    {
+      "tool_id": "update_database_record",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Updates database columns to target values based on condition; idempotent given same target values"
+    },
+    {
+      "tool_id": "delete_database_record",
+      "inferred": "idempotent_write",
+      "ground_truth": "idempotent_write",
+      "match": true,
+      "category": "match",
+      "rationale": "Deletes records matching condition; target state is records absent"
+    },
+    {
+      "tool_id": "aggregate_database_data",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Computes aggregations (counts, sums) without modifying table data"
+    },
+    {
+      "tool_id": "fetch_web_page",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "HTTP GET retrieval"
+    },
+    {
+      "tool_id": "extract_web_text",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Text extraction from HTML"
+    },
+    {
+      "tool_id": "extract_web_links",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Hyperlink extraction from HTML"
+    },
+    {
+      "tool_id": "extract_web_metadata",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Metadata parsing from HTML"
+    },
+    {
+      "tool_id": "extract_structured_web_data",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Structured field extraction"
+    },
+    {
+      "tool_id": "search_web",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Web corpus search query"
+    },
+    {
+      "tool_id": "search_research_papers",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Academic paper search"
+    },
+    {
+      "tool_id": "get_paper_metadata",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Paper metadata lookup"
+    },
+    {
+      "tool_id": "get_paper_citations",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Citations lookup"
+    },
+    {
+      "tool_id": "summarize_research_paper",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Paper summary generation"
+    },
+    {
+      "tool_id": "compare_research_papers",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Comparison between papers"
+    },
+    {
+      "tool_id": "send_email",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Sends outbound message; repeated execution sends duplicate messages to recipient"
+    },
+    {
+      "tool_id": "search_email",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Email search query"
+    },
+    {
+      "tool_id": "read_email",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Email content retrieval"
+    },
+    {
+      "tool_id": "reply_email",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Sends outbound thread reply; repeated execution posts duplicate replies"
+    },
+    {
+      "tool_id": "create_email_draft",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Creates new draft entity; repeated execution creates duplicate drafts"
+    },
+    {
+      "tool_id": "archive_email",
+      "inferred": "idempotent_write",
+      "ground_truth": "idempotent_write",
+      "match": true,
+      "category": "match",
+      "rationale": "Moves email to archived folder; repeated execution leaves email archived"
+    },
+    {
+      "tool_id": "create_calendar_event",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Creates new calendar entry; repeated execution creates duplicate calendar entries"
+    },
+    {
+      "tool_id": "search_calendar_events",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Calendar search query"
+    },
+    {
+      "tool_id": "update_calendar_event",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Updates event fields to target values; idempotent given same values"
+    },
+    {
+      "tool_id": "delete_calendar_event",
+      "inferred": "idempotent_write",
+      "ground_truth": "idempotent_write",
+      "match": true,
+      "category": "match",
+      "rationale": "Deletes event; repeated execution leaves event absent"
+    },
+    {
+      "tool_id": "check_calendar_availability",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Checks time slot availability"
+    },
+    {
+      "tool_id": "send_channel_message",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Posts chat message; repeated execution posts duplicate messages"
+    },
+    {
+      "tool_id": "search_messages",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Message search query"
+    },
+    {
+      "tool_id": "reply_to_thread",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Posts thread reply; repeated execution posts duplicate replies"
+    },
+    {
+      "tool_id": "list_channels",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Channel listing"
+    },
+    {
+      "tool_id": "get_channel_history",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Channel message history lookup"
+    },
+    {
+      "tool_id": "get_git_status",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Git working-tree status inspection"
+    },
+    {
+      "tool_id": "get_git_diff",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Git diff inspection"
+    },
+    {
+      "tool_id": "get_commit_history",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Git commit history inspection"
+    },
+    {
+      "tool_id": "list_git_branches",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Branch listing"
+    },
+    {
+      "tool_id": "create_git_branch",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Creates new branch ref; fails if branch exists, alters repo ref state"
+    },
+    {
+      "tool_id": "create_git_commit",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Creates new commit SHA; repeated execution creates duplicate commits with new timestamps"
+    },
+    {
+      "tool_id": "search_issues",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Issue search query"
+    },
+    {
+      "tool_id": "read_issue",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Issue details inspection"
+    },
+    {
+      "tool_id": "create_issue",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Creates new issue ticket; repeated execution creates duplicate tickets"
+    },
+    {
+      "tool_id": "update_issue",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "idempotent_write",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Modifies issue fields/state to target values; idempotent"
+    },
+    {
+      "tool_id": "comment_on_issue",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "non_idempotent_mutation",
+      "match": true,
+      "category": "match",
+      "rationale": "Adds comment to issue; repeated execution adds duplicate comments"
+    },
+    {
+      "tool_id": "summarize_text",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Pure text analysis transform"
+    },
+    {
+      "tool_id": "translate_text",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Pure text translation transform"
+    },
+    {
+      "tool_id": "analyze_sentiment",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Pure sentiment analysis"
+    },
+    {
+      "tool_id": "extract_keywords",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Pure keyword extraction"
+    },
+    {
+      "tool_id": "extract_entities",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Pure entity extraction"
+    },
+    {
+      "tool_id": "rewrite_text",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Pure text transformation"
+    },
+    {
+      "tool_id": "classify_text",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Pure text classification"
+    },
+    {
+      "tool_id": "calculate_expression",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Mathematical arithmetic computation"
+    },
+    {
+      "tool_id": "calculate_descriptive_statistics",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Statistical computation"
+    },
+    {
+      "tool_id": "calculate_percentage_change",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Mathematical computation"
+    },
+    {
+      "tool_id": "calculate_compound_interest",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Financial mathematical computation"
+    },
+    {
+      "tool_id": "solve_linear_equation",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Algebraic equation solver"
+    },
+    {
+      "tool_id": "inspect_dataset",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Dataset inspection"
+    },
+    {
+      "tool_id": "filter_dataset",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory dataset filtering"
+    },
+    {
+      "tool_id": "sort_dataset",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory dataset sorting"
+    },
+    {
+      "tool_id": "group_dataset",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory dataset grouping"
+    },
+    {
+      "tool_id": "create_calculated_column",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory derived column computation"
+    },
+    {
+      "tool_id": "analyze_missing_values",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Dataset missing-value analysis"
+    },
+    {
+      "tool_id": "parse_json",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory JSON deserialization"
+    },
+    {
+      "tool_id": "query_json",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory JSON querying"
+    },
+    {
+      "tool_id": "validate_json_schema",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory JSON schema validation"
+    },
+    {
+      "tool_id": "transform_json",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory JSON structure transformation"
+    },
+    {
+      "tool_id": "compare_json",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory JSON diff comparison"
+    },
+    {
+      "tool_id": "get_system_info",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "System info query"
+    },
+    {
+      "tool_id": "get_disk_usage",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Disk usage inspection"
+    },
+    {
+      "tool_id": "get_memory_usage",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Memory usage inspection"
+    },
+    {
+      "tool_id": "list_processes",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Process listing"
+    },
+    {
+      "tool_id": "read_environment_variable",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Environment variable query"
+    },
+    {
+      "tool_id": "geocode_location",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Geocoding lookup"
+    },
+    {
+      "tool_id": "reverse_geocode",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Reverse geocoding lookup"
+    },
+    {
+      "tool_id": "calculate_geographic_distance",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Geographic distance calculation"
+    },
+    {
+      "tool_id": "lookup_timezone",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Timezone lookup"
+    },
+    {
+      "tool_id": "lookup_country_information",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Country information lookup"
+    },
+    {
+      "tool_id": "get_image_metadata",
+      "inferred": "read_only",
+      "ground_truth": "read_only",
+      "match": true,
+      "category": "match",
+      "rationale": "Image metadata query"
+    },
+    {
+      "tool_id": "resize_image",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory image resize transform"
+    },
+    {
+      "tool_id": "crop_image",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory image crop transform"
+    },
+    {
+      "tool_id": "convert_image_format",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "In-memory image format conversion"
+    },
+    {
+      "tool_id": "describe_image",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Vision object description"
+    },
+    {
+      "tool_id": "calculate_date_difference",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Date arithmetic computation"
+    },
+    {
+      "tool_id": "add_date_duration",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Date arithmetic computation"
+    },
+    {
+      "tool_id": "generate_uuid",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Pure UUID string generator"
+    },
+    {
+      "tool_id": "hash_text",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Cryptographic hash computation"
+    },
+    {
+      "tool_id": "encode_base64",
+      "inferred": "non_idempotent_mutation",
+      "ground_truth": "read_only",
+      "match": false,
+      "category": "safe_direction_error",
+      "rationale": "Base64 encoding transform"
+    }
+  ]
+}

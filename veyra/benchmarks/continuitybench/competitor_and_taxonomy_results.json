@@ -1,0 +1,147 @@
+{
+  "phase36_competitor_comparison": {
+    "1_no_router": {
+      "architecture": "Raw Agent (No Middleware)",
+      "tool_catalog_size": 250,
+      "mean_prompt_tokens": 4850,
+      "task_success": "72.0%",
+      "replans_per_50": 16,
+      "perturbation_recovery": "0.0%",
+      "boundary_latency_ms": 0.0
+    },
+    "2_pre_inference_routing": {
+      "architecture": "Pre-Inference Router (AgentWeave-style)",
+      "tool_catalog_size": 5,
+      "mean_prompt_tokens": 1420,
+      "task_success": "76.0%",
+      "replans_per_50": 14,
+      "perturbation_recovery": "0.0%",
+      "boundary_latency_ms": 45.0
+    },
+    "3_post_proposal_veyra": {
+      "architecture": "Post-Proposal Boundary Controller (Veyra alone)",
+      "tool_catalog_size": 250,
+      "mean_prompt_tokens": 4850,
+      "task_success": "96.0%",
+      "replans_per_50": 0,
+      "perturbation_recovery": "100.0%",
+      "boundary_latency_ms": 0.0084
+    },
+    "4_both_combined": {
+      "architecture": "Pre-Inference Router + Post-Proposal Veyra",
+      "tool_catalog_size": 5,
+      "mean_prompt_tokens": 1420,
+      "task_success": "98.0%",
+      "replans_per_50": 0,
+      "perturbation_recovery": "100.0%",
+      "boundary_latency_ms": 45.0084
+    }
+  },
+  "phase36_key_insight": "Pre-inference routing (e.g. AgentWeave) and post-proposal execution resolution (Veyra) solve orthogonal problems. Pre-inference routing slashes prompt tokens (-70.7%) but cannot rescue runtime execution faults (0% recovery). Veyra rescues runtime execution faults (100% recovery) without adding prompt tokens. Combining both yields optimal efficiency (1,420 tokens) and resilience (98% success, 0 replans).",
+  "phase37_failure_census": {
+    "total_traces_analyzed": 500,
+    "veyra_addressable_traces": 320,
+    "veyra_addressable_pct": "64.0%",
+    "static_addressable_traces": 210,
+    "static_addressable_pct": "42.0%",
+    "veyra_incremental_advantage": "+22.0pp",
+    "categories": [
+      {
+        "category": "1_tool_discovery",
+        "n": 65,
+        "pct": 13.0,
+        "veyra_addressable": false,
+        "static_addressable": false,
+        "primary_solution": "Pre-inference router / embedding catalog"
+      },
+      {
+        "category": "2_argument_schema",
+        "n": 70,
+        "pct": 14.0,
+        "veyra_addressable": true,
+        "static_addressable": true,
+        "primary_solution": "Veyra safe coercion & parameter alias maps"
+      },
+      {
+        "category": "3_sequencing",
+        "n": 40,
+        "pct": 8.0,
+        "veyra_addressable": false,
+        "static_addressable": false,
+        "primary_solution": "Agent planner / LLM ReAct loop"
+      },
+      {
+        "category": "4_state_mismatch",
+        "n": 45,
+        "pct": 9.0,
+        "veyra_addressable": true,
+        "static_addressable": false,
+        "primary_solution": "Veyra ExecutionContract state assertions"
+      },
+      {
+        "category": "5_authorization",
+        "n": 35,
+        "pct": 7.0,
+        "veyra_addressable": true,
+        "static_addressable": true,
+        "primary_solution": "Veyra boundary DENY / permission scope"
+      },
+      {
+        "category": "6_tool_availability",
+        "n": 55,
+        "pct": 11.0,
+        "veyra_addressable": true,
+        "static_addressable": true,
+        "primary_solution": "Veyra declared replica fallback"
+      },
+      {
+        "category": "7_tool_degradation",
+        "n": 40,
+        "pct": 8.0,
+        "veyra_addressable": true,
+        "static_addressable": false,
+        "primary_solution": "Veyra CUSUM / EWMA / Beta-Bernoulli health"
+      },
+      {
+        "category": "8_transient_infrastructure",
+        "n": 50,
+        "pct": 10.0,
+        "veyra_addressable": true,
+        "static_addressable": true,
+        "primary_solution": "Veyra bounded backoff & Retry-After"
+      },
+      {
+        "category": "9_unknown_state_lost_ack",
+        "n": 25,
+        "pct": 5.0,
+        "veyra_addressable": true,
+        "static_addressable": false,
+        "primary_solution": "Veyra verification check & idempotency guard"
+      },
+      {
+        "category": "10_semantic_misunderstanding",
+        "n": 35,
+        "pct": 7.0,
+        "veyra_addressable": false,
+        "static_addressable": false,
+        "primary_solution": "Agent model fine-tuning / reasoning"
+      },
+      {
+        "category": "11_task_planning",
+        "n": 25,
+        "pct": 5.0,
+        "veyra_addressable": false,
+        "static_addressable": false,
+        "primary_solution": "Agent planner"
+      },
+      {
+        "category": "12_output_result_misuse",
+        "n": 15,
+        "pct": 3.0,
+        "veyra_addressable": false,
+        "static_addressable": false,
+        "primary_solution": "Agent reasoning"
+      }
+    ]
+  }
+}

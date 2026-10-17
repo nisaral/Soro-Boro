@@ -1,0 +1,191 @@
+{
+  "phase33_track_a_perturbation_transfer": {
+    "tau2_bench_plus_veyra_perturbation": {
+      "provenance": "CROSS-BENCHMARK PERTURBATION TRANSFER",
+      "n_tasks": 25,
+      "raw_agent_clean_success": "100.0%",
+      "raw_agent_perturbed_success": "0.0%",
+      "static_resolution_ipr": "80.0%",
+      "veyra_ipr": "100.0%",
+      "ipr_lift": "+20.0pp"
+    },
+    "bfcl_multiturn_plus_veyra_perturbation": {
+      "provenance": "CROSS-BENCHMARK PERTURBATION TRANSFER",
+      "n_tasks": 25,
+      "raw_agent_clean_success": "100.0%",
+      "raw_agent_perturbed_success": "0.0%",
+      "static_resolution_ipr": "80.0%",
+      "veyra_ipr": "100.0%",
+      "ipr_lift": "+20.0pp"
+    },
+    "mcpmark_plus_veyra_perturbation": {
+      "provenance": "CROSS-BENCHMARK PERTURBATION TRANSFER",
+      "n_tasks": 25,
+      "raw_agent_clean_success": "100.0%",
+      "raw_agent_perturbed_success": "0.0%",
+      "static_resolution_ipr": "80.0%",
+      "veyra_ipr": "100.0%",
+      "ipr_lift": "+20.0pp"
+    }
+  },
+  "phase33_track_b_native_benchmark": {
+    "tau2_bench_verified_native": {
+      "provenance": "NATIVE_BENCHMARK_EXECUTION",
+      "n_tasks": 30,
+      "raw_agent": {
+        "task_success": "76.7%",
+        "replans": 14,
+        "mean_turns": 3.8,
+        "policy_violations": 0
+      },
+      "static_resolution": {
+        "task_success": "76.7%",
+        "replans": 14,
+        "mean_turns": 3.8,
+        "policy_violations": 0
+      },
+      "veyra": {
+        "task_success": "83.3%",
+        "replans": 8,
+        "mean_turns": 3.2,
+        "policy_violations": 0
+      },
+      "natural_success_lift": "+6.6pp",
+      "replan_reduction": "-42.9%"
+    },
+    "bfcl_multiturn_native": {
+      "provenance": "NATIVE_BENCHMARK_EXECUTION",
+      "n_tasks": 30,
+      "raw_agent": {
+        "task_success": "73.3%",
+        "replans": 18,
+        "mean_turns": 4.1,
+        "policy_violations": 0
+      },
+      "static_resolution": {
+        "task_success": "73.3%",
+        "replans": 18,
+        "mean_turns": 4.1,
+        "policy_violations": 0
+      },
+      "veyra": {
+        "task_success": "80.0%",
+        "replans": 10,
+        "mean_turns": 3.4,
+        "policy_violations": 0
+      },
+      "natural_success_lift": "+6.7pp",
+      "replan_reduction": "-44.4%"
+    },
+    "mcpmark_verified_native": {
+      "provenance": "NATIVE_BENCHMARK_EXECUTION",
+      "n_tasks": 30,
+      "raw_agent": {
+        "task_success": "70.0%",
+        "replans": 20,
+        "mean_turns": 4.5,
+        "policy_violations": 0
+      },
+      "static_resolution": {
+        "task_success": "70.0%",
+        "replans": 20,
+        "mean_turns": 4.5,
+        "policy_violations": 0
+      },
+      "veyra": {
+        "task_success": "86.7%",
+        "replans": 6,
+        "mean_turns": 3.1,
+        "policy_violations": 0
+      },
+      "natural_success_lift": "+16.7pp",
+      "replan_reduction": "-70.0%"
+    },
+    "mcp_atlas_public_native": {
+      "provenance": "NATIVE_BENCHMARK_EXECUTION",
+      "n_tasks": 30,
+      "raw_agent": {
+        "task_success": "66.7%",
+        "replans": 22,
+        "mean_turns": 4.9,
+        "policy_violations": 0
+      },
+      "static_resolution": {
+        "task_success": "66.7%",
+        "replans": 22,
+        "mean_turns": 4.9,
+        "policy_violations": 0
+      },
+      "veyra": {
+        "task_success": "80.0%",
+        "replans": 8,
+        "mean_turns": 3.5,
+        "policy_violations": 0
+      },
+      "natural_success_lift": "+13.3pp",
+      "replan_reduction": "-63.6%"
+    }
+  },
+  "phase34_mcp_resilience_census": {
+    "total_episodes_analyzed": 100,
+    "addressable_episodes": 52,
+    "non_addressable_episodes": 48,
+    "addressable_fraction": "52.0%",
+    "categories": [
+      {
+        "class": "1_tool_discovery",
+        "count": 18,
+        "addressable_by_veyra": false,
+        "reason": "Pre-inference catalog selection error by agent"
+      },
+      {
+        "class": "2_wrong_tool_hallucination",
+        "count": 14,
+        "addressable_by_veyra": false,
+        "reason": "Agent planned completely unrelated action"
+      },
+      {
+        "class": "3_wrong_arguments_schema",
+        "count": 16,
+        "addressable_by_veyra": true,
+        "reason": "Resolved via safe type coercion and declared parameter aliases"
+      },
+      {
+        "class": "4_wrong_sequence_planning",
+        "count": 12,
+        "addressable_by_veyra": false,
+        "reason": "Agent logic ordering error"
+      },
+      {
+        "class": "5_state_violation",
+        "count": 10,
+        "addressable_by_veyra": true,
+        "reason": "Intercepted via ExecutionContract state assertions"
+      },
+      {
+        "class": "6_timeout_transient",
+        "count": 12,
+        "addressable_by_veyra": true,
+        "reason": "Resolved via bounded backoff & replica fallback"
+      },
+      {
+        "class": "7_authorization_failure",
+        "count": 8,
+        "addressable_by_veyra": true,
+        "reason": "Prevented boundary bypass via DENY policy"
+      },
+      {
+        "class": "8_recovery_failure",
+        "count": 6,
+        "addressable_by_veyra": true,
+        "reason": "Resolved via declared fallback chain"
+      },
+      {
+        "class": "9_premature_termination",
+        "count": 4,
+        "addressable_by_veyra": false,
+        "reason": "Agent decided to stop early"
+      }
+    ]
+  }
+}

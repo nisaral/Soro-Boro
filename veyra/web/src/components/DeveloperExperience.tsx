@@ -4,72 +4,74 @@ import { useState } from "react";
 import { Check, Copy, Terminal, Play, Code2, Server, GitFork } from "lucide-react";
 
 export default function DeveloperExperience() {
-  const [activeTab, setActiveTab] = useState<"python" | "mcp" | "equiv" | "cli">("python");
+  const [activeTab, setActiveTab] = useState<"python" | "reconciler" | "wal" | "cli">("python");
   const [copied, setCopied] = useState(false);
 
   const snippets = {
-    python: `# Python Function Integration with Veyra
-from veyra import Veyra
+    python: `# Soro-Boro: Wrap consequential mutations with durable boundary
+from soro_boro import soro_wrap, SideEffectClass, OperationIdentity
 
-veyra = Veyra()
-
-@veyra.tool(
-    retryable=True,
-    idempotent=True,
-    risk_class="low"
+@soro_wrap(
+    side_effect_class=SideEffectClass.NON_IDEMPOTENT_MUTATION,
+    key_generator=lambda order_id, amount: f"refund_{order_id}_{amount}",
+    reconciler=stripe_refund_reconciler,
+    max_retries=1
 )
-def get_customer(customer_id: int) -> dict:
-    """Fetch customer record by integer ID."""
-    return db.query_customer(customer_id)
+def refund_customer(order_id: str, amount: float, op: OperationIdentity):
+    # op.idempotency_key is stable and deterministically bound to this logical write
+    return stripe.Refund.create(
+        charge=order_id,
+        amount=int(amount * 100),
+        idempotency_key=op.idempotency_key
+    )
 
-# If an agent calls with string argument: get_customer(customer_id="42")
-# Veyra safely normalizes "42" -> 42 without forcing an agent re-plan!
-result = get_customer(customer_id="42")
-print(result)`,
+# Returns typed TerminalOutcome:
+# outcome.status: "COMMITTED" | "PREVENTED_DUPLICATE" | "AMBIGUOUS_DEFERRED"
+`,
 
-    mcp: `# Model Context Protocol (MCP) Middleware
-from veyra.boundary import MCPToolMiddleware
+    reconciler: `# Authoritative Provider Reconciler
+from soro_boro import ReconciliationResult, ProviderLifecycleState, OperationIdentity
 
-middleware = MCPToolMiddleware()
+def stripe_refund_reconciler(op: OperationIdentity) -> ReconciliationResult:
+    refunds = stripe.Refund.list(limit=1, idempotency_key=op.idempotency_key)
+    if not refunds.data:
+        # If read replica is eventual, NOT_FOUND cannot prove non-commit!
+        return ReconciliationResult(
+            state=ProviderLifecycleState.NOT_FOUND,
+            authoritative=True,
+            consistency_observed="strong"  # or "eventual"
+        )
 
-# Intercepts standard JSON-RPC tools/call requests
-response = middleware.handle_call_tool(
-    tool_name="database_query",
-    arguments=request.arguments,
-    handler=my_mcp_handler,
-    input_schema=tool.input_schema,
-    retryable=True,
-    idempotent=True
-)
+    rf = refunds.data[0]
+    return ReconciliationResult(
+        state=ProviderLifecycleState.SUCCEEDED if rf.status == "succeeded" else ProviderLifecycleState.PENDING,
+        authoritative=True,
+        raw_response=rf
+    )`,
 
-# Returns structured result or clean MCP error classification:
-# {"isError": False, "structured_result": ...}`,
+    wal: `# Tamper-Evident Write-Ahead Log (WAL)
+from soro_boro import WriteAheadLog
 
-    equiv: `# Explicit Declared Equivalence (Section 7)
-from veyra import Veyra
+wal = WriteAheadLog("runs/soro_boro_wal.jsonl")
 
-veyra = Veyra()
+# 1. Sync INTENT flushed before external call
+wal.record_intent(op.operation_id, op.idempotency_key, "refund", {"amount": 149.99})
 
-# Explicitly register equivalent tool endpoints
-# Zero automatic semantic guessing — strict developer declaration
-veyra.equivalent(
-    "get_customer",
-    ["crm.get_customer", "legacy.get_customer"]
-)
+# 2. Crash recovery: On restart, detect any in-flight unacknowledged writes
+orphans = wal.find_orphaned_intents()
+for o in orphans:
+    print(f"Reconciling orphaned write from crash: {o.operation_id}")`,
 
-# Hard constraints filter ensures router NEVER widens allowed action space!`,
-
-    cli: `# Diagnostic & Benchmark CLI Commands
-# 1. Audit boundary execution traces and inspect recovery metrics
-$ veyra-py audit --traces runs/traces.jsonl
-
-# 2. Run ToolMisuseBench 4-way controlled baseline evaluation
-$ veyra-py toolmisuse
+    cli: `# Soro-Boro Adversarial Benchmark & Audit CLI
+# 1. Run the 5-fault distributed failure test suite (0 duplicate effects)
+$ pytest python/tests/test_soro_boro_adversarial.py -v
 
 # Output:
-# System Arm             | Success  | Recoveries  | Unsafe Retries  | Replans
-# raw_agent              |   16.7% |        0.0% |               0 |       50
-# veyra                  |   41.7% |       50.0% |               0 |       35`,
+# test_dropped_ack_prevents_duplicate_charge ... PASSED
+# test_stale_replica_causes_safe_deferral ...... PASSED
+# test_probe_failure_fails_closed .............. PASSED
+# test_wal_durability_and_crash_recovery ....... PASSED
+# ================= 6 passed in 11.46s ==================`,
   };
 
   const copyCurrent = () => {
@@ -87,20 +89,20 @@ $ veyra-py toolmisuse
               Developer Experience
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
-              Drop-in boundary integration. No agent rewrite.
+              Explicit integration. Safe defaults. Zero blind retries.
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Veyra requires zero changes to your agent reasoning prompts or conversation state. Wrap existing Python tools or insert MCP middleware at the execution boundary.
+              Wrap your consequential write operations with Soro-Boro. Retain your existing agent framework while enforcing stable idempotency keys, write-ahead durability, and fail-closed reconciliation.
             </p>
 
             <div className="pt-2 space-y-2 text-xs font-mono text-slate-700">
               <div className="flex items-center gap-2 p-2 bg-white rounded border border-slate-200">
                 <Terminal className="w-3.5 h-3.5 text-slate-400" />
-                <span>pip install veyra</span>
+                <span>pip install soro-boro</span>
               </div>
               <div className="flex items-center gap-2 p-2 bg-white rounded border border-slate-200">
                 <Play className="w-3.5 h-3.5 text-emerald-600" />
-                <span>veyra-py audit --traces runs/traces.jsonl</span>
+                <span>pytest python/tests/test_soro_boro_adversarial.py</span>
               </div>
             </div>
           </div>
@@ -118,27 +120,27 @@ $ veyra-py toolmisuse
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
-                    @veyra.tool
+                    @soro_wrap
                   </button>
                   <button
-                    onClick={() => setActiveTab("mcp")}
+                    onClick={() => setActiveTab("reconciler")}
                     className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                      activeTab === "mcp"
+                      activeTab === "reconciler"
                         ? "bg-slate-800 text-emerald-400 font-semibold"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
-                    MCP Middleware
+                    Reconciler
                   </button>
                   <button
-                    onClick={() => setActiveTab("equiv")}
+                    onClick={() => setActiveTab("wal")}
                     className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                      activeTab === "equiv"
+                      activeTab === "wal"
                         ? "bg-slate-800 text-emerald-400 font-semibold"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
-                    Declared Equivalence
+                    Write-Ahead Log
                   </button>
                   <button
                     onClick={() => setActiveTab("cli")}
@@ -148,14 +150,13 @@ $ veyra-py toolmisuse
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
-                    CLI Audit
+                    Adversarial Suite
                   </button>
                 </div>
 
                 <button
                   onClick={copyCurrent}
-                  className="flex items-center gap-1 px-2 py-1 text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors"
-                  title="Copy code snippet"
+                  className="flex items-center gap-1 text-[11px] font-mono text-slate-400 hover:text-slate-200 transition-colors"
                 >
                   {copied ? (
                     <>
@@ -171,8 +172,8 @@ $ veyra-py toolmisuse
                 </button>
               </div>
 
-              {/* Code Container */}
-              <div className="p-4 sm:p-5 font-mono text-xs overflow-x-auto leading-relaxed text-slate-300">
+              {/* Code Snippet Box */}
+              <div className="p-4 overflow-x-auto text-xs font-mono leading-relaxed text-slate-200 bg-slate-950">
                 <pre>{snippets[activeTab]}</pre>
               </div>
             </div>

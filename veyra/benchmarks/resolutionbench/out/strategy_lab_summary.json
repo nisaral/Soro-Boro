@@ -1,0 +1,89 @@
+{
+  "benchmark": "ResolutionStrategyLab",
+  "results": [
+    {
+      "strategy": "exact_cache",
+      "Recall@1": 1.0,
+      "Recall@3": 1.0,
+      "MRR": 1.0,
+      "NDCG": 1.0,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.003,
+      "memory_footprint_kb": 62.09
+    },
+    {
+      "strategy": "structural_matching",
+      "Recall@1": 0.61,
+      "Recall@3": 1.0,
+      "MRR": 0.805,
+      "NDCG": 0.8561,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 0.4,
+      "coverage": 0.96,
+      "mean_latency_ms": 0.012,
+      "memory_footprint_kb": 0.05
+    },
+    {
+      "strategy": "bm25",
+      "Recall@1": 0.62,
+      "Recall@3": 1.0,
+      "MRR": 0.81,
+      "NDCG": 0.8598,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.027,
+      "memory_footprint_kb": 0.54
+    },
+    {
+      "strategy": "dense_embedding",
+      "Recall@1": 0.64,
+      "Recall@3": 1.0,
+      "MRR": 0.82,
+      "NDCG": 0.8671,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 0.01,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.1,
+      "memory_footprint_kb": 4.59
+    },
+    {
+      "strategy": "case_based_memory",
+      "Recall@1": 1.0,
+      "Recall@3": 1.0,
+      "MRR": 1.0,
+      "NDCG": 1.0,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.011,
+      "memory_footprint_kb": 11.41
+    },
+    {
+      "strategy": "tage_history",
+      "Recall@1": 1.0,
+      "Recall@3": 1.0,
+      "MRR": 1.0,
+      "NDCG": 1.0,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.004,
+      "memory_footprint_kb": 21.82
+    },
+    {
+      "strategy": "process_mined",
+      "Recall@1": 0.74,
+      "Recall@3": 1.0,
+      "MRR": 0.87,
+      "NDCG": 0.904,
+      "wrong_tool_rate": 0.0,
+      "deferral_rate": 1.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.004,
+      "memory_footprint_kb": 39.3
+    }
+  ]
+}

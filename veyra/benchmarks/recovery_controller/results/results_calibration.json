@@ -1,0 +1,27 @@
+{
+  "n_evaluations": 500,
+  "brier_score": 0.0443,
+  "log_loss": 0.1203,
+  "expected_calibration_error_ece": 0.045,
+  "calibration_status": "WELL_CALIBRATED",
+  "reliability_diagram": [
+    {
+      "bin": "[0.0, 0.1]",
+      "count": 290,
+      "mean_predicted": 0.0,
+      "empirical_accuracy": 0.0
+    },
+    {
+      "bin": "[0.8, 0.9]",
+      "count": 50,
+      "mean_predicted": 0.85,
+      "empirical_accuracy": 0.4
+    },
+    {
+      "bin": "[0.9, 1.0]",
+      "count": 160,
+      "mean_predicted": 1.0,
+      "empirical_accuracy": 1.0
+    }
+  ]
+}

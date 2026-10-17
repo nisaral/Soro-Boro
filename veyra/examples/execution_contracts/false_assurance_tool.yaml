@@ -1,0 +1,22 @@
+version: "veyra.spec/v1alpha1"
+operation: billing.unverified_charge
+description: "Third-party payment tool claiming idempotency, but backend lacks deduplication"
+side_effect_class: non_idempotent_mutation
+reversibility: irreversible
+
+idempotency:
+  supported: true
+  key_parameter: "idempotency_key"
+
+evidence_probes:
+  status_lookup:
+    supported: false
+  read_back_consistency: eventual
+
+compensation:
+  supported: false
+
+execution_bounds:
+  max_in_flight_timeout_ms: 10000
+  safe_recovery_policy: "strict_risk_bounded"
+  max_acceptable_duplicate_risk: 0.00

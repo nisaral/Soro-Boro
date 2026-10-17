@@ -18,23 +18,23 @@ export default function GitHubPage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
-            Build with Veyra.
+            Build with Soro-Boro.
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Open-source adaptive execution for tool-using agents under cost, risk, and state constraints.
+            Execution boundary for consequential AI agent writes. Prevents unsafe retries, reuses stable operation identity, and fails closed when state is ambiguous.
           </p>
 
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <a
-              href="https://github.com/nisaral/EB-JEPA/tree/main/veyra"
+              href="https://github.com/nisaral/EB-JEPA"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 shadow-md transition-all"
             >
               <GithubIcon className="w-4 h-4 text-white" />
-              Open Veyra on GitHub
+              Open Soro-Boro on GitHub
               <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
             </a>
             <a
@@ -50,7 +50,7 @@ export default function GitHubPage() {
           <div className="technical-card p-6 bg-white text-left text-xs font-mono space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <span className="font-semibold text-slate-900 text-sm">Standalone Repository Structure</span>
-              <span className="text-slate-400">veyra/ main branch</span>
+              <span className="text-slate-400">soro-boro main branch</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-700">

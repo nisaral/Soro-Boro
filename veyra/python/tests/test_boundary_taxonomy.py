@@ -4,6 +4,7 @@ import pytest
 from veyra.boundary.taxonomy import (
     FailureClassification,
     FailureKind,
+    FailureProvenance,
     VeyraBoundaryError,
     classify_exception,
 )
@@ -97,7 +98,7 @@ def test_classify_tool_implementation_error():
     res = classify_exception(exc)
 
     assert res.kind == FailureKind.TOOL_IMPLEMENTATION_ERROR
-    assert res.provenance.value == "tool_implementation_error"
+    assert res.provenance == FailureProvenance.TOOL_IMPLEMENTATION_ERROR
     assert res.requires_agent is True
     assert res.safe_to_retry is False
     assert res.status_code == 500
@@ -106,7 +107,7 @@ def test_classify_tool_implementation_error():
     exc_attr = AttributeError("'NoneType' object has no attribute 'get'")
     res_attr = classify_exception(exc_attr)
     assert res_attr.kind == FailureKind.TOOL_IMPLEMENTATION_ERROR
-    assert res_attr.provenance.value == "tool_implementation_error"
+    assert res_attr.provenance == FailureProvenance.TOOL_IMPLEMENTATION_ERROR
 
 
 def test_provenance_in_dict_serialization():
@@ -115,5 +116,5 @@ def test_provenance_in_dict_serialization():
     d = res.to_dict()
 
     assert "provenance" in d
-    assert d["provenance"] == "precondition_error"
+    assert d["provenance"] == FailureProvenance.PRECONDITION_ERROR.value
     assert d["kind"] == "precondition_error"

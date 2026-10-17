@@ -1,270 +1,124 @@
-# Veyra
+# Soro
 
-**An adaptive agent harness that chooses the next tool, model, verification, retry, or abstention under a budget and a permission check.**
+> **The Type-Safe MCP & Agent Tool Harness.**
+> Stop runaway LLM duplicate tool loops, auto-repair broken JSON arguments, and audit MCP servers for reliability.
 
-The product objective, Harbor-first evaluation, and Gate 1 stop rule are in [`docs/OBJECTIVE.md`](docs/OBJECTIVE.md). `veyra targets` prints the checklist. No Harbor or Terminal-Bench number has been measured yet.
-
-The v0.1 prototype below is the kernel that still answers a narrower plumbing question about switching coding harnesses:
-
-> **Can a lightweight, state-dependent controller improve the cost of long-horizon agent
-> execution by switching between execution harnesses without materially reducing task success?**
-
-It is deliberately *not* a claim that adaptive routing is better than everything else. Prior
-work already covers model routing, plugin harnesses, harness evolution and solve-time adaptation
-(see [What this is not](#what-this-is-not)). Veyra asks a narrower, testable question and
-publishes the answer either way.
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![CI](https://github.com/nisaral/Soro-Boro/actions/workflows/ci.yml/badge.svg)](https://github.com/nisaral/Soro-Boro/actions)
 
 ---
 
-## Result
+## Why Soro?
 
-Model and tools are held constant across every arm; only the *execution strategy* changes.
-Measured on the bundled 30-task suite, split 15 dev / 15 test before any results were seen.
+When AI agents use tools in production, three things routinely break:
+1. **Runaway LLM Duplicate Loops**: An LLM gets confused or loops across conversational turns, repeatedly calling `charge_card()` or `create_ticket()` with the same parameters.
+2. **Brittle Argument Formatting**: The LLM passes `"49.99"` instead of `49.99`, `'{"items": [1, 2]}'` as a raw string instead of a dictionary, or `orderId` instead of `order_id`, causing runtime `TypeError` crashes.
+3. **Unchecked MCP Tool Servers**: Third-party Model Context Protocol (MCP) servers omit safety hints (`readOnlyHint`, `idempotentHint`), causing constant approval popup fatigue in Cursor / Claude Desktop or blind retries during network hiccups.
 
-Full numbers, caveats and per-category tables: `out/dev/comparison.md` and `out/test/comparison.md`
-(reproduce with `make bench-dev && make train && make bench-test`).
-
-**Dev split** (used only to pick the fixed baseline):
-
-| arm | success | mean $ / task | switches/run |
-|---|---:|---:|---:|
-| `fixed:native` | 80.0% | $0.0078 | 0.00 |
-| `fixed:repair` | 100.0% | $0.0096 | 0.00 |
-| `fixed:langgraph` | 100.0% | $0.0190 | 0.00 |
-| `veyra:heuristic` | 100.0% | $0.0096 | 0.20 |
-| `veyra:von` (surrogate) | 100.0% | $0.0096 | 0.20 |
-| `veyra:bandit` (untrained) | 100.0% | $0.0096 | 0.20 |
-| `oracle` (offline ceiling) | 100.0% | $0.0096 | 0.20 |
-
-`fixed:repair` wins on dev, so it becomes the held-out baseline.
-
-**Held-out test split** (5 arms only — no re-selection):
-
-| arm | success | mean $ / task | cost vs baseline |
-|---|---:|---:|---:|
-| `fixed:repair` (dev-selected baseline) | 100.0% | $0.0096 | — |
-| `veyra:heuristic` | 100.0% | $0.0096 | 0% |
-| `veyra:von` (surrogate) | 100.0% | $0.0096 | 0% |
-| `veyra:bandit` (trained on dev) | 100.0% | $0.0096 | 0% |
-| `oracle` (offline ceiling) | 100.0% | $0.0096 | 0% |
-
-**Outcome: NOT SUPPORTED** against `fixed:repair`. Adaptive arms match its success and its mean
-cost. They do not beat it. Runtime verdict: `out/test/verdict.json`.
-
-The v0.1 comparison, before `repair` existed, selected `fixed:langgraph` and reported adaptive
-arms 37.9% cheaper. That result is kept in `docs/PREREGISTRATION.md`. It is not the current suite.
-
-### What the result actually shows
-
-- **`repair` is the harness that beats the previous fixed arms.** `fixed:native` scores 0% on
-  `recovery`. `fixed:langgraph` scores 100% and charges graph overhead on every step.
-  `fixed:repair` scores 100% at about half the graph harness's cost, because it loads the
-  failing file in the harness and edits before it executes.
-- **Switching into repair ties starting there.** The controller stays on the cheap loop until a
-  failure, then moves to `repair`. Easy tasks stay cheap. Recovery tasks pay the failed step
-  plus the repair. The average lands on the same $0.0096.
-- **The offline oracle ceiling equals the heuristic.** Learning adds nothing measurable on this
-  suite. That is a reported null result about the learned policy.
-
-> **These numbers come from the scripted offline model.** They validate the kernel, the harness
-> adapters, the state contract, the ledger and the decision backends — i.e. the *plumbing* — and
-> they are not a claim about model behaviour. The headline claim needs a live model
-> (`--model-mode ollama`). See [Caveats](#caveats).
+**Soro solves all three in a unified, lightweight package.**
 
 ---
 
-## How it works
+## 3 Core Features
 
-```
-        ┌──────────────────────────────────────────────────────────────┐
-        │  Go kernel  (task lifecycle · ledger · checkpoints · gRPC)  │
-        └──────────────────────────────────────────────────────────────┘
-                │                                          ▲
-   DecisionRequest│                                          │Decision
-                ▼                                          │
-   ┌────────────────────┐   candidates   ┌────────────────────────────┐
-   │ planner + policy   │───────────────▶│ DecisionModel              │
-   │ (what is legal /   │                │  heuristic | von | bandit  │
-   │  affordable?)      │◀───────────────│  | oracle (offline only)   │
-   └────────────────────┘   score/choice └────────────────────────────┘
-                │
-                ▼
-   ┌────────────────────────────────────────────────────────────────────┐
-   │ HarnessService: native ReAct  |  LangGraph  (one node per action)  │
-   └────────────────────────────────────────────────────────────────────┘
-```
-
-The design invariant is enforced in code and tested:
-
-```
-DecisionModel predicts  →  Policy constrains  →  Executor acts  →  Verifier validates
-```
-
-A decision backend **can never widen the action space**. It returns a preference over a
-candidate set that the planner proposed and the policy already filtered; if it names anything
-else, the kernel records `decision_rejected` and re-resolves deterministically.
-
-### Switching is a checkpoint, not a hack
-
-Veyra does not reach into a harness's private state. `CommonExecutionState` (proto) is the
-portable contract — messages, tool results, observations, variables, artifacts, usage, budget,
-checkpoint id. Each adapter maps it in and out:
-
-```
-native state ──▶ CommonExecutionState ──checkpoint──▶ CommonExecutionState ──▶ langgraph state
-                            ▲                                    │
-                            └────── Veyra decides SWITCH ────────┘
-```
-
-That is why `switch_harness:<id>` is a first-class action with a real cost, not a serialization
-trick.
-
-### The ledger is authoritative
-
-Every action is charged to a ledger before dispatch: model cost, wall time, tokens, **and a
-per-step harness overhead**. Harness choice is therefore an economic decision, and
-`cost_usd` in the tables is charged cost, not self-reported model spend.
-
----
-
-## Quickstart
-
-Prerequisites: Go 1.24+, Python 3.10+, `protoc` (only to regenerate the wire format).
+### 1. `soro-audit` — Test Any MCP Server in 10 Seconds
+A standalone CLI chaos and schema linter for Model Context Protocol servers. It connects over `stdio`, tests schemas, verifies behavior in an isolated sandbox, and outputs instant patches.
 
 ```bash
+# Run schema and annotation audit on any server
+soro-audit --stdio "npx -y @modelcontextprotocol/server-filesystem /tmp" --dry-run
+
+# Run dynamic behavioral verification
+soro-audit --stdio "node dist/index.js" --markdown audit_summary.md
+```
+
+> **Real-World Census**: We audited **359 public MCP servers** ([see census report](reports/mcp_live_census_report.json)) and found that **over 40% omit `readOnlyHint`**, causing AI desktop clients to prompt for user approval on harmless search queries. We generated instant fix patches for servers like [Datadog](reports/patch_datadog_mcp_server.diff) and [DuckDuckGo](reports/patch_duckduckgo_mcp_server.diff).
+
+---
+
+### 2. `@soro_wrap` — Stop LLM Double-Calls & Retry Double-Writes
+Add a 1-line decorator to any tool. Soro automatically caches successful writes in a 120-second sliding loop guard and guards against network timeout double-writes:
+
+```python
+from soro import soro_wrap
+
+@soro_wrap(side_effect="mutation")
+def refund_customer(order_id: str, amount: float):
+    return stripe.Refund.create(charge=order_id, amount=int(amount * 100))
+
+# Turn 1: Normal execution
+res1 = refund_customer("ord_101", 50.0)
+
+# Turn 2: LLM gets stuck in a loop and calls it again with identical arguments
+res2 = refund_customer("ord_101", 50.0)
+# -> Stopped automatically! Returns PREVENTED_DUPLICATE with cached result.
+```
+
+---
+
+### 3. `SoroHarness` — Route -> Repair -> Guard in 5 Lines
+A complete, type-safe pipeline that routes natural language queries, auto-repairs LLM argument types, and executes with loop guard protection:
+
+```python
+from soro import SoroHarness
+
+harness = SoroHarness()
+
+@harness.tool(description="Process customer refund", side_effect="mutation")
+def refund(order_id: str, amount: float, reason: str = "customer_request"):
+    return {"status": "ok", "order_id": order_id, "amount": amount}
+
+# 1. Automatic Argument Repair: Coerces strings to floats & camelCase to snake_case!
+res = harness.execute("refund", {"orderId": "ord_882", "amount": "99.50"})
+print(res.data)
+# {'status': 'ok', 'order_id': 'ord_882', 'amount': 99.5}
+
+# 2. Natural Language Routing + Auto-Repair + Loop-Guard:
+res = harness.run("Please refund order ord_99 for 25 dollars", {"orderId": "ord_99", "amount": "25"})
+```
+
+---
+
+## Installation
+
+```bash
+# Install Soro tool harness & boundary SDK
 pip install -e "./python[dev]"
-cd go && go build -o ../dist/veyra.exe ./cmd/veyra && cd ..
-veyra doctor
-veyra compare --spawn --split dev --out out/dev
-veyra view --runs out/dev
-veyra train --runs-dir out/dev/runs --out policies/bandit.json
-veyra compare --spawn --split test --out out/test --select-from out/dev --bandit-state policies/bandit.json
+
+# Or run the standalone zero-dependency MCP auditor directly
+pip install soro-audit
 ```
-
-`make bench-dev`, `make train`, and `make bench-test` are the same three steps when `make` exists.
-
-One-off, no Makefile:
-
-```bash
-cd go && go build -o ../dist/veyra ./cmd/veyra && cd ..
-python -m veyra.cli compare --spawn --split dev --out out/dev
-```
-
-On Windows, `make` may be unavailable; the individual commands above are equivalent. Any
-`compare --spawn` refuses to start if something is already listening on the kernel or sidecar
-port, because a stale kernel silently serving old code is the fastest way to publish wrong
-numbers.
-
-### Live-model mode
-
-```bash
-python -m veyra.cli compare --spawn --split dev --out out/live \
-  --model-mode ollama --model-cheap qwen2.5-coder:3b --model-strong qwen2.5-coder:7b
-```
-
-`--model-mode openai` targets any OpenAI-compatible endpoint (vLLM, SGLang, hosted).
 
 ---
 
-## Decision backends
+## Pipeline Architecture
 
-| backend | what it is | honest label in the log |
-|---|---|---|
-| `heuristic` | readable hand-written rules; the unlearned baseline | `heuristic` |
-| `von` | adapter for a Jev-style typed-probability model over HTTP (`POST /decide`) | `von` when an endpoint is configured, **`von-surrogate`** otherwise |
-| `bandit` | LinUCB contextual bandit, fit offline from recorded traces | `bandit` when trained, **`bandit-untrained`** otherwise |
-| `oracle` | **offline-only** ceiling: given the realized outcome, which harness would have been best at this checkpoint? | `oracle` |
-
-Two rules keep these from being mistaken for more than they are:
-
-- The `von` adapter with no endpoint is a small hand-tuned scorer, tagged `von-surrogate`. It is
-  never presented as a Jev model. Point `--von-endpoint` at a real Von/Kev/NanoJev server to use
-  one.
-- An untrained `bandit` does not invent a policy; it defers to `heuristic` and is tagged
-  `bandit-untrained`. Training reads the exact candidate set the kernel recorded in each decision
-  event, so the policy is never fit on a guessed context.
-
-The offline `oracle` arm exists to bound the value of switching: if an adaptive policy gets close
-to the oracle, switching is being captured well; if it does not, that is informative too.
-
----
-
-## The benchmark
-
-30 deterministic tasks, 6 per category, split 15/15 dev/test before any results were seen.
-Categories are chosen so that *execution strategy* can plausibly matter:
-
-| category | why it is in the suite |
-|---|---|
-| `coding` | short, well-scoped; a plain loop is enough |
-| `terminal` | tool-heavy shell/filesystem round trips |
-| `recovery` | the first approach breaks; escalation is the point |
-| `migration` | a rewrite against a changed interface |
-| `long_horizon` | five or more dependent steps |
-| — | each task carries a seed workspace, tools, budget, deterministic grader and optional fault injection |
-
-Grader-based success is the ground truth; graders never call a model. `SWE-bench` is a
-deliberate non-goal for v0.1 (its harness needs substantial machine resources); the task format is
-small enough that an adapter is a later, separable piece of work.
-
----
-
-## Repository layout
-
-```
-proto/veyra/v1/runtime.proto   wire format: kernel <-> decision <-> harness (source of truth)
-go/                            kernel: lifecycle, ledger, checkpoints, event log, gRPC
-  internal/{engine,planner,policy,budget,decision,runstore,eventlog,kernelsrv,pyclient,cli}
-python/src/veyra/              sidecar: harness adapters, decision backends, benchmark, graders
-  harness/{base,native,langgraph_harness,registry}.py
-  decision/{base,heuristic,von,bandit,oracle}.py
-  bench/{tasks,runner,report}.py
-python/tests/                  pytest suite (tools, graders, contract, decisions, harnesses, report)
-docs/PREREGISTRATION.md        the claim, the falsification bar, and the threats to validity
-docs/ARCHITECTURE.md           why the kernel is small and where the boundaries are
+```text
+User / Agent Query
+        │
+        ▼
+┌────────────────────────────────────────────────────────┐
+│  1. ROUTE: Local Conformal Router (Fast Shortlisting)  │
+│  2. REPAIR: Auto-Coerce Types & JSON Schema (Kev)      │
+│  3. GUARD: Soro-Boro Boundary & 120s Loop Guard        │
+└────────────────────────────────────────────────────────┘
+        │
+   Protected External Execution (API / SQL / MCP / HTTP)
 ```
 
-The Go kernel is **infrastructure, not the contribution**. It owns task lifecycle, checkpointing,
-budget, the event log and gRPC — deliberately nothing else. Python owns decision models, harness
-adapters, the benchmark, graders and policy fitting. There is no Kubernetes, Postgres, ClickHouse
-or NATS in v0.1; run logs are files.
-
 ---
 
-## What this is not
+## Repository Structure
 
-Veyra is **not** "the first adaptive/self-evolving agent harness", and this README will not claim
-that. Related work already occupies that space:
+- `python/src/soro/harness/`: Unified `SoroHarness` pipeline (`Route -> Repair -> Guard`).
+- `python/src/soro_boro/`: Execution boundary engine (`@soro_wrap`, atomic claim store, intent minting).
+- `python/src/soro/cli_audit.py`: `soro-audit` MCP server linter and behavioral sandbox verifier.
+- `reports/`: Real findings across 359 MCP servers (`mcp_live_census_report.json` and generated patches).
+- `web/`: Next.js interactive architecture visualization and simulator demo.
 
-- harness routing, plugins, benchmark integration, RL and harness evolution (HarnessX-likes),
-- solve-time adaptation and routing (adaptive auto-harness work),
-- typed probabilistic decision models (Von / Kev / NanoJev and the Jev-style family),
-- harness-vs-horizon studies, which motivate this project's focus on long-horizon and recovery
-  tasks rather than short well-scoped ones.
-
-Veyra's contribution is narrow and testable: **a portable execution-state contract, a small
-kernel that can switch harnesses at a checkpoint, and a pre-registered evaluation of whether that
-switching pays for itself under a fixed model and tool set.**
-
-## Caveats
-
-- `model_mode=offline` (the committed numbers) uses a deterministic scripted model. It proves
-  plumbing and protocol; it cannot show model behaviour.
-- `langgraph` falls back to an in-repo `MiniGraph` when the `langgraph` package cannot be
-  imported; the arm says so (`engine:builtin-graph`). Install the `langgraph` extra to use the
-  real runtime.
-- `veyra:von` is a **surrogate** unless `--von-endpoint` is set. It must never be reported as a
-  real Jev-style model.
-- The bandit is fit offline on logged decisions (offline policy fitting), which is not causal
-  inference; the pre-registration says so explicitly.
-- The suite is 30 tasks. Confidence intervals on 15-task splits are wide; treat the numbers as a
-  signal, not a measurement.
-
-## Status
-
-v0.1 research prototype, working end-to-end (`go test`, `pytest`, and both benchmark splits pass).
-Next steps are listed in `docs/ARCHITECTURE.md`.
+---
 
 ## License
 
-Apache-2.0 — see `LICENSE`.
+Apache-2.0. See [LICENSE](LICENSE) for details.

@@ -1,0 +1,13 @@
+{
+  "n": 100,
+  "seed": 42,
+  "heuristic": {
+    "n": 100,
+    "tool_accuracy": 0.59,
+    "by_file": {
+      "BFCL_v3_multiple.json": 0.9705882352941176,
+      "BFCL_v3_live_multiple.json": 0.7575757575757576,
+      "BFCL_v3_irrelevance.json": 0.030303030303030304
+    }
+  }
+}

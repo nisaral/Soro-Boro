@@ -2,18 +2,14 @@ import { CheckCircle2, ShieldCheck, BarChart3, Terminal } from "lucide-react";
 
 export default function CurrentStatus() {
   const verifiedItems = [
-    { title: "132 Python Tests Passing", detail: "Passing offline unit & integration test suite in under 4 seconds" },
-    { title: "Tier 0 Correctness Validation", detail: "200+ synthetic cases: 0 false interventions, 0 unsafe retries, 100% classification accuracy" },
-    { title: "ToolMisuseBench Controlled Win", detail: "41.7% vs 16.7% raw baseline (+25pp), 50% boundary recovery, 15 re-plans eliminated" },
-    { title: "Safe Argument Normalizer", detail: "Strict scalar & enum coercion ('42' -> 42, ISO dates, whitespace). Zero semantic guessing" },
-    { title: "7-Tier Failure Taxonomy", detail: "Structured classification for schema, transient, rate limit, precondition, auth, and unknown state" },
-    { title: "Bounded Safe Retry Engine", detail: "Retries allowed ONLY on idempotent transient/rate-limit errors. 0 unsafe write retries" },
-    { title: "CandidateResolver & Equivalence", detail: "Declared developer equivalence with hard constraint filtering (health, permissions, risk)" },
-    { title: "DeterministicRoutePolicy", detail: "v0.1 deterministic priority selection; zero LLM or embedding latency overhead in runtime path" },
-    { title: "ExecutionEngine Pipeline", detail: "Full proposal -> candidate resolution -> route policy -> execution -> recovery loop" },
-    { title: "MCP Tool Middleware", detail: "Transparent wrapper intercepting MCP tools/call JSON-RPC messages" },
-    { title: "Trace Sink & Redaction", detail: "Section 11 execution traces with automatic recursive redaction of credentials and secrets" },
-    { title: "Diagnostic Audit CLI", detail: "veyra-py audit and veyra-py toolmisuse subcommands for developer telemetry" },
+    { title: "Wrap + UNKNOWN_ACK", detail: "Five-minute charge/verify fixture: one ledger row, VERIFIED_COMMITTED, replayed=False" },
+    { title: "DeterministicRouter", detail: "Contract filter then dense shortlist. EXECUTE / ASK / ABSTAIN / DENY. No LLM." },
+    { title: "Thin agent loop", detail: "soro.run(task, llm=...) may only call tools that survived routing" },
+    { title: "Catalog decorator", detail: "@soro.tool registers schema, side-effect class, permissions" },
+    { title: "LangGraph / OpenAI Agents adapters", detail: "Wrap their tool nodes; Soro does not replace the graph" },
+    { title: "ContinuityBench (local)", detail: "+20pp IPR vs fair static_resolution on the in-repo 120-task set — not a public leaderboard" },
+    { title: "ToolMisuse +25pp", detail: "Quarantined. Do not treat the website table as a published score." },
+    { title: "Harbor / MCPMark", detail: "Not claimed. No official public run." },
   ];
 
   return (

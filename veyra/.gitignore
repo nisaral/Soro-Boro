@@ -13,8 +13,14 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+.env
+.env.local
+eval_lab/out/
+# keep PLAN_RUN_RESULTS if we want it committed — ignore other lab dumps
+!eval_lab/out/PLAN_RUN_RESULTS.json
 
 # local caches + run data
+bench_toolmisuse_official/
 .cache/
 runs/
 data/
@@ -44,3 +50,10 @@ out/kev/**
 .idea/
 .DS_Store
 Thumbs.db
+
+# scratch and ephemeral experiment dumps
+scratch/
+python/scratch_*.py
+python/raw_tools_*.json
+python/src/out/
+audit_summary*.md

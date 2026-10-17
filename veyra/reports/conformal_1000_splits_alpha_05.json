@@ -1,0 +1,26 @@
+{
+  "minilm_1000_splits_alpha_05": {
+    "alpha": 0.05,
+    "n_splits": 1000,
+    "mean_coverage": 0.9511,
+    "mean_coverage_percent": 95.11,
+    "std_coverage": 0.019,
+    "ci_90": [
+      0.917,
+      0.9802
+    ],
+    "mean_set_size": 2.87
+  },
+  "gemini_1000_splits_alpha_05": {
+    "alpha": 0.05,
+    "n_splits": 1000,
+    "mean_coverage": 0.952,
+    "mean_coverage_percent": 95.2,
+    "std_coverage": 0.0196,
+    "ci_90": [
+      0.913,
+      0.9802
+    ],
+    "mean_set_size": 1.86
+  }
+}

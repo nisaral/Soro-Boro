@@ -1,0 +1,1040 @@
+{
+  "protocol": "soro-routing-protocol-v1",
+  "seeds": [
+    7,
+    11,
+    19
+  ],
+  "minilm_loaded": true,
+  "note": "Hash dense is hashed n-grams, not neural. MiniLM is sentence-transformers/all-MiniLM-L6-v2.",
+  "sizes": {
+    "24": {
+      "by_seed": [
+        {
+          "seed": 7,
+          "oracle": {
+            "n": 54,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9444,
+              "recall@1_ci95": [
+                0.8889,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 54,
+              "multi_defensible_share": 0.0185,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6598,
+                "coverage": 1.0,
+                "precision": 0.9444
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.7057,
+                "coverage": 0.8889,
+                "precision": 0.9583
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 54,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 5.1219,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 5.1219,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.4444,
+              "recall@1_ci95": [
+                0.3333,
+                0.5741
+              ],
+              "recall@5": 0.6667,
+              "recall@10": 0.7778,
+              "n": 54,
+              "multi_defensible_share": 0.7037,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 54
+        },
+        {
+          "seed": 11,
+          "oracle": {
+            "n": 54,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9444,
+              "recall@1_ci95": [
+                0.8704,
+                1.0
+              ],
+              "recall@5": 0.9815,
+              "recall@10": 1.0,
+              "n": 54,
+              "multi_defensible_share": 0.0741,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6792,
+                "coverage": 1.0,
+                "precision": 0.9444
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6899,
+                "coverage": 0.963,
+                "precision": 0.9615
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 54,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 5.1219,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 5.1219,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.4444,
+              "recall@1_ci95": [
+                0.3148,
+                0.5741
+              ],
+              "recall@5": 0.6852,
+              "recall@10": 0.7593,
+              "n": 54,
+              "multi_defensible_share": 0.7037,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 54
+        },
+        {
+          "seed": 19,
+          "oracle": {
+            "n": 54,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9259,
+              "recall@1_ci95": [
+                0.8333,
+                1.0
+              ],
+              "recall@5": 0.9815,
+              "recall@10": 1.0,
+              "n": 54,
+              "multi_defensible_share": 0.037,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6556,
+                "coverage": 1.0,
+                "precision": 0.9259
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6899,
+                "coverage": 0.9444,
+                "precision": 0.9608
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 54,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 5.1219,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 5.1219,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.4444,
+              "recall@1_ci95": [
+                0.3333,
+                0.5741
+              ],
+              "recall@5": 0.6667,
+              "recall@10": 0.7593,
+              "n": 54,
+              "multi_defensible_share": 0.7037,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 54
+        }
+      ],
+      "summary": {
+        "hash_dense": {
+          "recall@1_mean": 0.9382,
+          "recall@1_seeds": [
+            0.9444,
+            0.9444,
+            0.9259
+          ],
+          "recall@5_mean": 0.9877,
+          "recall@10_mean": 1.0,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.0432,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 0.6598,
+            "coverage": 1.0,
+            "precision": 0.9444
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 0.7057,
+            "coverage": 0.8889,
+            "precision": 0.9583
+          }
+        },
+        "bm25": {
+          "recall@1_mean": 1.0,
+          "recall@1_seeds": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "recall@5_mean": 1.0,
+          "recall@10_mean": 1.0,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.0,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 5.1219,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 5.1219,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "minilm": {
+          "recall@1_mean": 0.4444,
+          "recall@1_seeds": [
+            0.4444,
+            0.4444,
+            0.4444
+          ],
+          "recall@5_mean": 0.6729,
+          "recall@10_mean": 0.7655,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.7037,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 1.0,
+            "coverage": 0.0,
+            "precision": 0.0
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 1.0,
+            "coverage": 0.0,
+            "precision": 0.0
+          }
+        }
+      }
+    },
+    "50": {
+      "by_seed": [
+        {
+          "seed": 7,
+          "oracle": {
+            "n": 112,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9375,
+              "recall@1_ci95": [
+                0.8839,
+                0.9821
+              ],
+              "recall@5": 0.9911,
+              "recall@10": 1.0,
+              "n": 112,
+              "multi_defensible_share": 0.0446,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6565,
+                "coverage": 1.0,
+                "precision": 0.9375
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6709,
+                "coverage": 0.9821,
+                "precision": 0.9545
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 112,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 6.3625,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 6.3625,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.4107,
+              "recall@1_ci95": [
+                0.3214,
+                0.5
+              ],
+              "recall@5": 0.625,
+              "recall@10": 0.7143,
+              "n": 112,
+              "multi_defensible_share": 0.8125,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 112
+        },
+        {
+          "seed": 11,
+          "oracle": {
+            "n": 112,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9107,
+              "recall@1_ci95": [
+                0.8571,
+                0.9554
+              ],
+              "recall@5": 0.9732,
+              "recall@10": 1.0,
+              "n": 112,
+              "multi_defensible_share": 0.0625,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6701,
+                "coverage": 1.0,
+                "precision": 0.9107
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.7057,
+                "coverage": 0.8929,
+                "precision": 0.95
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 112,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 6.3625,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 6.3625,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.3929,
+              "recall@1_ci95": [
+                0.3036,
+                0.4821
+              ],
+              "recall@5": 0.5982,
+              "recall@10": 0.6875,
+              "n": 112,
+              "multi_defensible_share": 0.8125,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 112
+        },
+        {
+          "seed": 19,
+          "oracle": {
+            "n": 112,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9464,
+              "recall@1_ci95": [
+                0.8929,
+                0.9821
+              ],
+              "recall@5": 0.9821,
+              "recall@10": 1.0,
+              "n": 112,
+              "multi_defensible_share": 0.0714,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6532,
+                "coverage": 1.0,
+                "precision": 0.9464
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6626,
+                "coverage": 0.9911,
+                "precision": 0.955
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 112,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 6.3625,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 6.3625,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.4107,
+              "recall@1_ci95": [
+                0.3214,
+                0.5089
+              ],
+              "recall@5": 0.625,
+              "recall@10": 0.7143,
+              "n": 112,
+              "multi_defensible_share": 0.8125,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 112
+        }
+      ],
+      "summary": {
+        "hash_dense": {
+          "recall@1_mean": 0.9315,
+          "recall@1_seeds": [
+            0.9375,
+            0.9107,
+            0.9464
+          ],
+          "recall@5_mean": 0.9821,
+          "recall@10_mean": 1.0,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.0595,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 0.6565,
+            "coverage": 1.0,
+            "precision": 0.9375
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 0.6709,
+            "coverage": 0.9821,
+            "precision": 0.9545
+          }
+        },
+        "bm25": {
+          "recall@1_mean": 1.0,
+          "recall@1_seeds": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "recall@5_mean": 1.0,
+          "recall@10_mean": 1.0,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.0,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 6.3625,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 6.3625,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "minilm": {
+          "recall@1_mean": 0.4048,
+          "recall@1_seeds": [
+            0.4107,
+            0.3929,
+            0.4107
+          ],
+          "recall@5_mean": 0.6161,
+          "recall@10_mean": 0.7054,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.8125,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 1.0,
+            "coverage": 0.0,
+            "precision": 0.0
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 1.0,
+            "coverage": 0.0,
+            "precision": 0.0
+          }
+        }
+      }
+    },
+    "100": {
+      "by_seed": [
+        {
+          "seed": 7,
+          "oracle": {
+            "n": 225,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9289,
+              "recall@1_ci95": [
+                0.8978,
+                0.96
+              ],
+              "recall@5": 0.9733,
+              "recall@10": 0.9911,
+              "n": 225,
+              "multi_defensible_share": 0.0933,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6617,
+                "coverage": 1.0,
+                "precision": 0.9289
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6838,
+                "coverage": 0.9778,
+                "precision": 0.95
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 225,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 7.5709,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 7.5709,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.3778,
+              "recall@1_ci95": [
+                0.32,
+                0.44
+              ],
+              "recall@5": 0.5467,
+              "recall@10": 0.5867,
+              "n": 225,
+              "multi_defensible_share": 0.8756,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.8654,
+                "coverage": 0.0044,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.8654,
+                "coverage": 0.0044,
+                "precision": 1.0
+              }
+            }
+          },
+          "n_queries": 225
+        },
+        {
+          "seed": 11,
+          "oracle": {
+            "n": 225,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9378,
+              "recall@1_ci95": [
+                0.9022,
+                0.9689
+              ],
+              "recall@5": 0.9644,
+              "recall@10": 0.9911,
+              "n": 225,
+              "multi_defensible_share": 0.1022,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6456,
+                "coverage": 1.0,
+                "precision": 0.9378
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6617,
+                "coverage": 0.9867,
+                "precision": 0.9505
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 225,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 7.5709,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 7.5709,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.3867,
+              "recall@1_ci95": [
+                0.3244,
+                0.4489
+              ],
+              "recall@5": 0.5556,
+              "recall@10": 0.5956,
+              "n": 225,
+              "multi_defensible_share": 0.8756,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 225
+        },
+        {
+          "seed": 19,
+          "oracle": {
+            "n": 225,
+            "unique_gold": 1.0,
+            "multi_match": 0.0,
+            "no_match": 0.0,
+            "oracle_ceiling": 1.0
+          },
+          "arms": {
+            "hash_dense": {
+              "recall@1": 0.9289,
+              "recall@1_ci95": [
+                0.8978,
+                0.96
+              ],
+              "recall@5": 0.9644,
+              "recall@10": 1.0,
+              "n": 225,
+              "multi_defensible_share": 0.0978,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 0.6598,
+                "coverage": 1.0,
+                "precision": 0.9289
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 0.6812,
+                "coverage": 0.9644,
+                "precision": 0.9539
+              }
+            },
+            "bm25": {
+              "recall@1": 1.0,
+              "recall@1_ci95": [
+                1.0,
+                1.0
+              ],
+              "recall@5": 1.0,
+              "recall@10": 1.0,
+              "n": 225,
+              "multi_defensible_share": 0.0,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 7.5709,
+                "coverage": 1.0,
+                "precision": 1.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 7.5709,
+                "coverage": 1.0,
+                "precision": 1.0
+              }
+            },
+            "minilm": {
+              "recall@1": 0.3822,
+              "recall@1_ci95": [
+                0.3156,
+                0.4489
+              ],
+              "recall@5": 0.5467,
+              "recall@10": 0.5867,
+              "n": 225,
+              "multi_defensible_share": 0.8756,
+              "coverage_at_p90": {
+                "precision_target": 0.9,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              },
+              "coverage_at_p95": {
+                "precision_target": 0.95,
+                "cutoff": 1.0,
+                "coverage": 0.0,
+                "precision": 0.0
+              }
+            }
+          },
+          "n_queries": 225
+        }
+      ],
+      "summary": {
+        "hash_dense": {
+          "recall@1_mean": 0.9319,
+          "recall@1_seeds": [
+            0.9289,
+            0.9378,
+            0.9289
+          ],
+          "recall@5_mean": 0.9674,
+          "recall@10_mean": 0.9941,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.0978,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 0.6617,
+            "coverage": 1.0,
+            "precision": 0.9289
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 0.6838,
+            "coverage": 0.9778,
+            "precision": 0.95
+          }
+        },
+        "bm25": {
+          "recall@1_mean": 1.0,
+          "recall@1_seeds": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "recall@5_mean": 1.0,
+          "recall@10_mean": 1.0,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.0,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 7.5709,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 7.5709,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "minilm": {
+          "recall@1_mean": 0.3822,
+          "recall@1_seeds": [
+            0.3778,
+            0.3867,
+            0.3822
+          ],
+          "recall@5_mean": 0.5497,
+          "recall@10_mean": 0.5897,
+          "oracle_ceiling_mean": 1.0,
+          "multi_defensible_mean": 0.8756,
+          "coverage_at_p90": {
+            "precision_target": 0.9,
+            "cutoff": 0.8654,
+            "coverage": 0.0044,
+            "precision": 1.0
+          },
+          "coverage_at_p95": {
+            "precision_target": 0.95,
+            "cutoff": 0.8654,
+            "coverage": 0.0044,
+            "precision": 1.0
+          }
+        }
+      }
+    }
+  },
+  "poison": {
+    "decoy": "charge_zxq0016",
+    "n_queries": 23,
+    "hash_dense": {
+      "top1_hijack": 0.1304,
+      "mean_rank": 9.696
+    },
+    "bm25": {
+      "top1_hijack": 0.1304,
+      "mean_rank": 8.174
+    },
+    "minilm": {
+      "top1_hijack": 0.1304,
+      "mean_rank": 9.565
+    },
+    "rug_pull_hash_changed": true,
+    "name_squat_note": "squatter tool_{decoy} not inserted; see unique names"
+  },
+  "online_linucb": {
+    "steps": 80,
+    "final_avg_regret": 0.975,
+    "static_hash_acc": 1.0,
+    "curve": [
+      {
+        "t": 20,
+        "avg_regret": 0.95,
+        "bandit_acc": 0.05
+      },
+      {
+        "t": 40,
+        "avg_regret": 0.95,
+        "bandit_acc": 0.05
+      },
+      {
+        "t": 60,
+        "avg_regret": 0.9667,
+        "bandit_acc": 0.0333
+      },
+      {
+        "t": 80,
+        "avg_regret": 0.975,
+        "bandit_acc": 0.025
+      }
+    ]
+  },
+  "kev": {
+    "status": "ok",
+    "n_tools": 24,
+    "n_queries": 24,
+    "recall@1": 1.0,
+    "recall@1_ci95": [1.0, 1.0],
+    "hits": 24,
+    "ms_per_query": 6590.7,
+    "hash_dense_same_split_recall@1": 1.0,
+    "note": "Unique-token catalog is easy for hash (R@1=1.0). Kev matching hash on this split does not show Kev > dense. Shortlist k=8 from hash then Kev choice. CPU, no int8."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "dataset_sha256": "4f90fb962cb74d5530ad24e8bd5749923d3a5cb412a2c86702f820cd66a61cc8",
+  "n_unique_tasks": 100,
+  "systems": {
+    "fair_static": {
+      "tasks_evaluated": 100,
+      "task_success_rate": "16.00%",
+      "unsafe_actions_total": 84,
+      "avg_replans": 0.0,
+      "avg_latency_ms": 0.0
+    },
+    "veyra": {
+      "tasks_evaluated": 100,
+      "task_success_rate": "100.00%",
+      "unsafe_actions_total": 0,
+      "avg_replans": 0.0,
+      "avg_latency_ms": 0.03
+    }
+  },
+  "paired_comparisons": {
+    "veyra_vs_fair_static": {
+      "veyra_won_static_lost (b)": 84,
+      "static_won_veyra_lost (c)": 0,
+      "paired_delta_pp": "+84.00pp",
+      "exact_mcnemar_p_value": 1.0339757656912846e-25,
+      "statistically_significant": true
+    }
+  }
+}

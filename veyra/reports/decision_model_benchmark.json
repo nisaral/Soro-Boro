@@ -1,0 +1,131 @@
+{
+  "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "n": 160,
+  "seed": 42,
+  "models": [
+    {
+      "name": "heuristic",
+      "kind": "decision",
+      "by_file": {
+        "BFCL_v3_multiple.json": {
+          "correct": 34,
+          "n": 34,
+          "accuracy": 1.0
+        },
+        "BFCL_v3_live_multiple.json": {
+          "correct": 28,
+          "n": 33,
+          "accuracy": 0.8485
+        },
+        "BFCL_v3_irrelevance.json": {
+          "correct": 1,
+          "n": 33,
+          "accuracy": 0.0303
+        },
+        "external_human": {
+          "correct": 22,
+          "n": 60,
+          "accuracy": 0.3667
+        }
+      },
+      "malformed_rate": 0.0,
+      "mean_forward_passes": 1,
+      "median_latency_ms": 0.31,
+      "peak_vram_mb": 0.0,
+      "note": "Hashed token overlap. No neural forward."
+    },
+    {
+      "name": "jaredpalmer/kev-0.8b",
+      "kind": "decision",
+      "by_file": {
+        "BFCL_v3_multiple.json": {
+          "correct": 34,
+          "n": 34,
+          "accuracy": 1.0
+        },
+        "BFCL_v3_live_multiple.json": {
+          "correct": 23,
+          "n": 33,
+          "accuracy": 0.697
+        },
+        "BFCL_v3_irrelevance.json": {
+          "correct": 27,
+          "n": 33,
+          "accuracy": 0.8182
+        },
+        "external_human": {
+          "correct": 45,
+          "n": 60,
+          "accuracy": 0.75
+        }
+      },
+      "malformed_rate": 0.0,
+      "mean_forward_passes": 1,
+      "median_latency_ms": 110.95,
+      "peak_vram_mb": 1612.0,
+      "note": "Original Kev pointer on Qwen3.5-0.8B-Base. Special-token boundaries, temperature 2.351. Windows still uses the slow DeltaNet fallback."
+    },
+    {
+      "name": "soro-kev-0.8b",
+      "kind": "decision",
+      "by_file": {
+        "BFCL_v3_multiple.json": {
+          "correct": 34,
+          "n": 34,
+          "accuracy": 1.0
+        },
+        "BFCL_v3_live_multiple.json": {
+          "correct": 32,
+          "n": 33,
+          "accuracy": 0.9697
+        },
+        "BFCL_v3_irrelevance.json": {
+          "correct": 19,
+          "n": 33,
+          "accuracy": 0.5758
+        },
+        "external_human": {
+          "correct": 50,
+          "n": 60,
+          "accuracy": 0.8333
+        }
+      },
+      "malformed_rate": 0.0,
+      "mean_forward_passes": 1,
+      "median_latency_ms": 80.01,
+      "peak_vram_mb": 1563.2,
+      "note": "Qwen3.5-0.8B pointer. Windows PyTorch fallback for DeltaNet, so latency is not the Linux kernel time."
+    },
+    {
+      "name": "soro-kev-4b",
+      "kind": "decision",
+      "by_file": {
+        "BFCL_v3_multiple.json": {
+          "correct": 34,
+          "n": 34,
+          "accuracy": 1.0
+        },
+        "BFCL_v3_live_multiple.json": {
+          "correct": 32,
+          "n": 33,
+          "accuracy": 0.9697
+        },
+        "BFCL_v3_irrelevance.json": {
+          "correct": 25,
+          "n": 33,
+          "accuracy": 0.7576
+        },
+        "external_human": {
+          "correct": 51,
+          "n": 60,
+          "accuracy": 0.85
+        }
+      },
+      "malformed_rate": 0.0,
+      "mean_forward_passes": 1,
+      "median_latency_ms": 413.18,
+      "peak_vram_mb": 4048.3,
+      "note": "Qwen3-4B NF4 pointer with SDPA. One prefill. Not a Qwen3.5 hybrid."
+    }
+  ]
+}

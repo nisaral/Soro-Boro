@@ -1,0 +1,38 @@
+{
+  "raw_agent": {
+    "trials_count": 50,
+    "duplicate_external_effects": 0,
+    "incorrect_final_state_rate": "100.0%",
+    "verification_success_rate": "0.0%",
+    "recovery_success_rate": "0.0%",
+    "additional_calls_avg": 0.0,
+    "latency_ms_avg": 0.001
+  },
+  "naive_retry": {
+    "trials_count": 50,
+    "duplicate_external_effects": 50,
+    "incorrect_final_state_rate": "100.0%",
+    "verification_success_rate": "0.0%",
+    "recovery_success_rate": "0.0%",
+    "additional_calls_avg": 1.0,
+    "latency_ms_avg": 0.001
+  },
+  "competent_middleware": {
+    "trials_count": 50,
+    "duplicate_external_effects": 50,
+    "incorrect_final_state_rate": "100.0%",
+    "verification_success_rate": "0.0%",
+    "recovery_success_rate": "0.0%",
+    "additional_calls_avg": 1.0,
+    "latency_ms_avg": 0.001
+  },
+  "veyra": {
+    "trials_count": 50,
+    "duplicate_external_effects": 0,
+    "incorrect_final_state_rate": "0.0%",
+    "verification_success_rate": "100.0%",
+    "recovery_success_rate": "100.0%",
+    "additional_calls_avg": 1.0,
+    "latency_ms_avg": 0.017
+  }
+}

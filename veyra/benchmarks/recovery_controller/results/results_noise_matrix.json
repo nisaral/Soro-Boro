@@ -1,0 +1,270 @@
+{
+  "CLEAN": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "86.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "86.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "FALSE_NEGATIVE_PROBE": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "60.0%",
+      "observed_DER": "26.0%",
+      "der_95_upper_bound": "34.60%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "65.0%",
+      "observed_DER": "21.0%",
+      "der_95_upper_bound": "28.98%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "FALSE_POSITIVE_PROBE": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "45.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "45.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "STALE_READ_REPLICA": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "65.0%",
+      "observed_DER": "21.0%",
+      "der_95_upper_bound": "28.98%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "69.0%",
+      "observed_DER": "17.0%",
+      "der_95_upper_bound": "24.36%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "PROBE_DELAY": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "19.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "78.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "43.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "56.0%"
+    }
+  },
+  "MISSING_PROBE": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "44.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "42.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "43.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "56.0%"
+    }
+  },
+  "CONTRADICTORY_EVIDENCE": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "86.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "86.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "CORRELATED_PROBE_ERROR": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "60.0%",
+      "observed_DER": "26.0%",
+      "der_95_upper_bound": "34.60%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "65.0%",
+      "observed_DER": "21.0%",
+      "der_95_upper_bound": "28.98%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "LATE_COMMIT": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "60.0%",
+      "observed_DER": "26.0%",
+      "der_95_upper_bound": "34.60%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "65.0%",
+      "observed_DER": "21.0%",
+      "der_95_upper_bound": "28.98%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "TRANSPORT_REDELIVERY": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "60.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "60.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "PROCESS_CRASH_POST_DISPATCH": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "50.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "42.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "42.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "58.0%"
+    }
+  },
+  "PARTIAL_BATCH_COMMIT": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "81.0%",
+      "observed_DER": "9.0%",
+      "der_95_upper_bound": "14.61%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "79.0%",
+      "observed_DER": "6.0%",
+      "der_95_upper_bound": "10.65%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "UNBOUNDED_IN_FLIGHT": {
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "83.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "8.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "83.0%",
+      "observed_DER": "0.0%",
+      "der_95_upper_bound": "3.00%",
+      "abstention_rate": "11.0%"
+    }
+  },
+  "reliability_ladder": {
+    "rel_1.00": {
+      "Full-Mechanism Deterministic": {
+        "safe_recovery_rate": "86.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "8.0%"
+      },
+      "Belief-State Veyra": {
+        "safe_recovery_rate": "86.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "11.0%"
+      }
+    },
+    "rel_0.99": {
+      "Full-Mechanism Deterministic": {
+        "safe_recovery_rate": "86.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "8.0%"
+      },
+      "Belief-State Veyra": {
+        "safe_recovery_rate": "62.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "35.0%"
+      }
+    },
+    "rel_0.95": {
+      "Full-Mechanism Deterministic": {
+        "safe_recovery_rate": "84.0%",
+        "observed_DER": "3.0%",
+        "der_95_upper_bound": "6.34%",
+        "abstention_rate": "8.0%"
+      },
+      "Belief-State Veyra": {
+        "safe_recovery_rate": "62.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "36.0%"
+      }
+    },
+    "rel_0.90": {
+      "Full-Mechanism Deterministic": {
+        "safe_recovery_rate": "83.0%",
+        "observed_DER": "3.0%",
+        "der_95_upper_bound": "6.34%",
+        "abstention_rate": "8.0%"
+      },
+      "Belief-State Veyra": {
+        "safe_recovery_rate": "62.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "34.0%"
+      }
+    },
+    "rel_0.80": {
+      "Full-Mechanism Deterministic": {
+        "safe_recovery_rate": "75.0%",
+        "observed_DER": "4.0%",
+        "der_95_upper_bound": "7.84%",
+        "abstention_rate": "8.0%"
+      },
+      "Belief-State Veyra": {
+        "safe_recovery_rate": "41.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "58.0%"
+      }
+    },
+    "rel_0.70": {
+      "Full-Mechanism Deterministic": {
+        "safe_recovery_rate": "70.0%",
+        "observed_DER": "7.0%",
+        "der_95_upper_bound": "12.00%",
+        "abstention_rate": "8.0%"
+      },
+      "Belief-State Veyra": {
+        "safe_recovery_rate": "41.0%",
+        "observed_DER": "0.0%",
+        "der_95_upper_bound": "3.00%",
+        "abstention_rate": "58.0%"
+      }
+    }
+  }
+}

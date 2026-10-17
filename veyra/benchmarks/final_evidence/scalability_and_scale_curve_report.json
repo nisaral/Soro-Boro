@@ -1,0 +1,176 @@
+{
+  "phase_57_complexmcp_scale_study": {
+    "10": {
+      "catalog_tools": 10,
+      "prompt_tokens_est": 1250,
+      "raw_success": "57.0%",
+      "static_success": "68.4%",
+      "veyra_success": "90.8%",
+      "veyra_lift_vs_static_pp": "+22.4pp",
+      "replans_raw": 1.22,
+      "replans_veyra": 0.0
+    },
+    "25": {
+      "catalog_tools": 25,
+      "prompt_tokens_est": 1925,
+      "raw_success": "57.0%",
+      "static_success": "68.4%",
+      "veyra_success": "90.8%",
+      "veyra_lift_vs_static_pp": "+22.4pp",
+      "replans_raw": 1.26,
+      "replans_veyra": 0.0
+    },
+    "50": {
+      "catalog_tools": 50,
+      "prompt_tokens_est": 3050,
+      "raw_success": "57.0%",
+      "static_success": "68.4%",
+      "veyra_success": "90.8%",
+      "veyra_lift_vs_static_pp": "+22.4pp",
+      "replans_raw": 1.32,
+      "replans_veyra": 0.0
+    },
+    "100": {
+      "catalog_tools": 100,
+      "prompt_tokens_est": 5300,
+      "raw_success": "43.0%",
+      "static_success": "58.6%",
+      "veyra_success": "88.7%",
+      "veyra_lift_vs_static_pp": "+30.1pp",
+      "replans_raw": 1.45,
+      "replans_veyra": 0.0
+    },
+    "250": {
+      "catalog_tools": 250,
+      "prompt_tokens_est": 12050,
+      "raw_success": "43.0%",
+      "static_success": "58.6%",
+      "veyra_success": "88.7%",
+      "veyra_lift_vs_static_pp": "+30.1pp",
+      "replans_raw": 1.82,
+      "replans_veyra": 0.0
+    },
+    "500": {
+      "catalog_tools": 500,
+      "prompt_tokens_est": 23300,
+      "raw_success": "43.0%",
+      "static_success": "58.6%",
+      "veyra_success": "88.7%",
+      "veyra_lift_vs_static_pp": "+30.1pp",
+      "replans_raw": 2.45,
+      "replans_veyra": 0.0
+    },
+    "1000": {
+      "catalog_tools": 1000,
+      "prompt_tokens_est": 45800,
+      "raw_success": "29.0%",
+      "static_success": "48.8%",
+      "veyra_success": "86.6%",
+      "veyra_lift_vs_static_pp": "+37.8pp",
+      "replans_raw": 3.7,
+      "replans_veyra": 0.0
+    }
+  },
+  "phase_58_and_59_large_catalog_scalability": {
+    "10": {
+      "n_candidates": 10,
+      "latency_p50_us": 23.7,
+      "latency_p95_us": 46.3,
+      "latency_p99_us": 78.0,
+      "latency_p50_ms": 0.0237,
+      "throughput_decisions_per_sec": 42194,
+      "catalog_memory_kb": 1.9,
+      "target_sub_millisecond_met": true
+    },
+    "50": {
+      "n_candidates": 50,
+      "latency_p50_us": 23.3,
+      "latency_p95_us": 30.5,
+      "latency_p99_us": 43.2,
+      "latency_p50_ms": 0.0233,
+      "throughput_decisions_per_sec": 42918,
+      "catalog_memory_kb": 9.2,
+      "target_sub_millisecond_met": true
+    },
+    "100": {
+      "n_candidates": 100,
+      "latency_p50_us": 23.8,
+      "latency_p95_us": 34.9,
+      "latency_p99_us": 51.4,
+      "latency_p50_ms": 0.0238,
+      "throughput_decisions_per_sec": 42016,
+      "catalog_memory_kb": 18.5,
+      "target_sub_millisecond_met": true
+    },
+    "250": {
+      "n_candidates": 250,
+      "latency_p50_us": 23.3,
+      "latency_p95_us": 28.7,
+      "latency_p99_us": 36.0,
+      "latency_p50_ms": 0.0233,
+      "throughput_decisions_per_sec": 42918,
+      "catalog_memory_kb": 46.1,
+      "target_sub_millisecond_met": true
+    },
+    "500": {
+      "n_candidates": 500,
+      "latency_p50_us": 22.2,
+      "latency_p95_us": 24.3,
+      "latency_p99_us": 34.8,
+      "latency_p50_ms": 0.0222,
+      "throughput_decisions_per_sec": 45045,
+      "catalog_memory_kb": 92.0,
+      "target_sub_millisecond_met": true
+    },
+    "1000": {
+      "n_candidates": 1000,
+      "latency_p50_us": 27.7,
+      "latency_p95_us": 38.9,
+      "latency_p99_us": 77.0,
+      "latency_p50_ms": 0.0277,
+      "throughput_decisions_per_sec": 36101,
+      "catalog_memory_kb": 184.4,
+      "target_sub_millisecond_met": true
+    },
+    "5000": {
+      "n_candidates": 5000,
+      "latency_p50_us": 70.0,
+      "latency_p95_us": 84.6,
+      "latency_p99_us": 95.9,
+      "latency_p50_ms": 0.07,
+      "throughput_decisions_per_sec": 14285,
+      "catalog_memory_kb": 919.8,
+      "target_sub_millisecond_met": true
+    },
+    "10000": {
+      "n_candidates": 10000,
+      "latency_p50_us": 118.9,
+      "latency_p95_us": 178.8,
+      "latency_p99_us": 178.8,
+      "latency_p50_ms": 0.1189,
+      "throughput_decisions_per_sec": 8410,
+      "catalog_memory_kb": 1841.0,
+      "target_sub_millisecond_met": true
+    },
+    "50000": {
+      "n_candidates": 50000,
+      "latency_p50_us": 696.7,
+      "latency_p95_us": 842.5,
+      "latency_p99_us": 842.5,
+      "latency_p50_ms": 0.6967,
+      "throughput_decisions_per_sec": 1435,
+      "catalog_memory_kb": 9223.0,
+      "target_sub_millisecond_met": true
+    },
+    "100000": {
+      "n_candidates": 100000,
+      "latency_p50_us": 1123.5,
+      "latency_p95_us": 1695.2,
+      "latency_p99_us": 1695.2,
+      "latency_p50_ms": 1.1235,
+      "throughput_decisions_per_sec": 890,
+      "catalog_memory_kb": 18360.3,
+      "target_sub_millisecond_met": false
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "public_505_local_encoders": {
+    "n": 505,
+    "n_tools": 101,
+    "hash_dense": {
+      "recall@1": 0.435644,
+      "recall@1_count": 220,
+      "recall@5": 0.689109,
+      "recall@10": 0.784158,
+      "recall@20": 0.865347
+    },
+    "minilm": {
+      "recall@1": 0.756436,
+      "recall@1_count": 382,
+      "recall@5": 0.956436,
+      "recall@10": 0.982178,
+      "recall@20": 0.994059
+    },
+    "note": "Same embedding_document layout as the paper (name, taxonomy, purpose, examples). MiniLM is not gemini-embedding-001; a gap vs 95.6% is an encoder gap.",
+    "minilm_vs_hash_mcnemar": {
+      "b_a_correct_b_wrong": 201,
+      "c_b_correct_a_wrong": 39,
+      "chi2_cc": 108.0042,
+      "exact_p_approx": 0.0
+    }
+  },
+  "v2_document_expansion": {
+    "minilm_plain": {
+      "recall@1": 0.325,
+      "recall@1_ci95": [
+        0.225,
+        0.45
+      ],
+      "recall@5": 0.725,
+      "recall@10": 0.8375,
+      "recall@20": 0.8875,
+      "n": 80,
+      "multi_defensible_share": 0.275,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 0.6736,
+        "coverage": 0.0125,
+        "precision": 1.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 0.6736,
+        "coverage": 0.0125,
+        "precision": 1.0
+      }
+    },
+    "minilm_expanded": {
+      "recall@1": 0.4,
+      "recall@1_ci95": [
+        0.3,
+        0.5125
+      ],
+      "recall@5": 0.75,
+      "recall@10": 0.8125,
+      "recall@20": 0.875,
+      "n": 80,
+      "multi_defensible_share": 0.2,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 0.4793,
+        "coverage": 0.0375,
+        "precision": 1.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 0.4793,
+        "coverage": 0.0375,
+        "precision": 1.0
+      }
+    },
+    "mcnemar_expanded_vs_plain": {
+      "b_a_correct_b_wrong": 8,
+      "c_b_correct_a_wrong": 2,
+      "chi2_cc": 2.5,
+      "exact_p_approx": 0.109375
+    },
+    "provenance": "synthetic_examples from name/description templates; not test queries"
+  },
+  "five_fold_margin": {
+    "p90": {
+      "target_precision": 0.9,
+      "pooled_coverage": 0.15,
+      "pooled_precision": 0.9167,
+      "n_test_pooled": 80,
+      "n_covered": 12,
+      "n_correct_when_covered": 11
+    },
+    "p95": {
+      "target_precision": 0.95,
+      "pooled_coverage": 0.1375,
+      "pooled_precision": 0.9091,
+      "n_test_pooled": 80,
+      "n_covered": 11,
+      "n_correct_when_covered": 10
+    }
+  },
+  "poison_heldout_templates": {
+    "decoy": "diceRoll",
+    "payload_source": "synthetic_examples of other tools (not test queries)",
+    "n": 79,
+    "hijack": {
+      "minilm": 0.0,
+      "bm25": 0.0253,
+      "both_agree": 0.0,
+      "minilm_after_length_flag": 0.0
+    },
+    "length_flagged_decoy": true,
+    "clean_minilm_r1": 0.3165,
+    "clean_minilm_r1_after_length_drop": 0.3165
+  },
+  "not_done": [
+    "bge/e5/gte (not in local HF cache; not downloaded this run unless SORO_DOWNLOAD_ENCODERS=1)",
+    "MS MARCO cross-encoder (cached model is NLI)",
+    "independent annotator / v2b 300-query two-writer set",
+    "Qwen3.5-0.8B-Base TDM zero-shot (separate from Kev)",
+    "LiveMCPBench 527-tool catalog"
+  ],
+  "kev": {
+    "n": 80,
+    "k": 8,
+    "unconditional_r1": 0.3375,
+    "shortlist_contains_gold": 0.8125,
+    "r1_given_gold_in_shortlist": 0.4154,
+    "minilm_top1": 0.325,
+    "mcnemar_vs_minilm_top1": {
+      "b_a_correct_b_wrong": 14,
+      "c_b_correct_a_wrong": 13,
+      "chi2_cc": 0.0,
+      "exact_p_approx": 1.0
+    },
+    "option_order_flip_rate": 0.35,
+    "perm_comparisons": 80,
+    "ms_per_query": 25529.8,
+    "hot_path": false
+  }
+}

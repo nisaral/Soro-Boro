@@ -1,0 +1,2602 @@
+[
+  {
+    "task_id": "cont300_scorecard_001",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_flawed_stale_vs_fresh_001",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_001",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_001",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_002",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_002",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_002",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_002",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_003",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_flawed_tenant_mismatch_003",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_003",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_003",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_004",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_resource_scope_mismatch_004",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_004",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_004",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_005",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_005",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_005",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_005",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_006",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_flawed_consistency_mismatch_006",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_006",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_006",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_007",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_flawed_result_schema_mismatch_007",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_007",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_007",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_008",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_flawed_output_semantics_mismatch_008",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_008",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_008",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_009",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_flawed_hidden_dependency_mismatch_009",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_009",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_009",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_010",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_flawed_unknown_state_lost_ack_010",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_010",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_010",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_011",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_flawed_partial_mutation_011",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_011",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_011",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_012",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_flawed_degraded_endpoints_012",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_012",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_012",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_013",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_flawed_transient_timeout_013",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_013",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_013",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_014",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_flawed_stale_vs_fresh_014",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_014",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_014",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_015",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_015",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_015",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_015",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_016",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_flawed_tenant_mismatch_016",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_016",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_016",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_017",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_flawed_resource_scope_mismatch_017",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_017",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_017",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_018",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_018",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_018",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_018",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_019",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_consistency_mismatch_019",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_019",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_019",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_020",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_flawed_result_schema_mismatch_020",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_020",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_020",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_021",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_flawed_output_semantics_mismatch_021",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_021",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_021",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_022",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_flawed_hidden_dependency_mismatch_022",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_022",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_022",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_023",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_flawed_unknown_state_lost_ack_023",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_023",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_023",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_024",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_flawed_partial_mutation_024",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_024",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_024",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_025",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_flawed_degraded_endpoints_025",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_025",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_025",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_026",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_flawed_transient_timeout_026",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_026",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_026",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_027",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_flawed_stale_vs_fresh_027",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_027",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_027",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_028",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_028",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_028",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_028",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_029",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_flawed_tenant_mismatch_029",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_029",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_029",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_030",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_flawed_resource_scope_mismatch_030",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_030",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_030",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_031",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_031",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_031",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_031",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_032",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_flawed_consistency_mismatch_032",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_032",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_032",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_033",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_flawed_result_schema_mismatch_033",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_033",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_033",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_034",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_output_semantics_mismatch_034",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_034",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_034",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_035",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_flawed_hidden_dependency_mismatch_035",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_035",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_035",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_036",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_flawed_unknown_state_lost_ack_036",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_036",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_036",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_037",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_flawed_partial_mutation_037",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_037",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_037",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_038",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_flawed_degraded_endpoints_038",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_038",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_038",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_039",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_flawed_transient_timeout_039",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_039",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_039",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_040",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_flawed_stale_vs_fresh_040",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_040",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_040",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_041",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_041",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_041",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_041",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_042",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_flawed_tenant_mismatch_042",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_042",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_042",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_043",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_flawed_resource_scope_mismatch_043",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_043",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_043",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_044",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_044",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_044",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_044",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_045",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_flawed_consistency_mismatch_045",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_045",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_045",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_046",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_flawed_result_schema_mismatch_046",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_046",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_046",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_047",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_flawed_output_semantics_mismatch_047",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_047",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_047",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_048",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_flawed_hidden_dependency_mismatch_048",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_048",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_048",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_049",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_unknown_state_lost_ack_049",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_049",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_049",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_050",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_flawed_partial_mutation_050",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_050",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_050",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_051",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_flawed_degraded_endpoints_051",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_051",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_051",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_052",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_flawed_transient_timeout_052",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_052",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_052",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_053",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_flawed_stale_vs_fresh_053",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_053",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_053",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_054",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_054",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_054",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_054",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_055",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_flawed_tenant_mismatch_055",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_055",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_055",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_056",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_flawed_resource_scope_mismatch_056",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_056",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_056",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_057",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_057",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_057",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_057",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_058",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_flawed_consistency_mismatch_058",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_058",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_058",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_059",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_flawed_result_schema_mismatch_059",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_059",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_059",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_060",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_flawed_output_semantics_mismatch_060",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_060",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_060",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_061",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_flawed_hidden_dependency_mismatch_061",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_061",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_061",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_062",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_flawed_unknown_state_lost_ack_062",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_062",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_062",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_063",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_flawed_partial_mutation_063",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_063",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_063",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_064",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_degraded_endpoints_064",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_064",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_064",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_065",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_flawed_transient_timeout_065",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_065",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_065",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_066",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_flawed_stale_vs_fresh_066",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_066",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_066",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_067",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_067",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_067",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_067",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_068",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_flawed_tenant_mismatch_068",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_068",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_068",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_069",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_flawed_resource_scope_mismatch_069",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_069",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_069",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_070",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_070",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_070",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_070",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_071",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_flawed_consistency_mismatch_071",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_071",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_071",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_072",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_flawed_result_schema_mismatch_072",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_072",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_072",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_073",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_flawed_output_semantics_mismatch_073",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_073",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_073",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_074",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_flawed_hidden_dependency_mismatch_074",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_074",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_074",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_075",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_flawed_unknown_state_lost_ack_075",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_075",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_075",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_076",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_flawed_partial_mutation_076",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_076",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_076",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_077",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_flawed_degraded_endpoints_077",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_077",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_077",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_078",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_flawed_transient_timeout_078",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_078",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_078",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_079",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_stale_vs_fresh_079",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_079",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_079",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_080",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_080",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_080",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_080",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_081",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_flawed_tenant_mismatch_081",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_081",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_081",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_082",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_flawed_resource_scope_mismatch_082",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_082",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_082",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_083",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_083",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_083",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_083",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_084",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_flawed_consistency_mismatch_084",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_084",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_084",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_085",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_flawed_result_schema_mismatch_085",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_085",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_085",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_086",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_flawed_output_semantics_mismatch_086",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_086",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_search_engine_replica_valid_086",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_087",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_flawed_hidden_dependency_mismatch_087",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_087",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_vector_db_replica_valid_087",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_088",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_flawed_unknown_state_lost_ack_088",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_088",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_security_audit_replica_valid_088",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_089",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_flawed_partial_mutation_089",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_089",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_ci_cd_pipeline_replica_valid_089",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_090",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_flawed_degraded_endpoints_090",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_090",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_iot_telemetry_replica_valid_090",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_091",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_flawed_transient_timeout_091",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_091",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_crm_replica_valid_091",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_092",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_flawed_stale_vs_fresh_092",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_092",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_finance_replica_valid_092",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_093",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_093",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_093",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_payment_replica_valid_093",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_094",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_flawed_tenant_mismatch_094",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_094",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_healthcare_replica_valid_094",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_095",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_flawed_resource_scope_mismatch_095",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_095",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_cloud_compute_replica_valid_095",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_096",
+    "system_id": "fair_static",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_096",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_096",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_object_storage_replica_valid_096",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_097",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_flawed_consistency_mismatch_097",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_097",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sql_database_replica_valid_097",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_098",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_flawed_result_schema_mismatch_098",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_098",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_nosql_store_replica_valid_098",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_099",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_flawed_output_semantics_mismatch_099",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_099",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_email_dispatch_replica_valid_099",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  },
+  {
+    "task_id": "cont300_scorecard_100",
+    "system_id": "fair_static",
+    "terminal_status": "failure",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_flawed_hidden_dependency_mismatch_100",
+        "is_unsafe": true
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.002
+  },
+  {
+    "task_id": "cont300_scorecard_100",
+    "system_id": "veyra",
+    "terminal_status": "success",
+    "events": [
+      {
+        "tool": "scorecard_v2_sms_gateway_replica_valid_100",
+        "is_unsafe": false
+      }
+    ],
+    "replans": 0,
+    "latency_ms": 0.027
+  }
+]

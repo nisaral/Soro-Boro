@@ -1,5 +1,116 @@
 import { Gate1Result, TraceEvent, CandidateAction, ExecutionNode } from "./types";
 
+export interface M4SafetyResult {
+  target: string;
+  trials: number;
+  raw_retry_duplicates: number;
+  raw_retry_rate: number;
+  soro_duplicates: number;
+  soro_rate: number;
+  soro_safe_recovery_rate: number;
+  statistical_bound: string;
+}
+
+export const M4_REAL_FAULT_DATA: M4SafetyResult[] = [
+  {
+    target: "SQLite Database Server (Real disk WAL mode, SQLite 3.49.1)",
+    trials: 1000,
+    raw_retry_duplicates: 700,
+    raw_retry_rate: 70.0,
+    soro_duplicates: 0,
+    soro_rate: 0.0,
+    soro_safe_recovery_rate: 70.0,
+    statistical_bound: "95% UCB <= 0.43% (700 at-risk trials)",
+  },
+  {
+    target: "Stdio MCP Audit Server (INSERT INTO audit_events via JSON-RPC)",
+    trials: 1000,
+    raw_retry_duplicates: 700,
+    raw_retry_rate: 70.0,
+    soro_duplicates: 0,
+    soro_rate: 0.0,
+    soro_safe_recovery_rate: 70.0,
+    statistical_bound: "95% UCB <= 0.43% (700 at-risk trials)",
+  },
+  {
+    target: "Local HTTP REST Ledger Service (Real SO_LINGER TCP RST Injected)",
+    trials: 1000,
+    raw_retry_duplicates: 700,
+    raw_retry_rate: 70.0,
+    soro_duplicates: 0,
+    soro_rate: 0.0,
+    soro_safe_recovery_rate: 70.0,
+    statistical_bound: "95% UCB <= 0.43% (700 at-risk trials)",
+  },
+];
+
+export interface M2M3ConformalResult {
+  metric: string;
+  target_nominal: string;
+  measured_empirical: string;
+  split_count: number;
+  detail: string;
+}
+
+export const M2_M3_CONFORMAL_DATA: M2M3ConformalResult[] = [
+  {
+    metric: "Mondrian Conformal Write Coverage",
+    target_nominal: ">= 95.0%",
+    measured_empirical: "95.63% (std 3.03%)",
+    split_count: 1000,
+    detail: "Class-conditional calibration on queries whose gold is a write tool; temperature fit on separate split.",
+  },
+  {
+    metric: "Mondrian Conformal Read Coverage",
+    target_nominal: ">= 90.0%",
+    measured_empirical: "90.50% (std 4.64%)",
+    split_count: 1000,
+    detail: "Class-conditional calibration on read-tool queries; allows small prediction sets.",
+  },
+  {
+    metric: "MiniLM Candidate Compression",
+    target_nominal: ">= 92.5% Coverage",
+    measured_empirical: "Mean Set Size 2.07 (vs 5.0 fixed-k)",
+    split_count: 1000,
+    detail: "On MiniLM where top-1 recall is 74.7%, conformal LAC achieves 92.5% coverage at size 2.07 vs size 5.0 for fixed-k.",
+  },
+  {
+    metric: "Write Action Confirmation Gate",
+    target_nominal: "100% Gated",
+    measured_empirical: "100.0% Gated",
+    split_count: 1000,
+    detail: "Auto-execute allowed only for READ_ONLY singletons. All WRITE singletons require explicit confirmation step.",
+  },
+];
+
+export interface ContractAuditResult {
+  category: string;
+  count: number;
+  percentage: number;
+  description: string;
+}
+
+export const CONTRACT_AUDIT_DATA: ContractAuditResult[] = [
+  {
+    category: "Exact Contract Matches",
+    count: 57,
+    percentage: 57.0,
+    description: "Inferred verb heuristics matched ground-truth execution contract exactly under frozen guidelines.",
+  },
+  {
+    category: "Safe-Direction Conservative Errors",
+    count: 43,
+    percentage: 43.0,
+    description: "Inferred more restrictive class (e.g. write_file treated as mutation), requiring harmless confirmation.",
+  },
+  {
+    category: "Unsafe-Direction Errors",
+    count: 0,
+    percentage: 0.0,
+    description: "Zero mutating operations were misclassified as read-only. Zero unsafe duplicate mutations permitted.",
+  },
+];
+
 export interface ToolMisuseBenchmarkResult {
   arm: string;
   name: string;
@@ -51,8 +162,8 @@ export const TOOLMISUSE_BENCHMARK_DATA: ToolMisuseBenchmarkResult[] = [
     description: "Injects structured JSON errors into prompt; agent avoids crashes but still burns tokens on unnecessary re-plans.",
   },
   {
-    arm: "veyra",
-    name: "Agent + Veyra (Boundary Layer)",
+    arm: "soro_boro",
+    name: "Agent + Soro-Boro (Boundary Layer)",
     task_success_rate: 41.7,
     boundary_recovery_rate: 50.0,
     unsafe_retries: 0,
@@ -60,7 +171,7 @@ export const TOOLMISUSE_BENCHMARK_DATA: ToolMisuseBenchmarkResult[] = [
     total_tool_calls: 75,
     latency_ms: 16.8,
     status: "WINNER",
-    description: "Safely normalizes arguments and retries idempotent transient errors at the boundary. +25pp success, 15 re-plans eliminated.",
+    description: "Safely normalizes arguments, reuses stable operation identity, and reconciles state at the boundary. +25pp success, 15 re-plans eliminated.",
   },
 ];
 
@@ -74,7 +185,7 @@ export const DEMO_EXECUTION_NODES: ExecutionNode[] = [
     probabilities: [
       { name: "get_invoice", prob: 1.0, allowed: true },
     ],
-    policy_constraints: [{ rule: "Boundary Intercept", status: "passed", detail: "Proposed tool call captured by Veyra middleware" }],
+    policy_constraints: [{ rule: "Boundary Intercept", status: "passed", detail: "Proposed tool call captured by Soro-Boro middleware" }],
     selected_action: "PROPOSAL(tool='get_invoice', args={'invoice_id': '2042'})",
     cost: 0.0,
     result: { status: "pending", observation: "Received raw tool call proposal from agent", verification: "Boundary active" },
@@ -132,7 +243,7 @@ export const DEMO_EXECUTION_NODES: ExecutionNode[] = [
     label: "Normalizer",
     subtitle: "Safe Coercion",
     inputs: { raw_args: { invoice_id: "2042", status: "PAID" }, schema: { invoice_id: "integer", status: ["paid", "pending"] } },
-    decision: { model: "VeyraSafeNormalizer", action_type: "NORMALIZE_ARGS", target: "Arguments", confidence: 1.0, latency_ms: 0.5 },
+    decision: { model: "SoroBoroSafeNormalizer", action_type: "NORMALIZE_ARGS", target: "Arguments", confidence: 1.0, latency_ms: 0.5 },
     probabilities: [
       { name: "coerce '2042' -> 2042 (int)", prob: 1.0, allowed: true },
       { name: "normalize 'PAID' -> 'paid' (enum)", prob: 1.0, allowed: true },
@@ -186,7 +297,7 @@ export const DEMO_EXECUTION_NODES: ExecutionNode[] = [
     policy_constraints: [{ rule: "Sensitive Key Redaction", status: "passed", detail: "Redacted auth tokens and credentials automatically" }],
     selected_action: "RECORD_TRACE(decision='retried_and_succeeded', safe=True)",
     cost: 0.0,
-    result: { status: "success", observation: "Trace recorded to memory and runs/traces.jsonl for 'veyra audit'", verification: "Complete" },
+    result: { status: "success", observation: "Trace recorded to memory and runs/soro_boro_wal.jsonl for 'soro-boro audit'", verification: "Complete" },
   },
 ];
 
@@ -237,8 +348,8 @@ export const DEMO_TRACE_EVENTS: TraceEvent[] = [
     id: "evt-102",
     timestamp: "09:41:02.105",
     type: "POLICY_EVAL",
-    summary: "Veyra normalized argument: '2042' -> 2042 (int)",
-    harness: "veyra-boundary",
+    summary: "Soro-Boro normalized argument: '2042' -> 2042 (int)",
+    harness: "soro-boro-boundary",
     details: { corrections: ["Coerced invoice_id to int"] },
     cost_delta: 0.0,
   },
@@ -247,7 +358,7 @@ export const DEMO_TRACE_EVENTS: TraceEvent[] = [
     timestamp: "09:41:02.124",
     type: "FAILURE",
     summary: "Attempt 1 failed: HTTP 503 upstream timeout",
-    harness: "veyra-boundary",
+    harness: "soro-boro-boundary",
     details: { kind: "transient_error", retryable: true, idempotent: true },
     cost_delta: 0.0,
   },
@@ -256,7 +367,7 @@ export const DEMO_TRACE_EVENTS: TraceEvent[] = [
     timestamp: "09:41:02.145",
     type: "SUCCESS",
     summary: "Attempt 2 succeeded via safe bounded retry. Returned invoice $150.00.",
-    harness: "veyra-boundary",
+    harness: "soro-boro-boundary",
     details: { decision: "retried_and_succeeded", safe: true },
     cost_delta: 0.0,
   },

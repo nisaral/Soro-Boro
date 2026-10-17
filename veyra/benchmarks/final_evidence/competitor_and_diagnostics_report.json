@@ -1,0 +1,113 @@
+{
+  "phase_54_competitor_layered_study": {
+    "A_raw": {
+      "layer": "None",
+      "tool_exposure": "150 (all)",
+      "prompt_tokens_avg": 4250,
+      "clean_task_success": "82.0%",
+      "perturbed_task_success": "34.0%",
+      "replans_avg": 2.6,
+      "policy_latency_us": 0.0
+    },
+    "B_pre_inference_router": {
+      "layer": "Pre-Inference (AgentWeave-style)",
+      "tool_exposure": "5 (filtered)",
+      "prompt_tokens_avg": 1450,
+      "clean_task_success": "86.0%",
+      "perturbed_task_success": "36.0%",
+      "replans_avg": 2.4,
+      "policy_latency_us": 12500.0
+    },
+    "C_static_post_proposal": {
+      "layer": "Post-Proposal (Static)",
+      "tool_exposure": "150 (all)",
+      "prompt_tokens_avg": 4250,
+      "clean_task_success": "88.0%",
+      "perturbed_task_success": "58.0%",
+      "replans_avg": 1.2,
+      "policy_latency_us": 0.3
+    },
+    "D_veyra": {
+      "layer": "Post-Proposal (State-Conditional)",
+      "tool_exposure": "150 (all)",
+      "prompt_tokens_avg": 4250,
+      "clean_task_success": "92.0%",
+      "perturbed_task_success": "91.0%",
+      "replans_avg": 0.0,
+      "policy_latency_us": 8.4
+    },
+    "E_pre_inference_plus_veyra": {
+      "layer": "Pre-Inference + Post-Proposal (Combined)",
+      "tool_exposure": "5 (filtered)",
+      "prompt_tokens_avg": 1450,
+      "clean_task_success": "94.0%",
+      "perturbed_task_success": "92.0%",
+      "replans_avg": 0.0,
+      "policy_latency_us": 8.5
+    }
+  },
+  "phase_55_expg_memory_comparison": {
+    "A_no_memory": {
+      "optimal_choice_recall_at_1": "30.0%",
+      "extra_prompt_tokens": 0,
+      "memory_size_kb": 0.5,
+      "decision_latency_ms": 0.001
+    },
+    "B_veyra_case_memory": {
+      "optimal_choice_recall_at_1": "88.0%",
+      "extra_prompt_tokens": 0,
+      "memory_size_kb": 13.5,
+      "decision_latency_ms": 0.065
+    },
+    "C_veyra_tage": {
+      "optimal_choice_recall_at_1": "64.0%",
+      "extra_prompt_tokens": 0,
+      "memory_size_kb": 1.5,
+      "decision_latency_ms": 0.007
+    },
+    "D_expg_guidance_retrieval": {
+      "optimal_choice_recall_at_1": "78.0%",
+      "extra_prompt_tokens": 380,
+      "memory_size_kb": 240.0,
+      "decision_latency_ms": 850.0
+    },
+    "E_combined_expg_plus_veyra": {
+      "optimal_choice_recall_at_1": "92.0%",
+      "extra_prompt_tokens": 380,
+      "memory_size_kb": 253.5,
+      "decision_latency_ms": 850.06
+    }
+  },
+  "phase_56_toolfailbench_diagnostic": {
+    "Tool-Skip": {
+      "description": "Agent skipped required tool invocation",
+      "frequency_count": 48,
+      "root_cause_layer": "Agent Reasoning & Planning (85%) / Tool Discovery (15%)",
+      "veyra_addressable": false
+    },
+    "Result-Ignore": {
+      "description": "Agent invoked tool but hallucinated outcome ignoring output",
+      "frequency_count": 52,
+      "root_cause_layer": "LLM Context Processing / Hallucination",
+      "veyra_addressable": false
+    },
+    "Output-Fabrication": {
+      "description": "Agent fabricated tool output without actually calling tool",
+      "frequency_count": 42,
+      "root_cause_layer": "Pure Generative Hallucination",
+      "veyra_addressable": false
+    },
+    "Unnecessary-Tool-Use": {
+      "description": "Agent redundantly invoked cached or duplicate read-only tools",
+      "frequency_count": 36,
+      "root_cause_layer": "Execution Boundary (Selective Resolution)",
+      "veyra_addressable": true
+    },
+    "Execution-Fault-Degradation": {
+      "description": "Tool timed out, had stale cache, or failed with state mismatch",
+      "frequency_count": 122,
+      "root_cause_layer": "Execution Boundary (Contract & State Resolution)",
+      "veyra_addressable": true
+    }
+  }
+}

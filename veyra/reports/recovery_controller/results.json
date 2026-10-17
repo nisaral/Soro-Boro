@@ -1,0 +1,47 @@
+{
+  "benchmark": "RecoveryControllerHeterogeneousBenchmark",
+  "arms": {
+    "A0_raw": {
+      "safe_recovery_rate": "33.3%",
+      "duplicate_effect_rate": "66.7%",
+      "unnecessary_abstention_rate": "0.0%",
+      "total_duplicates": 4,
+      "total_recovered": 2
+    },
+    "A1_naive_retry": {
+      "safe_recovery_rate": "33.3%",
+      "duplicate_effect_rate": "66.7%",
+      "unnecessary_abstention_rate": "0.0%",
+      "total_duplicates": 4,
+      "total_recovered": 2
+    },
+    "A2_verify_before_retry": {
+      "safe_recovery_rate": "50.0%",
+      "duplicate_effect_rate": "50.0%",
+      "unnecessary_abstention_rate": "0.0%",
+      "total_duplicates": 3,
+      "total_recovered": 3
+    },
+    "A3_idempotency": {
+      "safe_recovery_rate": "50.0%",
+      "duplicate_effect_rate": "50.0%",
+      "unnecessary_abstention_rate": "0.0%",
+      "total_duplicates": 3,
+      "total_recovered": 3
+    },
+    "A4_current_veyra": {
+      "safe_recovery_rate": "33.3%",
+      "duplicate_effect_rate": "0.0%",
+      "unnecessary_abstention_rate": "50.0%",
+      "total_duplicates": 0,
+      "total_recovered": 2
+    },
+    "A5_belief_state_veyra": {
+      "safe_recovery_rate": "83.3%",
+      "duplicate_effect_rate": "0.0%",
+      "unnecessary_abstention_rate": "0.0%",
+      "total_duplicates": 0,
+      "total_recovered": 5
+    }
+  }
+}

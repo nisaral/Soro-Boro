@@ -10,19 +10,19 @@ export default function Footer() {
           {/* Brand Col */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white font-mono font-bold text-xs">
-                V
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-white font-mono font-bold text-xs">
+                SB
               </div>
               <span className="font-semibold text-slate-900 tracking-tight text-base">
-                Veyra
+                Soro-Boro
               </span>
             </div>
             <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
-              An open-source adaptive agent harness that decides what an agent should do next under cost, risk, and execution constraints.
+              Execution boundary for consequential AI agent writes. Prevents unsafe retries, reuses stable operation identity, and fails closed when state is ambiguous.
             </p>
             <div className="flex items-center gap-2 pt-1 text-[11px] font-mono text-slate-400">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Go Execution Kernel + Python Sidecar · Apache-2.0
+              soro-boro · Apache-2.0 · Python SDK
             </div>
           </div>
 
@@ -53,15 +53,15 @@ export default function Footer() {
             <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Open Source</h4>
             <ul className="space-y-1.5 text-xs">
               <li><Link href="/github" className="hover:text-slate-900 transition-colors flex items-center gap-1">GitHub Repository <ExternalLink className="w-3 h-3 text-slate-400" /></Link></li>
-              <li><a href="https://github.com/nisaral/EB-JEPA/blob/main/veyra/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">Apache-2.0 License</a></li>
-              <li><a href="https://github.com/nisaral/EB-JEPA/blob/main/veyra/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">Contributing</a></li>
-              <li><a href="https://github.com/nisaral/EB-JEPA/blob/main/veyra/SECURITY.md" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">Security Policy</a></li>
+              <li><a href="https://github.com/nisaral/EB-JEPA/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">Apache-2.0 License</a></li>
+              <li><a href="https://github.com/nisaral/EB-JEPA/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">Contributing</a></li>
+              <li><a href="https://github.com/nisaral/EB-JEPA/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">Security Policy</a></li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400">
-          <div>© {new Date().getFullYear()} Veyra Open Source Project. Released under Apache-2.0.</div>
+          <div>© {new Date().getFullYear()} Soro-Boro. Apache-2.0. Published as soro-boro.</div>
           <div className="mt-2 sm:mt-0 font-mono">
             State → Decision → Policy → Action → Observation → Verification
           </div>

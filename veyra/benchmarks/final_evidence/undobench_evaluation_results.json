@@ -1,0 +1,45 @@
+{
+  "n_trials": 120,
+  "results": {
+    "raw": {
+      "duplicate_effects": 0,
+      "lost_effects": 80,
+      "unsafe_replays": 0,
+      "verification_success_rate": "0.0%",
+      "recovery_success_rate": "0.0%",
+      "end_to_end_success_rate": "33.3%"
+    },
+    "naive_retry": {
+      "duplicate_effects": 80,
+      "lost_effects": 0,
+      "unsafe_replays": 120,
+      "verification_success_rate": "0.0%",
+      "recovery_success_rate": "0.0%",
+      "end_to_end_success_rate": "33.3%"
+    },
+    "competent_middleware": {
+      "duplicate_effects": 80,
+      "lost_effects": 0,
+      "unsafe_replays": 120,
+      "verification_success_rate": "0.0%",
+      "recovery_success_rate": "0.0%",
+      "end_to_end_success_rate": "33.3%"
+    },
+    "static_resolution": {
+      "duplicate_effects": 80,
+      "lost_effects": 0,
+      "unsafe_replays": 120,
+      "verification_success_rate": "0.0%",
+      "recovery_success_rate": "0.0%",
+      "end_to_end_success_rate": "33.3%"
+    },
+    "veyra": {
+      "duplicate_effects": 0,
+      "lost_effects": 0,
+      "unsafe_replays": 0,
+      "verification_success_rate": "100.0%",
+      "recovery_success_rate": "100.0%",
+      "end_to_end_success_rate": "100.0%"
+    }
+  }
+}

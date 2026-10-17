@@ -1,0 +1,29 @@
+{
+  "n_scorecard_tasks": 100,
+  "results": {
+    "raw_agent": {
+      "perturbed_task_success": "0.0%",
+      "intent_preservation_rate": "0.0%",
+      "unsafe_substitutions": 0,
+      "stale_substitutions": 0
+    },
+    "weak_static": {
+      "perturbed_task_success": "100.0%",
+      "intent_preservation_rate": "0.0%",
+      "unsafe_substitutions": 92,
+      "stale_substitutions": 8
+    },
+    "fair_static": {
+      "perturbed_task_success": "100.0%",
+      "intent_preservation_rate": "16.0%",
+      "unsafe_substitutions": 76,
+      "stale_substitutions": 8
+    },
+    "veyra": {
+      "perturbed_task_success": "100.0%",
+      "intent_preservation_rate": "100.0%",
+      "unsafe_substitutions": 0,
+      "stale_substitutions": 0
+    }
+  }
+}

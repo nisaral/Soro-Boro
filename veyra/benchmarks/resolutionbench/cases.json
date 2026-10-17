@@ -1,0 +1,6040 @@
+{
+  "benchmark": "ResolutionBench",
+  "version": "v0.1-groundtruth",
+  "total_cases": 100,
+  "category_counts": {
+    "A_exact_equivalent_tools": 20,
+    "B_parameter_aliases": 20,
+    "C_schema_compatible_transformations": 20,
+    "D_primary_to_declared_fallback_execution": 20,
+    "E_compound_failure_plus_alias_and_schema": 20
+  },
+  "cases": [
+    {
+      "case_id": "res_a_01",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "customer_lookup",
+      "instruction": "Execute customer_lookup for customer_id=1001",
+      "proposed_tool": "fetch_customer",
+      "proposed_arguments": {
+        "customer_id": 1001
+      },
+      "available_tools": [
+        {
+          "name": "get_customer",
+          "description": "Canonical tool for customer_lookup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "customer_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "customer_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_customer",
+        "equivalents": [
+          "fetch_customer",
+          "get_customer"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_customer",
+        "arguments": {
+          "customer_id": 1001
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_customer"
+        },
+        {
+          "tool": "update_get_customer"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_02",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "order_status",
+      "instruction": "Execute order_status for order_id=2001",
+      "proposed_tool": "query_order",
+      "proposed_arguments": {
+        "order_id": 2001
+      },
+      "available_tools": [
+        {
+          "name": "get_order",
+          "description": "Canonical tool for order_status",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "order_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_order",
+        "equivalents": [
+          "query_order",
+          "get_order"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_order",
+        "arguments": {
+          "order_id": 2001
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_order"
+        },
+        {
+          "tool": "update_get_order"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_03",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "file_reading",
+      "instruction": "Execute file_reading for path=/var/log/sys.log",
+      "proposed_tool": "read_file_content",
+      "proposed_arguments": {
+        "path": "/var/log/sys.log"
+      },
+      "available_tools": [
+        {
+          "name": "read_file",
+          "description": "Canonical tool for file_reading",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "read_file",
+        "equivalents": [
+          "read_file_content",
+          "read_file"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "read_file",
+        "arguments": {
+          "path": "/var/log/sys.log"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_read_file"
+        },
+        {
+          "tool": "update_read_file"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_04",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "inventory_check",
+      "instruction": "Execute inventory_check for sku=SKU-991",
+      "proposed_tool": "check_stock",
+      "proposed_arguments": {
+        "sku": "SKU-991"
+      },
+      "available_tools": [
+        {
+          "name": "get_inventory",
+          "description": "Canonical tool for inventory_check",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_inventory",
+        "equivalents": [
+          "check_stock",
+          "get_inventory"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_inventory",
+        "arguments": {
+          "sku": "SKU-991"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_inventory"
+        },
+        {
+          "tool": "update_get_inventory"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_05",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "telemetry_query",
+      "instruction": "Execute telemetry_query for metric_id=501",
+      "proposed_tool": "fetch_metrics",
+      "proposed_arguments": {
+        "metric_id": 501
+      },
+      "available_tools": [
+        {
+          "name": "get_telemetry",
+          "description": "Canonical tool for telemetry_query",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "metric_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "metric_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_telemetry",
+        "equivalents": [
+          "fetch_metrics",
+          "get_telemetry"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_telemetry",
+        "arguments": {
+          "metric_id": 501
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_telemetry"
+        },
+        {
+          "tool": "update_get_telemetry"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_06",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "document_search",
+      "instruction": "Execute document_search for query=agent boundary",
+      "proposed_tool": "search_papers",
+      "proposed_arguments": {
+        "query": "agent boundary"
+      },
+      "available_tools": [
+        {
+          "name": "search",
+          "description": "Canonical tool for document_search",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "search",
+        "equivalents": [
+          "search_papers",
+          "search"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "search",
+        "arguments": {
+          "query": "agent boundary"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_search"
+        },
+        {
+          "tool": "update_search"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_07",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "user_profile",
+      "instruction": "Execute user_profile for user_id=301",
+      "proposed_tool": "view_user",
+      "proposed_arguments": {
+        "user_id": 301
+      },
+      "available_tools": [
+        {
+          "name": "get_user",
+          "description": "Canonical tool for user_profile",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "user_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "user_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_user",
+        "equivalents": [
+          "view_user",
+          "get_user"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_user",
+        "arguments": {
+          "user_id": 301
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_user"
+        },
+        {
+          "tool": "update_get_user"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_08",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "invoice_fetch",
+      "instruction": "Execute invoice_fetch for invoice_num=401",
+      "proposed_tool": "download_invoice",
+      "proposed_arguments": {
+        "invoice_num": 401
+      },
+      "available_tools": [
+        {
+          "name": "get_invoice",
+          "description": "Canonical tool for invoice_fetch",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "invoice_num": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "invoice_num"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_invoice",
+        "equivalents": [
+          "download_invoice",
+          "get_invoice"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_invoice",
+        "arguments": {
+          "invoice_num": 401
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_invoice"
+        },
+        {
+          "tool": "update_get_invoice"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_09",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "node_health",
+      "instruction": "Execute node_health for node_id=node-alpha",
+      "proposed_tool": "ping_node",
+      "proposed_arguments": {
+        "node_id": "node-alpha"
+      },
+      "available_tools": [
+        {
+          "name": "check_health",
+          "description": "Canonical tool for node_health",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "node_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "node_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "check_health",
+        "equivalents": [
+          "ping_node",
+          "check_health"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "check_health",
+        "arguments": {
+          "node_id": "node-alpha"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_check_health"
+        },
+        {
+          "tool": "update_check_health"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_10",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "schedule_lookup",
+      "instruction": "Execute schedule_lookup for calendar_id=cal-01",
+      "proposed_tool": "list_events",
+      "proposed_arguments": {
+        "calendar_id": "cal-01"
+      },
+      "available_tools": [
+        {
+          "name": "get_schedule",
+          "description": "Canonical tool for schedule_lookup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "calendar_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "calendar_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_schedule",
+        "equivalents": [
+          "list_events",
+          "get_schedule"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_schedule",
+        "arguments": {
+          "calendar_id": "cal-01"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_schedule"
+        },
+        {
+          "tool": "update_get_schedule"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_11",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "weather_report",
+      "instruction": "Execute weather_report for city=London",
+      "proposed_tool": "get_weather",
+      "proposed_arguments": {
+        "city": "London"
+      },
+      "available_tools": [
+        {
+          "name": "weather_data_retriever",
+          "description": "Canonical tool for weather_report",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "weather_data_retriever",
+        "equivalents": [
+          "get_weather",
+          "weather_data_retriever"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "weather_data_retriever",
+        "arguments": {
+          "city": "London"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_weather_data_retriever"
+        },
+        {
+          "tool": "update_weather_data_retriever"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_12",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "token_balance",
+      "instruction": "Execute token_balance for account_id=801",
+      "proposed_tool": "query_balance",
+      "proposed_arguments": {
+        "account_id": 801
+      },
+      "available_tools": [
+        {
+          "name": "get_balance",
+          "description": "Canonical tool for token_balance",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "account_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_balance",
+        "equivalents": [
+          "query_balance",
+          "get_balance"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_balance",
+        "arguments": {
+          "account_id": 801
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_balance"
+        },
+        {
+          "tool": "update_get_balance"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_13",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "article_reader",
+      "instruction": "Execute article_reader for slug=intro-ai",
+      "proposed_tool": "fetch_article",
+      "proposed_arguments": {
+        "slug": "intro-ai"
+      },
+      "available_tools": [
+        {
+          "name": "read_article",
+          "description": "Canonical tool for article_reader",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "slug"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "read_article",
+        "equivalents": [
+          "fetch_article",
+          "read_article"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "read_article",
+        "arguments": {
+          "slug": "intro-ai"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_read_article"
+        },
+        {
+          "tool": "update_read_article"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_14",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "repo_commits",
+      "instruction": "Execute repo_commits for repo=veyra-core",
+      "proposed_tool": "list_commits",
+      "proposed_arguments": {
+        "repo": "veyra-core"
+      },
+      "available_tools": [
+        {
+          "name": "get_commit_history",
+          "description": "Canonical tool for repo_commits",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "repo": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "repo"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_commit_history",
+        "equivalents": [
+          "list_commits",
+          "get_commit_history"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_commit_history",
+        "arguments": {
+          "repo": "veyra-core"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_commit_history"
+        },
+        {
+          "tool": "update_get_commit_history"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_15",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "cluster_status",
+      "instruction": "Execute cluster_status for cluster_id=us-east-1",
+      "proposed_tool": "inspect_cluster",
+      "proposed_arguments": {
+        "cluster_id": "us-east-1"
+      },
+      "available_tools": [
+        {
+          "name": "get_cluster_status",
+          "description": "Canonical tool for cluster_status",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "cluster_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "cluster_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_cluster_status",
+        "equivalents": [
+          "inspect_cluster",
+          "get_cluster_status"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_cluster_status",
+        "arguments": {
+          "cluster_id": "us-east-1"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_cluster_status"
+        },
+        {
+          "tool": "update_get_cluster_status"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_16",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "package_info",
+      "instruction": "Execute package_info for pkg_name=pydantic",
+      "proposed_tool": "query_package",
+      "proposed_arguments": {
+        "pkg_name": "pydantic"
+      },
+      "available_tools": [
+        {
+          "name": "get_package_metadata",
+          "description": "Canonical tool for package_info",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "pkg_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "pkg_name"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_package_metadata",
+        "equivalents": [
+          "query_package",
+          "get_package_metadata"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_package_metadata",
+        "arguments": {
+          "pkg_name": "pydantic"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_package_metadata"
+        },
+        {
+          "tool": "update_get_package_metadata"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_17",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "audit_log",
+      "instruction": "Execute audit_log for session_id=sess-77",
+      "proposed_tool": "fetch_audit_records",
+      "proposed_arguments": {
+        "session_id": "sess-77"
+      },
+      "available_tools": [
+        {
+          "name": "get_audit_log",
+          "description": "Canonical tool for audit_log",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "session_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_audit_log",
+        "equivalents": [
+          "fetch_audit_records",
+          "get_audit_log"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_audit_log",
+        "arguments": {
+          "session_id": "sess-77"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_audit_log"
+        },
+        {
+          "tool": "update_get_audit_log"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_18",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "device_state",
+      "instruction": "Execute device_state for device_id=dev-881",
+      "proposed_tool": "query_device",
+      "proposed_arguments": {
+        "device_id": "dev-881"
+      },
+      "available_tools": [
+        {
+          "name": "get_device_state",
+          "description": "Canonical tool for device_state",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "device_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "device_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_device_state",
+        "equivalents": [
+          "query_device",
+          "get_device_state"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_device_state",
+        "arguments": {
+          "device_id": "dev-881"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_device_state"
+        },
+        {
+          "tool": "update_get_device_state"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_19",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "shipping_rate",
+      "instruction": "Execute shipping_rate for postal_code=98101",
+      "proposed_tool": "lookup_shipping",
+      "proposed_arguments": {
+        "postal_code": "98101"
+      },
+      "available_tools": [
+        {
+          "name": "get_shipping_rate",
+          "description": "Canonical tool for shipping_rate",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "postal_code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "postal_code"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_shipping_rate",
+        "equivalents": [
+          "lookup_shipping",
+          "get_shipping_rate"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_shipping_rate",
+        "arguments": {
+          "postal_code": "98101"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_shipping_rate"
+        },
+        {
+          "tool": "update_get_shipping_rate"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_a_20",
+      "category": "A",
+      "category_name": "exact_equivalent_tools",
+      "intended_capability": "ticket_details",
+      "instruction": "Execute ticket_details for ticket_id=1099",
+      "proposed_tool": "view_ticket",
+      "proposed_arguments": {
+        "ticket_id": 1099
+      },
+      "available_tools": [
+        {
+          "name": "get_support_ticket",
+          "description": "Canonical tool for ticket_details",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ticket_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "ticket_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_support_ticket",
+        "equivalents": [
+          "view_ticket",
+          "get_support_ticket"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "tool_not_found",
+      "expected_valid_resolution": {
+        "tool": "get_support_ticket",
+        "arguments": {
+          "ticket_id": 1099
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "delete_get_support_ticket"
+        },
+        {
+          "tool": "update_get_support_ticket"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_01",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_account",
+      "instruction": "Call get_account with account_id=1001",
+      "proposed_tool": "get_account",
+      "proposed_arguments": {
+        "account_id": 1001
+      },
+      "available_tools": [
+        {
+          "name": "get_account",
+          "description": "Tool get_account",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_account",
+        "equivalents": [
+          "get_account"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "account_id": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_account",
+        "arguments": {
+          "id": 1001
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_account"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_02",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_read_file",
+      "instruction": "Call read_file with file_path=/data/records.csv",
+      "proposed_tool": "read_file",
+      "proposed_arguments": {
+        "file_path": "/data/records.csv"
+      },
+      "available_tools": [
+        {
+          "name": "read_file",
+          "description": "Tool read_file",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "read_file",
+        "equivalents": [
+          "read_file"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "file_path": "path"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "read_file",
+        "arguments": {
+          "path": "/data/records.csv"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_read_file"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_03",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_search_docs",
+      "instruction": "Call search_docs with search_query=vector database",
+      "proposed_tool": "search_docs",
+      "proposed_arguments": {
+        "search_query": "vector database"
+      },
+      "available_tools": [
+        {
+          "name": "search_docs",
+          "description": "Tool search_docs",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "search_docs",
+        "equivalents": [
+          "search_docs"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "search_query": "query"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "search_docs",
+        "arguments": {
+          "query": "vector database"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_search_docs"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_04",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_event",
+      "instruction": "Call get_event with event_identifier=evt-404",
+      "proposed_tool": "get_event",
+      "proposed_arguments": {
+        "event_identifier": "evt-404"
+      },
+      "available_tools": [
+        {
+          "name": "get_event",
+          "description": "Tool get_event",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_event",
+        "equivalents": [
+          "get_event"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "event_identifier": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_event",
+        "arguments": {
+          "id": "evt-404"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_event"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_05",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_invoice",
+      "instruction": "Call get_invoice with invoice_number=9921",
+      "proposed_tool": "get_invoice",
+      "proposed_arguments": {
+        "invoice_number": 9921
+      },
+      "available_tools": [
+        {
+          "name": "get_invoice",
+          "description": "Tool get_invoice",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_invoice",
+        "equivalents": [
+          "get_invoice"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "invoice_number": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_invoice",
+        "arguments": {
+          "id": 9921
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_invoice"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_06",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_user",
+      "instruction": "Call get_user with username=alice_w",
+      "proposed_tool": "get_user",
+      "proposed_arguments": {
+        "username": "alice_w"
+      },
+      "available_tools": [
+        {
+          "name": "get_user",
+          "description": "Tool get_user",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_user",
+        "equivalents": [
+          "get_user"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "username": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_user",
+        "arguments": {
+          "id": "alice_w"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_user"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_07",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_device",
+      "instruction": "Call get_device with hardware_id=hw-091",
+      "proposed_tool": "get_device",
+      "proposed_arguments": {
+        "hardware_id": "hw-091"
+      },
+      "available_tools": [
+        {
+          "name": "get_device",
+          "description": "Tool get_device",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_device",
+        "equivalents": [
+          "get_device"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "hardware_id": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_device",
+        "arguments": {
+          "id": "hw-091"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_device"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_08",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_telemetry",
+      "instruction": "Call get_telemetry with metric_name=cpu_usage",
+      "proposed_tool": "get_telemetry",
+      "proposed_arguments": {
+        "metric_name": "cpu_usage"
+      },
+      "available_tools": [
+        {
+          "name": "get_telemetry",
+          "description": "Tool get_telemetry",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "metric"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_telemetry",
+        "equivalents": [
+          "get_telemetry"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "metric_name": "metric"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_telemetry",
+        "arguments": {
+          "metric": "cpu_usage"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_telemetry"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_09",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_order",
+      "instruction": "Call get_order with order_number=5501",
+      "proposed_tool": "get_order",
+      "proposed_arguments": {
+        "order_number": 5501
+      },
+      "available_tools": [
+        {
+          "name": "get_order",
+          "description": "Tool get_order",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_order",
+        "equivalents": [
+          "get_order"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "order_number": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_order",
+        "arguments": {
+          "id": 5501
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_order"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_10",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_ticket",
+      "instruction": "Call get_ticket with issue_id=1234",
+      "proposed_tool": "get_ticket",
+      "proposed_arguments": {
+        "issue_id": 1234
+      },
+      "available_tools": [
+        {
+          "name": "get_ticket",
+          "description": "Tool get_ticket",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_ticket",
+        "equivalents": [
+          "get_ticket"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "issue_id": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_ticket",
+        "arguments": {
+          "id": 1234
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_ticket"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_11",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_repository",
+      "instruction": "Call get_repository with repo_name=veyra",
+      "proposed_tool": "get_repository",
+      "proposed_arguments": {
+        "repo_name": "veyra"
+      },
+      "available_tools": [
+        {
+          "name": "get_repository",
+          "description": "Tool get_repository",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_repository",
+        "equivalents": [
+          "get_repository"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "repo_name": "name"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_repository",
+        "arguments": {
+          "name": "veyra"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_repository"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_12",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_package",
+      "instruction": "Call get_package with pkg_id=fastapi",
+      "proposed_tool": "get_package",
+      "proposed_arguments": {
+        "pkg_id": "fastapi"
+      },
+      "available_tools": [
+        {
+          "name": "get_package",
+          "description": "Tool get_package",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_package",
+        "equivalents": [
+          "get_package"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "pkg_id": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_package",
+        "arguments": {
+          "id": "fastapi"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_package"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_13",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_cluster",
+      "instruction": "Call get_cluster with cluster_name=prod-eu",
+      "proposed_tool": "get_cluster",
+      "proposed_arguments": {
+        "cluster_name": "prod-eu"
+      },
+      "available_tools": [
+        {
+          "name": "get_cluster",
+          "description": "Tool get_cluster",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_cluster",
+        "equivalents": [
+          "get_cluster"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "cluster_name": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_cluster",
+        "arguments": {
+          "id": "prod-eu"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_cluster"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_14",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_transaction",
+      "instruction": "Call get_transaction with txn_id=tx-8812",
+      "proposed_tool": "get_transaction",
+      "proposed_arguments": {
+        "txn_id": "tx-8812"
+      },
+      "available_tools": [
+        {
+          "name": "get_transaction",
+          "description": "Tool get_transaction",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_transaction",
+        "equivalents": [
+          "get_transaction"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "txn_id": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_transaction",
+        "arguments": {
+          "id": "tx-8812"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_transaction"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_15",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_session",
+      "instruction": "Call get_session with auth_token=tok_live_123",
+      "proposed_tool": "get_session",
+      "proposed_arguments": {
+        "auth_token": "tok_live_123"
+      },
+      "available_tools": [
+        {
+          "name": "get_session",
+          "description": "Tool get_session",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "token"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_session",
+        "equivalents": [
+          "get_session"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "auth_token": "token"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_session",
+        "arguments": {
+          "token": "tok_live_123"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_session"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_16",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_contact",
+      "instruction": "Call get_contact with email_address=support@company.com",
+      "proposed_tool": "get_contact",
+      "proposed_arguments": {
+        "email_address": "support@company.com"
+      },
+      "available_tools": [
+        {
+          "name": "get_contact",
+          "description": "Tool get_contact",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "email"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_contact",
+        "equivalents": [
+          "get_contact"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "email_address": "email"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_contact",
+        "arguments": {
+          "email": "support@company.com"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_contact"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_17",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_job",
+      "instruction": "Call get_job with task_id=job-99",
+      "proposed_tool": "get_job",
+      "proposed_arguments": {
+        "task_id": "job-99"
+      },
+      "available_tools": [
+        {
+          "name": "get_job",
+          "description": "Tool get_job",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_job",
+        "equivalents": [
+          "get_job"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "task_id": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_job",
+        "arguments": {
+          "id": "job-99"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_job"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_18",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_log",
+      "instruction": "Call get_log with log_file=/var/log/app.log",
+      "proposed_tool": "get_log",
+      "proposed_arguments": {
+        "log_file": "/var/log/app.log"
+      },
+      "available_tools": [
+        {
+          "name": "get_log",
+          "description": "Tool get_log",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_log",
+        "equivalents": [
+          "get_log"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "log_file": "path"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_log",
+        "arguments": {
+          "path": "/var/log/app.log"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_log"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_19",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_product",
+      "instruction": "Call get_product with product_sku=PROD-A1",
+      "proposed_tool": "get_product",
+      "proposed_arguments": {
+        "product_sku": "PROD-A1"
+      },
+      "available_tools": [
+        {
+          "name": "get_product",
+          "description": "Tool get_product",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_product",
+        "equivalents": [
+          "get_product"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "product_sku": "sku"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_product",
+        "arguments": {
+          "sku": "PROD-A1"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_product"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_b_20",
+      "category": "B",
+      "category_name": "parameter_aliases",
+      "intended_capability": "execute_get_sensor",
+      "instruction": "Call get_sensor with sensor_name=temp_sensor_2",
+      "proposed_tool": "get_sensor",
+      "proposed_arguments": {
+        "sensor_name": "temp_sensor_2"
+      },
+      "available_tools": [
+        {
+          "name": "get_sensor",
+          "description": "Tool get_sensor",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_sensor",
+        "equivalents": [
+          "get_sensor"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "sensor_name": "id"
+      },
+      "failure_condition": "missing_required_arg",
+      "expected_valid_resolution": {
+        "tool": "get_sensor",
+        "arguments": {
+          "id": "temp_sensor_2"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "drop_get_sensor"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_01",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_get_metrics",
+      "instruction": "Call get_metrics with limit= 50 ",
+      "proposed_tool": "get_metrics",
+      "proposed_arguments": {
+        "limit": " 50 "
+      },
+      "available_tools": [
+        {
+          "name": "get_metrics",
+          "description": "Tool get_metrics",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "limit"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_metrics",
+        "equivalents": [
+          "get_metrics"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "get_metrics",
+        "arguments": {
+          "limit": 50
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_02",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_filter_logs",
+      "instruction": "Call filter_logs with verbose=true",
+      "proposed_tool": "filter_logs",
+      "proposed_arguments": {
+        "verbose": "true"
+      },
+      "available_tools": [
+        {
+          "name": "filter_logs",
+          "description": "Tool filter_logs",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "verbose": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "verbose"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "filter_logs",
+        "equivalents": [
+          "filter_logs"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "filter_logs",
+        "arguments": {
+          "verbose": true
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_03",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_filter_alerts",
+      "instruction": "Call filter_alerts with active_only=1",
+      "proposed_tool": "filter_alerts",
+      "proposed_arguments": {
+        "active_only": "1"
+      },
+      "available_tools": [
+        {
+          "name": "filter_alerts",
+          "description": "Tool filter_alerts",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "active_only": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "active_only"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "filter_alerts",
+        "equivalents": [
+          "filter_alerts"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "filter_alerts",
+        "arguments": {
+          "active_only": true
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_04",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_query_db",
+      "instruction": "Call query_db with timeout_sec=30.0",
+      "proposed_tool": "query_db",
+      "proposed_arguments": {
+        "timeout_sec": "30.0"
+      },
+      "available_tools": [
+        {
+          "name": "query_db",
+          "description": "Tool query_db",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "timeout_sec": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "timeout_sec"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "query_db",
+        "equivalents": [
+          "query_db"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "query_db",
+        "arguments": {
+          "timeout_sec": 30
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_05",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_parse_manifest",
+      "instruction": "Call parse_manifest with config={\"env\": \"prod\"}",
+      "proposed_tool": "parse_manifest",
+      "proposed_arguments": {
+        "config": "{\"env\": \"prod\"}"
+      },
+      "available_tools": [
+        {
+          "name": "parse_manifest",
+          "description": "Tool parse_manifest",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "config": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "config"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "parse_manifest",
+        "equivalents": [
+          "parse_manifest"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "parse_manifest",
+        "arguments": {
+          "config": {
+            "env": "prod"
+          }
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_06",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_get_records",
+      "instruction": "Call get_records with page= 3 ",
+      "proposed_tool": "get_records",
+      "proposed_arguments": {
+        "page": " 3 "
+      },
+      "available_tools": [
+        {
+          "name": "get_records",
+          "description": "Tool get_records",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "page"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_records",
+        "equivalents": [
+          "get_records"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "get_records",
+        "arguments": {
+          "page": 3
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_07",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_lookup_zip",
+      "instruction": "Call lookup_zip with zip_code=98101",
+      "proposed_tool": "lookup_zip",
+      "proposed_arguments": {
+        "zip_code": "98101"
+      },
+      "available_tools": [
+        {
+          "name": "lookup_zip",
+          "description": "Tool lookup_zip",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "zip_code": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "zip_code"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "lookup_zip",
+        "equivalents": [
+          "lookup_zip"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "lookup_zip",
+        "arguments": {
+          "zip_code": 98101
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_08",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_check_status",
+      "instruction": "Call check_status with dry_run=false",
+      "proposed_tool": "check_status",
+      "proposed_arguments": {
+        "dry_run": "false"
+      },
+      "available_tools": [
+        {
+          "name": "check_status",
+          "description": "Tool check_status",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dry_run": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "dry_run"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "check_status",
+        "equivalents": [
+          "check_status"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "check_status",
+        "arguments": {
+          "dry_run": false
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_09",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_set_preference",
+      "instruction": "Call set_preference with options={\"dark_mode\": true}",
+      "proposed_tool": "set_preference",
+      "proposed_arguments": {
+        "options": "{\"dark_mode\": true}"
+      },
+      "available_tools": [
+        {
+          "name": "set_preference",
+          "description": "Tool set_preference",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "options": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "options"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "set_preference",
+        "equivalents": [
+          "set_preference"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "set_preference",
+        "arguments": {
+          "options": {
+            "dark_mode": true
+          }
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_10",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_get_batch",
+      "instruction": "Call get_batch with batch_size=100",
+      "proposed_tool": "get_batch",
+      "proposed_arguments": {
+        "batch_size": "100"
+      },
+      "available_tools": [
+        {
+          "name": "get_batch",
+          "description": "Tool get_batch",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "batch_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "batch_size"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_batch",
+        "equivalents": [
+          "get_batch"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "get_batch",
+        "arguments": {
+          "batch_size": 100
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_11",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_fetch_depth",
+      "instruction": "Call fetch_depth with depth=5",
+      "proposed_tool": "fetch_depth",
+      "proposed_arguments": {
+        "depth": "5"
+      },
+      "available_tools": [
+        {
+          "name": "fetch_depth",
+          "description": "Tool fetch_depth",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "depth": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "depth"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "fetch_depth",
+        "equivalents": [
+          "fetch_depth"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "fetch_depth",
+        "arguments": {
+          "depth": 5
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_12",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_toggle_feature",
+      "instruction": "Call toggle_feature with enabled=yes",
+      "proposed_tool": "toggle_feature",
+      "proposed_arguments": {
+        "enabled": "yes"
+      },
+      "available_tools": [
+        {
+          "name": "toggle_feature",
+          "description": "Tool toggle_feature",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "enabled"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "toggle_feature",
+        "equivalents": [
+          "toggle_feature"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "toggle_feature",
+        "arguments": {
+          "enabled": true
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_13",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_inspect_payload",
+      "instruction": "Call inspect_payload with headers={\"X-Trace\": \"1\"}",
+      "proposed_tool": "inspect_payload",
+      "proposed_arguments": {
+        "headers": "{\"X-Trace\": \"1\"}"
+      },
+      "available_tools": [
+        {
+          "name": "inspect_payload",
+          "description": "Tool inspect_payload",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "headers": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "headers"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "inspect_payload",
+        "equivalents": [
+          "inspect_payload"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "inspect_payload",
+        "arguments": {
+          "headers": {
+            "X-Trace": "1"
+          }
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_14",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_query_range",
+      "instruction": "Call query_range with start_year=2024",
+      "proposed_tool": "query_range",
+      "proposed_arguments": {
+        "start_year": "2024"
+      },
+      "available_tools": [
+        {
+          "name": "query_range",
+          "description": "Tool query_range",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_year": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "start_year"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "query_range",
+        "equivalents": [
+          "query_range"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "query_range",
+        "arguments": {
+          "start_year": 2024
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_15",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_lookup_port",
+      "instruction": "Call lookup_port with port_number=8080",
+      "proposed_tool": "lookup_port",
+      "proposed_arguments": {
+        "port_number": "8080"
+      },
+      "available_tools": [
+        {
+          "name": "lookup_port",
+          "description": "Tool lookup_port",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "port_number": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "port_number"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "lookup_port",
+        "equivalents": [
+          "lookup_port"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "lookup_port",
+        "arguments": {
+          "port_number": 8080
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_16",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_check_flag",
+      "instruction": "Call check_flag with force=0",
+      "proposed_tool": "check_flag",
+      "proposed_arguments": {
+        "force": "0"
+      },
+      "available_tools": [
+        {
+          "name": "check_flag",
+          "description": "Tool check_flag",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "force": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "force"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "check_flag",
+        "equivalents": [
+          "check_flag"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "check_flag",
+        "arguments": {
+          "force": false
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_17",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_get_threshold",
+      "instruction": "Call get_threshold with max_retries=4",
+      "proposed_tool": "get_threshold",
+      "proposed_arguments": {
+        "max_retries": "4"
+      },
+      "available_tools": [
+        {
+          "name": "get_threshold",
+          "description": "Tool get_threshold",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "max_retries": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "max_retries"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_threshold",
+        "equivalents": [
+          "get_threshold"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "get_threshold",
+        "arguments": {
+          "max_retries": 4
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_18",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_query_epoch",
+      "instruction": "Call query_epoch with timestamp_sec=1700000000",
+      "proposed_tool": "query_epoch",
+      "proposed_arguments": {
+        "timestamp_sec": "1700000000"
+      },
+      "available_tools": [
+        {
+          "name": "query_epoch",
+          "description": "Tool query_epoch",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "timestamp_sec": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "timestamp_sec"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "query_epoch",
+        "equivalents": [
+          "query_epoch"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "query_epoch",
+        "arguments": {
+          "timestamp_sec": 1700000000
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_19",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_system_audit",
+      "instruction": "Call system_audit with deep_scan=True",
+      "proposed_tool": "system_audit",
+      "proposed_arguments": {
+        "deep_scan": "True"
+      },
+      "available_tools": [
+        {
+          "name": "system_audit",
+          "description": "Tool system_audit",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "deep_scan": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "deep_scan"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "system_audit",
+        "equivalents": [
+          "system_audit"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "system_audit",
+        "arguments": {
+          "deep_scan": true
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_c_20",
+      "category": "C",
+      "category_name": "schema_compatible_transformations",
+      "intended_capability": "normalize_lookup_sku_id",
+      "instruction": "Call lookup_sku_id with numeric_id=4096",
+      "proposed_tool": "lookup_sku_id",
+      "proposed_arguments": {
+        "numeric_id": "4096"
+      },
+      "available_tools": [
+        {
+          "name": "lookup_sku_id",
+          "description": "Tool lookup_sku_id",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "numeric_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "numeric_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "lookup_sku_id",
+        "equivalents": [
+          "lookup_sku_id"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "invalid_argument_type",
+      "expected_valid_resolution": {
+        "tool": "lookup_sku_id",
+        "arguments": {
+          "numeric_id": 4096
+        }
+      },
+      "forbidden_resolutions": [],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_01",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "read_db",
+      "instruction": "Execute read_db using query_primary_db with sql=SELECT 1",
+      "proposed_tool": "query_primary_db",
+      "proposed_arguments": {
+        "sql": "SELECT 1"
+      },
+      "available_tools": [
+        {
+          "name": "query_primary_db",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sql": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sql"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "query_replica_db",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sql": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sql"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "query_primary_db",
+        "equivalents": [
+          "query_primary_db",
+          "query_replica_db"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "query_replica_db",
+        "arguments": {
+          "sql": "SELECT 1"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_02",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "weather",
+      "instruction": "Execute weather using live_weather_service with location=London",
+      "proposed_tool": "live_weather_service",
+      "proposed_arguments": {
+        "location": "London"
+      },
+      "available_tools": [
+        {
+          "name": "live_weather_service",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "cached_weather_service",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "live_weather_service",
+        "equivalents": [
+          "live_weather_service",
+          "cached_weather_service"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "cached_weather_service",
+        "arguments": {
+          "location": "London"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_03",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "search",
+      "instruction": "Execute search using web_search_primary with q=LLM tool boundary",
+      "proposed_tool": "web_search_primary",
+      "proposed_arguments": {
+        "q": "LLM tool boundary"
+      },
+      "available_tools": [
+        {
+          "name": "web_search_primary",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "q": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "q"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "web_search_backup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "q": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "q"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "web_search_primary",
+        "equivalents": [
+          "web_search_primary",
+          "web_search_backup"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "web_search_backup",
+        "arguments": {
+          "q": "LLM tool boundary"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_04",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "rates",
+      "instruction": "Execute rates using ecb_exchange_rates with pair=EUR/USD",
+      "proposed_tool": "ecb_exchange_rates",
+      "proposed_arguments": {
+        "pair": "EUR/USD"
+      },
+      "available_tools": [
+        {
+          "name": "ecb_exchange_rates",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "pair": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "pair"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "fed_exchange_rates",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "pair": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "pair"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "ecb_exchange_rates",
+        "equivalents": [
+          "ecb_exchange_rates",
+          "fed_exchange_rates"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "fed_exchange_rates",
+        "arguments": {
+          "pair": "EUR/USD"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_05",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "geo",
+      "instruction": "Execute geo using google_geocoding with address=1600 Amphitheatre",
+      "proposed_tool": "google_geocoding",
+      "proposed_arguments": {
+        "address": "1600 Amphitheatre"
+      },
+      "available_tools": [
+        {
+          "name": "google_geocoding",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "address"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "osm_geocoding",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "address"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "google_geocoding",
+        "equivalents": [
+          "google_geocoding",
+          "osm_geocoding"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "osm_geocoding",
+        "arguments": {
+          "address": "1600 Amphitheatre"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_06",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "translate",
+      "instruction": "Execute translate using deepl_translator with text=Bonjour",
+      "proposed_tool": "deepl_translator",
+      "proposed_arguments": {
+        "text": "Bonjour"
+      },
+      "available_tools": [
+        {
+          "name": "deepl_translator",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "google_translator",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "deepl_translator",
+        "equivalents": [
+          "deepl_translator",
+          "google_translator"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "google_translator",
+        "arguments": {
+          "text": "Bonjour"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_07",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "dns",
+      "instruction": "Execute dns using primary_dns_lookup with domain=example.com",
+      "proposed_tool": "primary_dns_lookup",
+      "proposed_arguments": {
+        "domain": "example.com"
+      },
+      "available_tools": [
+        {
+          "name": "primary_dns_lookup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "domain": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "domain"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "secondary_dns_lookup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "domain": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "domain"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "primary_dns_lookup",
+        "equivalents": [
+          "primary_dns_lookup",
+          "secondary_dns_lookup"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "secondary_dns_lookup",
+        "arguments": {
+          "domain": "example.com"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_08",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "telemetry",
+      "instruction": "Execute telemetry using prometheus_query with expr=up == 1",
+      "proposed_tool": "prometheus_query",
+      "proposed_arguments": {
+        "expr": "up == 1"
+      },
+      "available_tools": [
+        {
+          "name": "prometheus_query",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "expr": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expr"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "victoriametrics_query",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "expr": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expr"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "prometheus_query",
+        "equivalents": [
+          "prometheus_query",
+          "victoriametrics_query"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "victoriametrics_query",
+        "arguments": {
+          "expr": "up == 1"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_09",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "market",
+      "instruction": "Execute market using bloomberg_quote with ticker=AAPL",
+      "proposed_tool": "bloomberg_quote",
+      "proposed_arguments": {
+        "ticker": "AAPL"
+      },
+      "available_tools": [
+        {
+          "name": "bloomberg_quote",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ticker": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ticker"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "reuters_quote",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ticker": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ticker"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "bloomberg_quote",
+        "equivalents": [
+          "bloomberg_quote",
+          "reuters_quote"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "reuters_quote",
+        "arguments": {
+          "ticker": "AAPL"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_10",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "ocr",
+      "instruction": "Execute ocr using cloud_ocr_service with image_id=img_001",
+      "proposed_tool": "cloud_ocr_service",
+      "proposed_arguments": {
+        "image_id": "img_001"
+      },
+      "available_tools": [
+        {
+          "name": "cloud_ocr_service",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "image_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "image_id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "tesseract_fallback",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "image_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "image_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "cloud_ocr_service",
+        "equivalents": [
+          "cloud_ocr_service",
+          "tesseract_fallback"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "tesseract_fallback",
+        "arguments": {
+          "image_id": "img_001"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_11",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "sentiment",
+      "instruction": "Execute sentiment using frontier_sentiment with text=Great product!",
+      "proposed_tool": "frontier_sentiment",
+      "proposed_arguments": {
+        "text": "Great product!"
+      },
+      "available_tools": [
+        {
+          "name": "frontier_sentiment",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "distilbert_sentiment",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "frontier_sentiment",
+        "equivalents": [
+          "frontier_sentiment",
+          "distilbert_sentiment"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "distilbert_sentiment",
+        "arguments": {
+          "text": "Great product!"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_12",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "routing",
+      "instruction": "Execute routing using here_route_calculator with destination=Paris",
+      "proposed_tool": "here_route_calculator",
+      "proposed_arguments": {
+        "destination": "Paris"
+      },
+      "available_tools": [
+        {
+          "name": "here_route_calculator",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "destination": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "destination"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "osrm_route_calculator",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "destination": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "destination"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "here_route_calculator",
+        "equivalents": [
+          "here_route_calculator",
+          "osrm_route_calculator"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "osrm_route_calculator",
+        "arguments": {
+          "destination": "Paris"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_13",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "time",
+      "instruction": "Execute time using ntp_primary_pool with host=time.nist.gov",
+      "proposed_tool": "ntp_primary_pool",
+      "proposed_arguments": {
+        "host": "time.nist.gov"
+      },
+      "available_tools": [
+        {
+          "name": "ntp_primary_pool",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "host"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "ntp_secondary_pool",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "host"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "ntp_primary_pool",
+        "equivalents": [
+          "ntp_primary_pool",
+          "ntp_secondary_pool"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "ntp_secondary_pool",
+        "arguments": {
+          "host": "time.nist.gov"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_14",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "status",
+      "instruction": "Execute status using aws_health_dashboard with service=ec2",
+      "proposed_tool": "aws_health_dashboard",
+      "proposed_arguments": {
+        "service": "ec2"
+      },
+      "available_tools": [
+        {
+          "name": "aws_health_dashboard",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "service": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "service"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "statuspage_backup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "service": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "service"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "aws_health_dashboard",
+        "equivalents": [
+          "aws_health_dashboard",
+          "statuspage_backup"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "statuspage_backup",
+        "arguments": {
+          "service": "ec2"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_15",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "inventory",
+      "instruction": "Execute inventory using warehouse_db_primary with item_id=item-99",
+      "proposed_tool": "warehouse_db_primary",
+      "proposed_arguments": {
+        "item_id": "item-99"
+      },
+      "available_tools": [
+        {
+          "name": "warehouse_db_primary",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "item_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "warehouse_cache_replica",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "item_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "warehouse_db_primary",
+        "equivalents": [
+          "warehouse_db_primary",
+          "warehouse_cache_replica"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "warehouse_cache_replica",
+        "arguments": {
+          "item_id": "item-99"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_16",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "papers",
+      "instruction": "Execute papers using arxiv_api_primary with arxiv_id=2604.01508",
+      "proposed_tool": "arxiv_api_primary",
+      "proposed_arguments": {
+        "arxiv_id": "2604.01508"
+      },
+      "available_tools": [
+        {
+          "name": "arxiv_api_primary",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "arxiv_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "arxiv_id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "semanticscholar_backup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "arxiv_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "arxiv_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "arxiv_api_primary",
+        "equivalents": [
+          "arxiv_api_primary",
+          "semanticscholar_backup"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "semanticscholar_backup",
+        "arguments": {
+          "arxiv_id": "2604.01508"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_17",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "registry",
+      "instruction": "Execute registry using npm_registry_primary with package=lodash",
+      "proposed_tool": "npm_registry_primary",
+      "proposed_arguments": {
+        "package": "lodash"
+      },
+      "available_tools": [
+        {
+          "name": "npm_registry_primary",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "package": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "package"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "npm_mirror_backup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "package": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "package"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "npm_registry_primary",
+        "equivalents": [
+          "npm_registry_primary",
+          "npm_mirror_backup"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "npm_mirror_backup",
+        "arguments": {
+          "package": "lodash"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_18",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "ledger",
+      "instruction": "Execute ledger using stripe_balance_check with account=acct_88",
+      "proposed_tool": "stripe_balance_check",
+      "proposed_arguments": {
+        "account": "acct_88"
+      },
+      "available_tools": [
+        {
+          "name": "stripe_balance_check",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "account"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "mock_balance_snapshot",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "account"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "stripe_balance_check",
+        "equivalents": [
+          "stripe_balance_check",
+          "mock_balance_snapshot"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "mock_balance_snapshot",
+        "arguments": {
+          "account": "acct_88"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_19",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "doc",
+      "instruction": "Execute doc using confluence_api_primary with doc_id=doc-11",
+      "proposed_tool": "confluence_api_primary",
+      "proposed_arguments": {
+        "doc_id": "doc-11"
+      },
+      "available_tools": [
+        {
+          "name": "confluence_api_primary",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "doc_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "doc_id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "offline_markdown_cache",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "doc_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "doc_id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "confluence_api_primary",
+        "equivalents": [
+          "confluence_api_primary",
+          "offline_markdown_cache"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "offline_markdown_cache",
+        "arguments": {
+          "doc_id": "doc-11"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_d_20",
+      "category": "D",
+      "category_name": "primary_to_declared_fallback_execution",
+      "intended_capability": "auth",
+      "instruction": "Execute auth using okta_verify_session with session_token=jwt.token.abc",
+      "proposed_tool": "okta_verify_session",
+      "proposed_arguments": {
+        "session_token": "jwt.token.abc"
+      },
+      "available_tools": [
+        {
+          "name": "okta_verify_session",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "session_token": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "session_token"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "local_jwt_validator",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "session_token": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "session_token"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "okta_verify_session",
+        "equivalents": [
+          "okta_verify_session",
+          "local_jwt_validator"
+        ]
+      },
+      "allowed_argument_mappings": {},
+      "failure_condition": "primary_503_transient",
+      "expected_valid_resolution": {
+        "tool": "local_jwt_validator",
+        "arguments": {
+          "session_token": "jwt.token.abc"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "force_reboot_system"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_01",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "account_read",
+      "instruction": "Execute account_read with query_acct(acct_id= 101 )",
+      "proposed_tool": "query_acct",
+      "proposed_arguments": {
+        "acct_id": " 101 "
+      },
+      "available_tools": [
+        {
+          "name": "get_account",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "crm_account_read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_account",
+        "equivalents": [
+          "query_acct",
+          "get_account",
+          "crm_account_read"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "acct_id": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "crm_account_read",
+        "arguments": {
+          "id": 101
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_02",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "file_fetch",
+      "instruction": "Execute file_fetch with download_doc(file_name=/tmp/report.pdf)",
+      "proposed_tool": "download_doc",
+      "proposed_arguments": {
+        "file_name": "/tmp/report.pdf"
+      },
+      "available_tools": [
+        {
+          "name": "read_file",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "fs_read_replica",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "read_file",
+        "equivalents": [
+          "download_doc",
+          "read_file",
+          "fs_read_replica"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "file_name": "path"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "fs_read_replica",
+        "arguments": {
+          "path": "/tmp/report.pdf"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_03",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "metric_poll",
+      "instruction": "Execute metric_poll with poll_metric(metric_code= 90 )",
+      "proposed_tool": "poll_metric",
+      "proposed_arguments": {
+        "metric_code": " 90 "
+      },
+      "available_tools": [
+        {
+          "name": "get_metric",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "replica_metrics",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_metric",
+        "equivalents": [
+          "poll_metric",
+          "get_metric",
+          "replica_metrics"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "metric_code": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "replica_metrics",
+        "arguments": {
+          "id": 90
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_04",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "order_view",
+      "instruction": "Execute order_view with inspect_order(order_no=5500)",
+      "proposed_tool": "inspect_order",
+      "proposed_arguments": {
+        "order_no": "5500"
+      },
+      "available_tools": [
+        {
+          "name": "get_order",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "order_archive",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_order",
+        "equivalents": [
+          "inspect_order",
+          "get_order",
+          "order_archive"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "order_no": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "order_archive",
+        "arguments": {
+          "id": 5500
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_05",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "stock_lookup",
+      "instruction": "Execute stock_lookup with check_inventory(item_sku=SKU-88)",
+      "proposed_tool": "check_inventory",
+      "proposed_arguments": {
+        "item_sku": "SKU-88"
+      },
+      "available_tools": [
+        {
+          "name": "get_stock",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "cached_inventory",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_stock",
+        "equivalents": [
+          "check_inventory",
+          "get_stock",
+          "cached_inventory"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "item_sku": "sku"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "cached_inventory",
+        "arguments": {
+          "sku": "SKU-88"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_06",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "invoice_view",
+      "instruction": "Execute invoice_view with fetch_invoice_data(inv_id=404)",
+      "proposed_tool": "fetch_invoice_data",
+      "proposed_arguments": {
+        "inv_id": "404"
+      },
+      "available_tools": [
+        {
+          "name": "get_invoice",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "billing_archive",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_invoice",
+        "equivalents": [
+          "fetch_invoice_data",
+          "get_invoice",
+          "billing_archive"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "inv_id": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "billing_archive",
+        "arguments": {
+          "id": 404
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_07",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "user_lookup",
+      "instruction": "Execute user_lookup with find_user_record(user_num= 77 )",
+      "proposed_tool": "find_user_record",
+      "proposed_arguments": {
+        "user_num": " 77 "
+      },
+      "available_tools": [
+        {
+          "name": "get_user",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "replica_user_db",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_user",
+        "equivalents": [
+          "find_user_record",
+          "get_user",
+          "replica_user_db"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "user_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "replica_user_db",
+        "arguments": {
+          "id": 77
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_08",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "calendar_event",
+      "instruction": "Execute calendar_event with view_event(event_num=301)",
+      "proposed_tool": "view_event",
+      "proposed_arguments": {
+        "event_num": "301"
+      },
+      "available_tools": [
+        {
+          "name": "get_event",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "cached_calendar",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_event",
+        "equivalents": [
+          "view_event",
+          "get_event",
+          "cached_calendar"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "event_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "cached_calendar",
+        "arguments": {
+          "id": 301
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_09",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "device_poll",
+      "instruction": "Execute device_poll with read_device(dev_num= 12 )",
+      "proposed_tool": "read_device",
+      "proposed_arguments": {
+        "dev_num": " 12 "
+      },
+      "available_tools": [
+        {
+          "name": "get_device",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "device_cache",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_device",
+        "equivalents": [
+          "read_device",
+          "get_device",
+          "device_cache"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "dev_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "device_cache",
+        "arguments": {
+          "id": 12
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_10",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "ticket_poll",
+      "instruction": "Execute ticket_poll with fetch_ticket(issue_num=808)",
+      "proposed_tool": "fetch_ticket",
+      "proposed_arguments": {
+        "issue_num": "808"
+      },
+      "available_tools": [
+        {
+          "name": "get_ticket",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "support_mirror",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_ticket",
+        "equivalents": [
+          "fetch_ticket",
+          "get_ticket",
+          "support_mirror"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "issue_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "support_mirror",
+        "arguments": {
+          "id": 808
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_11",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "shipping_quote",
+      "instruction": "Execute shipping_quote with calc_shipping(zip=98101)",
+      "proposed_tool": "calc_shipping",
+      "proposed_arguments": {
+        "zip": "98101"
+      },
+      "available_tools": [
+        {
+          "name": "get_shipping",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "postal_code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "postal_code"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "rate_fallback",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "postal_code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "postal_code"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_shipping",
+        "equivalents": [
+          "calc_shipping",
+          "get_shipping",
+          "rate_fallback"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "zip": "postal_code"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "rate_fallback",
+        "arguments": {
+          "postal_code": "98101"
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_12",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "cluster_poll",
+      "instruction": "Execute cluster_poll with poll_cluster(cluster_num= 2 )",
+      "proposed_tool": "poll_cluster",
+      "proposed_arguments": {
+        "cluster_num": " 2 "
+      },
+      "available_tools": [
+        {
+          "name": "get_cluster",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "cluster_monitor_backup",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_cluster",
+        "equivalents": [
+          "poll_cluster",
+          "get_cluster",
+          "cluster_monitor_backup"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "cluster_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "cluster_monitor_backup",
+        "arguments": {
+          "id": 2
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_13",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "paper_fetch",
+      "instruction": "Execute paper_fetch with query_arxiv(paper_id=2604)",
+      "proposed_tool": "query_arxiv",
+      "proposed_arguments": {
+        "paper_id": "2604"
+      },
+      "available_tools": [
+        {
+          "name": "get_paper",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "semanticscholar_mirror",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_paper",
+        "equivalents": [
+          "query_arxiv",
+          "get_paper",
+          "semanticscholar_mirror"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "paper_id": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "semanticscholar_mirror",
+        "arguments": {
+          "id": 2604
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_14",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "session_check",
+      "instruction": "Execute session_check with inspect_session(sess_id=990)",
+      "proposed_tool": "inspect_session",
+      "proposed_arguments": {
+        "sess_id": "990"
+      },
+      "available_tools": [
+        {
+          "name": "get_session",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "session_cache",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_session",
+        "equivalents": [
+          "inspect_session",
+          "get_session",
+          "session_cache"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "sess_id": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "session_cache",
+        "arguments": {
+          "id": 990
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_15",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "audit_fetch",
+      "instruction": "Execute audit_fetch with query_audit(record_id= 450 )",
+      "proposed_tool": "query_audit",
+      "proposed_arguments": {
+        "record_id": " 450 "
+      },
+      "available_tools": [
+        {
+          "name": "get_audit",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "audit_replica",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_audit",
+        "equivalents": [
+          "query_audit",
+          "get_audit",
+          "audit_replica"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "record_id": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "audit_replica",
+        "arguments": {
+          "id": 450
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_16",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "job_status",
+      "instruction": "Execute job_status with check_task(job_num=1024)",
+      "proposed_tool": "check_task",
+      "proposed_arguments": {
+        "job_num": "1024"
+      },
+      "available_tools": [
+        {
+          "name": "get_job",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "job_tracker_fallback",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_job",
+        "equivalents": [
+          "check_task",
+          "get_job",
+          "job_tracker_fallback"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "job_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "job_tracker_fallback",
+        "arguments": {
+          "id": 1024
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_17",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "port_scan",
+      "instruction": "Execute port_scan with query_port(port_str= 80 )",
+      "proposed_tool": "query_port",
+      "proposed_arguments": {
+        "port_str": " 80 "
+      },
+      "available_tools": [
+        {
+          "name": "get_port",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "port"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "local_port_cache",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "port"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_port",
+        "equivalents": [
+          "query_port",
+          "get_port",
+          "local_port_cache"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "port_str": "port"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "local_port_cache",
+        "arguments": {
+          "port": 80
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_18",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "catalog_lookup",
+      "instruction": "Execute catalog_lookup with search_catalog(catalog_no= 7 )",
+      "proposed_tool": "search_catalog",
+      "proposed_arguments": {
+        "catalog_no": " 7 "
+      },
+      "available_tools": [
+        {
+          "name": "get_catalog",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "catalog_replica",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_catalog",
+        "equivalents": [
+          "search_catalog",
+          "get_catalog",
+          "catalog_replica"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "catalog_no": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "catalog_replica",
+        "arguments": {
+          "id": 7
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_19",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "profile_fetch",
+      "instruction": "Execute profile_fetch with query_profile(profile_num=882)",
+      "proposed_tool": "query_profile",
+      "proposed_arguments": {
+        "profile_num": "882"
+      },
+      "available_tools": [
+        {
+          "name": "get_profile",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "profile_mirror",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_profile",
+        "equivalents": [
+          "query_profile",
+          "get_profile",
+          "profile_mirror"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "profile_num": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "profile_mirror",
+        "arguments": {
+          "id": 882
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    },
+    {
+      "case_id": "res_e_20",
+      "category": "E",
+      "category_name": "compound_failure_plus_alias_and_schema",
+      "intended_capability": "sensor_read",
+      "instruction": "Execute sensor_read with read_sensor(sensor_no= 42 )",
+      "proposed_tool": "read_sensor",
+      "proposed_arguments": {
+        "sensor_no": " 42 "
+      },
+      "available_tools": [
+        {
+          "name": "get_sensor",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        },
+        {
+          "name": "sensor_buffer",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "is_idempotent": true
+        }
+      ],
+      "allowed_equivalence_relation": {
+        "canonical": "get_sensor",
+        "equivalents": [
+          "read_sensor",
+          "get_sensor",
+          "sensor_buffer"
+        ]
+      },
+      "allowed_argument_mappings": {
+        "sensor_no": "id"
+      },
+      "failure_condition": "primary_fails_requires_alias_and_schema_coercion",
+      "expected_valid_resolution": {
+        "tool": "sensor_buffer",
+        "arguments": {
+          "id": 42
+        }
+      },
+      "forbidden_resolutions": [
+        {
+          "tool": "emergency_shutdown"
+        }
+      ],
+      "is_side_effecting": false,
+      "mock_response": {
+        "status": "success",
+        "data": "ok"
+      }
+    }
+  ]
+}

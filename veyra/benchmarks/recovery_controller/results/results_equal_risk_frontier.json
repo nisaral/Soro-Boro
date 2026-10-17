@@ -1,0 +1,262 @@
+{
+  "DER_budget_0.0%": {
+    "Raw Agent": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Naive Retry": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Verify-Before-Retry (B6 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "80.00%",
+      "qualifies": true
+    },
+    "Verify-Before-Retry (B6 Unconstrained)": {
+      "empirical_DER": "4.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Idempotency Keys (B2 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Idempotency Keys (B2 Unconstrained)": {
+      "empirical_DER": "30.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Current Veyra (Deterministic)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Full-Mechanism Deterministic": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Belief-State Veyra (eps=0.01)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Oracle": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "90.00%",
+      "qualifies": true
+    }
+  },
+  "DER_budget_0.5%": {
+    "Raw Agent": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Naive Retry": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Verify-Before-Retry (B6 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "80.00%",
+      "qualifies": true
+    },
+    "Verify-Before-Retry (B6 Unconstrained)": {
+      "empirical_DER": "4.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Idempotency Keys (B2 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Idempotency Keys (B2 Unconstrained)": {
+      "empirical_DER": "30.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Current Veyra (Deterministic)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Full-Mechanism Deterministic": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Belief-State Veyra (eps=0.01)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Oracle": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "90.00%",
+      "qualifies": true
+    }
+  },
+  "DER_budget_1.0%": {
+    "Raw Agent": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Naive Retry": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Verify-Before-Retry (B6 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "80.00%",
+      "qualifies": true
+    },
+    "Verify-Before-Retry (B6 Unconstrained)": {
+      "empirical_DER": "4.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Idempotency Keys (B2 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Idempotency Keys (B2 Unconstrained)": {
+      "empirical_DER": "30.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Current Veyra (Deterministic)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Full-Mechanism Deterministic": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Belief-State Veyra (eps=0.01)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Oracle": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "90.00%",
+      "qualifies": true
+    }
+  },
+  "DER_budget_2.0%": {
+    "Raw Agent": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Naive Retry": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Verify-Before-Retry (B6 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "80.00%",
+      "qualifies": true
+    },
+    "Verify-Before-Retry (B6 Unconstrained)": {
+      "empirical_DER": "4.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Idempotency Keys (B2 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Idempotency Keys (B2 Unconstrained)": {
+      "empirical_DER": "30.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Current Veyra (Deterministic)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Full-Mechanism Deterministic": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Belief-State Veyra (eps=0.01)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Oracle": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "90.00%",
+      "qualifies": true
+    }
+  },
+  "DER_budget_4.0%": {
+    "Raw Agent": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Naive Retry": {
+      "empirical_DER": "36.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Verify-Before-Retry (B6 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "80.00%",
+      "qualifies": true
+    },
+    "Verify-Before-Retry (B6 Unconstrained)": {
+      "empirical_DER": "4.00%",
+      "safe_recovery_rate": "92.00%",
+      "qualifies": true
+    },
+    "Idempotency Keys (B2 Cautious)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Idempotency Keys (B2 Unconstrained)": {
+      "empirical_DER": "30.00%",
+      "safe_recovery_rate": "DISQUALIFIED (Exceeds Risk Budget)",
+      "qualifies": false
+    },
+    "Current Veyra (Deterministic)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "42.00%",
+      "qualifies": true
+    },
+    "Full-Mechanism Deterministic": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Belief-State Veyra (eps=0.01)": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "86.00%",
+      "qualifies": true
+    },
+    "Oracle": {
+      "empirical_DER": "0.00%",
+      "safe_recovery_rate": "90.00%",
+      "qualifies": true
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "all_adversarial_audits_passed": true,
+  "checks": {
+    "task_id_leakage": {
+      "train_scorecard_overlap": 0,
+      "gate_scorecard_overlap": 0,
+      "status": "PASS"
+    },
+    "tag_normalization_leakage": {
+      "sample_tag": "search_documents#[limit:int,query:str]@auth_login->init_session",
+      "contains_outcome_tokens": false,
+      "status": "PASS"
+    },
+    "adversarial_1_degraded_historical_winner": {
+      "history_preferred": "tool_replica_A",
+      "contract_valid_candidates": [
+        "tool_replica_B"
+      ],
+      "selected_candidate": "tool_replica_B",
+      "safe_adaptation": true,
+      "status": "PASS"
+    },
+    "adversarial_2_changed_runtime_state": {
+      "memory_preferred": "tool_replica_B",
+      "valid_candidates_under_new_state": [
+        "tool_replica_C"
+      ],
+      "prevented_state_violation": true,
+      "status": "PASS"
+    },
+    "adversarial_3_side_effect_invariance": {
+      "rejects_mutation_under_read_contract": true,
+      "accepts_readonly_under_read_contract": true,
+      "status": "PASS"
+    },
+    "adversarial_4_conflicting_historical_outcomes": {
+      "tool_flaky_X_success_rate": 0.09,
+      "tool_stable_Y_success_rate": 1.0,
+      "prefers_statistically_superior_tool": true,
+      "status": "PASS"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "late_commit_without_idempotency": {
+    "Verify-Before-Retry (B6 Cautious)": {
+      "safe_recovery_rate": "0.0%",
+      "duplicate_effect_rate": "100.0%",
+      "abstention_rate": "0.0%"
+    },
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "0.0%",
+      "duplicate_effect_rate": "100.0%",
+      "abstention_rate": "0.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "0.0%",
+      "duplicate_effect_rate": "0.0%",
+      "abstention_rate": "100.0%"
+    }
+  },
+  "late_commit_with_idempotency": {
+    "Verify-Before-Retry (B6 Cautious)": {
+      "safe_recovery_rate": "0.0%",
+      "duplicate_effect_rate": "100.0%",
+      "abstention_rate": "0.0%"
+    },
+    "Full-Mechanism Deterministic": {
+      "safe_recovery_rate": "0.0%",
+      "duplicate_effect_rate": "100.0%",
+      "abstention_rate": "0.0%"
+    },
+    "Belief-State Veyra": {
+      "safe_recovery_rate": "100.0%",
+      "duplicate_effect_rate": "0.0%",
+      "abstention_rate": "0.0%"
+    }
+  }
+}

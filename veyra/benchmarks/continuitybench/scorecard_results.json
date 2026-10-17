@@ -1,0 +1,57 @@
+{
+  "raw_agent": {
+    "clean_success_rate": 1.0,
+    "perturbed_success_rate": 0.0,
+    "intent_preservation_rate": 0.0,
+    "degradation_delta": 1.0,
+    "replan_rate": 1.0,
+    "wrong_tool_rate": 0.0,
+    "unsafe_substitution_rate": 0.0,
+    "unauthorized_rate": 0.0,
+    "mean_latency_ms": 0.002
+  },
+  "competent_boundary": {
+    "clean_success_rate": 1.0,
+    "perturbed_success_rate": 0.0,
+    "intent_preservation_rate": 0.0,
+    "degradation_delta": 1.0,
+    "replan_rate": 1.0,
+    "wrong_tool_rate": 0.0,
+    "unsafe_substitution_rate": 0.0,
+    "unauthorized_rate": 0.0,
+    "mean_latency_ms": 30.3
+  },
+  "static_resolution": {
+    "clean_success_rate": 1.0,
+    "perturbed_success_rate": 1.0,
+    "intent_preservation_rate": 0.8,
+    "degradation_delta": 0.0,
+    "replan_rate": 0.0,
+    "wrong_tool_rate": 0.2,
+    "unsafe_substitution_rate": 0.0,
+    "unauthorized_rate": 0.0,
+    "mean_latency_ms": 0.023
+  },
+  "veyra": {
+    "clean_success_rate": 1.0,
+    "perturbed_success_rate": 1.0,
+    "intent_preservation_rate": 1.0,
+    "degradation_delta": 0.0,
+    "replan_rate": 0.0,
+    "wrong_tool_rate": 0.0,
+    "unsafe_substitution_rate": 0.0,
+    "unauthorized_rate": 0.0,
+    "mean_latency_ms": 0.124
+  },
+  "oracle": {
+    "clean_success_rate": 1.0,
+    "perturbed_success_rate": 1.0,
+    "intent_preservation_rate": 1.0,
+    "degradation_delta": 0.0,
+    "replan_rate": 0.0,
+    "wrong_tool_rate": 0.0,
+    "unsafe_substitution_rate": 0.0,
+    "unauthorized_rate": 0.0,
+    "mean_latency_ms": 0.002
+  }
+}

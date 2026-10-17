@@ -1,0 +1,56 @@
+{
+  "competent_baseline": {
+    "dr_value": 0.5692,
+    "dr_stderr": 0.027,
+    "ips_value": 0.6111,
+    "dm_value": 0.4712,
+    "effective_sample_size": 324.0,
+    "unsafe_mutations": 0,
+    "decision_latency_ms": 0.0011
+  },
+  "deterministic_veyra": {
+    "dr_value": 0.5692,
+    "dr_stderr": 0.027,
+    "ips_value": 0.6111,
+    "dm_value": 0.4712,
+    "effective_sample_size": 324.0,
+    "unsafe_mutations": 0,
+    "decision_latency_ms": 0.001
+  },
+  "tage_history": {
+    "dr_value": 0.6387,
+    "dr_stderr": 0.0272,
+    "ips_value": 0.7222,
+    "dm_value": 0.5128,
+    "effective_sample_size": 333.3,
+    "unsafe_mutations": 0,
+    "decision_latency_ms": 0.0011
+  },
+  "bandit_unpartitioned": {
+    "dr_value": 0.6387,
+    "dr_stderr": 0.0272,
+    "ips_value": 0.7222,
+    "dm_value": 0.5128,
+    "effective_sample_size": 333.3,
+    "unsafe_mutations": 0,
+    "decision_latency_ms": 0.0639
+  },
+  "bandit_partitioned": {
+    "dr_value": 0.6338,
+    "dr_stderr": 0.027,
+    "ips_value": 0.7056,
+    "dm_value": 0.5117,
+    "effective_sample_size": 331.7,
+    "unsafe_mutations": 0,
+    "decision_latency_ms": 0.0484
+  },
+  "pairwise_ranking": {
+    "dr_value": 0.6387,
+    "dr_stderr": 0.0272,
+    "ips_value": 0.7222,
+    "dm_value": 0.5128,
+    "effective_sample_size": 333.3,
+    "unsafe_mutations": 0,
+    "decision_latency_ms": 0.0016
+  }
+}

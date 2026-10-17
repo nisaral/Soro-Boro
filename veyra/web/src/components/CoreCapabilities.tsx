@@ -1,42 +1,42 @@
-import { CheckCircle2, Shield, AlertOctagon, RefreshCw, GitFork, FileCode2, Terminal } from "lucide-react";
+import { CheckCircle2, Shield, AlertOctagon, RefreshCw, GitFork, FileCode2, Terminal, Database, Lock } from "lucide-react";
 
 export default function CoreCapabilities() {
   const capabilities = [
     {
-      icon: CheckCircle2,
-      title: "Safe Argument Normalizer",
-      description: "Applies only provably safe, semantics-preserving coercions ('42' -> 42, 'true' -> True, unique enum matching, ISO dates). Zero semantic argument guessing.",
-      badge: "CORRECTNESS",
-    },
-    {
-      icon: AlertOctagon,
-      title: "7-Tier Failure Taxonomy",
-      description: "Classifies every failure into SCHEMA_ERROR, TRANSIENT_ERROR, RATE_LIMIT, PRECONDITION_ERROR, AUTHORIZATION_ERROR, UNKNOWN_STATE, or UNKNOWN with precise metadata.",
-      badge: "TAXONOMY",
+      icon: Lock,
+      title: "Durable Operation Identity",
+      description: "Binds every mutating tool call to a durable logical operation ID and stable idempotency key. Keys are deterministically reused across retries—never regenerated per attempt.",
+      badge: "IDENTITY",
     },
     {
       icon: RefreshCw,
-      title: "Bounded Safe Retries",
-      description: "Retries ONLY when failure is transient/rate-limit AND operation is explicitly declared retryable AND idempotent. Strict 0 unsafe retries invariant.",
-      badge: "SAFETY",
+      title: "Idempotency-First Recovery",
+      description: "When network drops occur, Soro-Boro's primary defense is stable key deduplication at the provider. Blind replays with new keys are strictly prohibited for mutations.",
+      badge: "RECOVERY",
     },
     {
-      icon: GitFork,
-      title: "Candidate Resolution & Equivalence",
-      description: "Explicit developer tool equivalence ('veyra.equivalent'). Enforces hard constraints (permissions, risk, health). Router never widens allowed action space.",
-      badge: "ROUTING",
+      icon: Shield,
+      title: "Rich Lifecycle Reconciliation",
+      description: "Providers do not return binary booleans. Soro-Boro reconciles through rich multi-stage states (SUCCEEDED, PENDING, FAILED, REQUIRES_ACTION, NOT_FOUND).",
+      badge: "RECONCILER",
     },
     {
-      icon: Terminal,
-      title: "MCP & Python Drop-in Middleware",
-      description: "Wraps standard Python functions (@veyra.tool) and intercepts MCP tools/call JSON-RPC messages. Developer keeps their agent, prompts, and models unchanged.",
-      badge: "INTEGRATION",
+      icon: AlertOctagon,
+      title: "Eventual Consistency Guards",
+      description: "Immediate lookups on eventual read replicas can return false 404s. Soro-Boro flags eventual consistency and enforces safe deferral (AMBIGUOUS_DEFERRED) rather than retrying.",
+      badge: "CONSISTENCY",
+    },
+    {
+      icon: Database,
+      title: "Write-Ahead Intent (WAL)",
+      description: "Synchronously writes INTENT to disk before the external tool is invoked. If the host crashes mid-mutation, startup scanners detect orphaned writes before resuming the agent.",
+      badge: "DURABILITY",
     },
     {
       icon: FileCode2,
-      title: "Observability & Audit CLI",
-      description: "Section 11 telemetry traces with automatic credential redaction. Diagnostic CLI ('veyra audit') reports failures, recoveries, and replans avoided.",
-      badge: "TELEMETRY",
+      title: "Tamper-Evident Audit Ledger",
+      description: "Every dispatch, reconciliation, and terminal state is chained into an append-only SHA-256 ledger, providing reproducible evidence for post-incident triage and compliance.",
+      badge: "AUDIT TRAIL",
     },
   ];
 
@@ -48,10 +48,10 @@ export default function CoreCapabilities() {
             Core Architecture
           </span>
           <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight mt-3">
-            Built for reliable, provably safe tool execution.
+            Engineered for consequential agent writes.
           </h2>
           <p className="text-sm text-slate-600 mt-2">
-            Veyra sits outside the agent reasoning loop at the tool boundary, enforcing strict correctness and safety invariants.
+            Soro-Boro prevents unsafe retries and data drift when AI agents touch money, cloud resources, or production databases.
           </p>
         </div>
 

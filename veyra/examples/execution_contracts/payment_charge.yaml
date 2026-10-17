@@ -1,0 +1,32 @@
+version: "veyra.spec/v1alpha1"
+operation: payments.create_charge
+description: "Process credit card charge against customer account"
+side_effect_class: non_idempotent_mutation
+reversibility: compensatable
+
+idempotency:
+  supported: true
+  key_parameter: "idempotency_key"
+  scope: "payload_hash"
+  retention_seconds: 86400
+
+evidence_probes:
+  status_lookup:
+    supported: true
+    tool: "payments.get_charge_status"
+    parameter_mapping:
+      charge_id: "id"
+  read_back_consistency: strong
+  expected_propagation_lag_ms: 100
+
+compensation:
+  supported: true
+  tool: "payments.refund_charge"
+  parameter_mapping:
+    id: "charge_id"
+    amount: "amount"
+
+execution_bounds:
+  max_in_flight_timeout_ms: 10000
+  safe_recovery_policy: "strict_risk_bounded"
+  max_acceptable_duplicate_risk: 0.00

@@ -1,231 +1,47 @@
-# Veyra — Frozen Objective & Execution Plan (v0.1)
+# Soro-Boro: System Objective & Execution Boundary Specification
 
-> **"Build the boundary first. Measure what actually breaks. Automate only what can be made reliably safe. Learn only from evidence."**
+> **Find which agent tools are unsafe to retry, then make them safe.**
 
----
+Soro-Boro sits between the agent framework and external tools/services, resolving ambiguous execution states and eliminating duplicate side-effects.
 
-## 1. Main Objective
-
-Build Veyra as a **drop-in, vendor-neutral tool-boundary reliability layer** for existing AI agents.
-
-The agent remains responsible for reasoning, conversation, and high-level planning. Veyra sits between the agent's proposed tool call and the actual tool:
-
-```
-User
-  ↓
-Existing Agent
-  ↓
-proposed tool call
-  ↓
-┌─────────────────────────────────┐
-│              VEYRA              │
-│                                 │
-│  1. validate arguments          │
-│  2. classify failure            │
-│  3. safely resolve              │
-│  4. route / recover             │
-│  5. observe & audit             │
-└────────────────┬────────────────┘
-                 ↓
-      MCP / Python / Internal
-                 ↓
-               result
-                 ↓
-               Veyra
-                 ↓
-         Existing Agent
-```
-
-### The Core Abstraction
-$$\text{Agent proposes} \longrightarrow \text{Veyra resolves}$$
-
-Veyra is strictly outside the agent reasoning loop. Learning is optional rather than mandatory.
-
----
-
-## 2. Immediate Objective (Binary Milestone)
-
-Do not try to solve "agent tooling" generally. Our immediate question is:
-
-> **Can Veyra reliably resolve a meaningful class of problematic tool calls without forcing the agent to re-plan, while adding negligible runtime overhead and very low harmful-intervention risk?**
-
-$$\text{Can this be useful?} \longrightarrow \begin{cases} \textbf{YES} \longrightarrow \text{Continue} \\ \textbf{NO} \longrightarrow \text{Kill / Reposition} \end{cases}$$
-
-Not:
-- Can we make the fanciest router?
-- Can we beat every tool-retrieval benchmark?
-- Can we train an RL agent?
-
-Those come only after the basic reliability layer demonstrates value.
-
----
-
-## 3. What Veyra v0.1 Actually Is
-
-Keep it very small.
-
-### Supported Initially
-- **Python functions** (`@veyra.tool(...)`, `veyra.wrap(...)`)
-- **MCP (Model Context Protocol)** middleware
-- *Nothing else. No OpenAPI/REST in the first implementation.*
-
-### V0.1 Responsibilities
-1. **Intercept** proposed tool calls
-2. **Validate** arguments
-3. **Classify** failures into structured taxonomy
-4. **Apply** only provably safe corrections (semantics-preserving normalizations)
-5. **Retry** only safe failure classes (idempotent + transient/rate-limit)
-6. **Return structured errors** when Veyra cannot safely resolve (enabling the agent to re-plan with precise error feedback)
-7. **Record** an execution trace
-
-### What Veyra Must NOT Do in v0.1 (Strict Exclusions)
-- ❌ No semantic argument guessing
-- ❌ No automatic tool equivalence discovery
-- ❌ No arbitrary fallback tools
-- ❌ No LLM-based repair
-- ❌ No RL
-- ❌ No learned routing
-- ❌ No agent orchestration
-- ❌ No managed credentials / identity platform
-- ❌ No integration marketplace
-- ❌ No huge dashboard
-
----
-
-## 4. Core Failure Taxonomy & Failure Provenance
-
-Every tool failure becomes a structured object tracking both failure kind and **failure provenance** (distinguishing tool implementation crashes from agent argument errors):
-
-```json
-{
-  "kind": "schema_error",
-  "provenance": "agent_argument_error",
-  "retryable": false,
-  "repairable": true,
-  "requires_agent": false,
-  "safe_to_retry": false,
-  "message": "...",
-  "details": {}
-}
-```
-
-### Failure Provenance Classes:
-1. **`TOOL_IMPLEMENTATION_ERROR`**:
-   - Internal bug in tool code itself (e.g. parameter shadowing built-ins like `range`, unhandled `AttributeError`/`IndexError`/`NameError`).
-   - *Resolution*: Escalated with crash diagnostics. Never blamed on the agent or treated as agent misuse.
-2. **`AGENT_ARGUMENT_ERROR` / `SCHEMA_VALIDATION_ERROR`**:
-   - Wrong type, missing required argument, invalid enum, malformed date, unknown property.
-   - *Provably safe normalization only*: `"42"` $\to$ `42`, `"2026-10-06"` $\to$ normalized ISO date, `"ACTIVE"` $\to$ `"active"` (unique case match).
-   - No semantic guessing. Unrecoverable arguments escalate with structured feedback.
-3. **`NETWORK_ERROR` / `TRANSIENT_ERROR`**:
-   - Timeout, connection reset, temporary 5xx, service unavailable.
-   - *Retry only when*: Tool is explicitly declared retryable **AND** operation is idempotent.
-4. **`RATE_LIMIT`**:
-   - HTTP 429, quota exceeded.
-   - *Resolution*: Exponential backoff + `retry-after` header obedience.
-5. **`PRECONDITION_ERROR`**:
-   - Resource locked, order missing, database not found in provider registry.
-   - *Resolution*: Return structured diagnostic to the agent. Do not invent the missing resource.
-6. **`AUTHORIZATION_ERROR`**:
-   - 401 / 403, permission denied, missing credentials in secret store.
-   - *Resolution*: Immediate escalation. 0 retries.
-7. **`UNKNOWN_STATE`**:
-   - Write request $\to$ timeout $\to$ state unknown.
-   - *Resolution*: Never retry unless idempotency is strictly guaranteed.
-8. **`UNKNOWN`**:
-   - Unclassified failure. Return diagnostic structured error.
-
----
-
-## 5. The First Killer Behavior
-
-```
-[BEFORE VEYRA]
-Agent → bad tool call → tool error → LLM sees error → reasons again → retry → maybe succeeds
-
-[WITH VEYRA]
-Agent → bad tool call → VEYRA → safe correction / safe retry → tool succeeds → Agent continues
+```text
+Agent / Host (LangGraph, CrewAI, AutoGen, MCP client)
+        │ proposed tool action
+        ▼
+┌────────────────────────────────────────────────────────┐
+│  SORO-BORO EXECUTION BOUNDARY                           │
+│  1. Mint durable OperationIdentity per workflow intent │
+│  2. Acquire atomic cross-process claim lease           │
+│  3. Synchronously flush intent to WAL (fsync)          │
+│  4. Dispatch external mutation                         │
+│  5. UNKNOWN_ACK → reconcile or AMBIGUOUS_DEFERRED     │
+│  6. Release claim & persist verifiable outcome         │
+└────────────────────────────────────────────────────────┘
+        │
+   Tools / MCP / HTTP / SQL
 ```
 
 ---
 
-## 6. Benchmark & Gate Strategy
+## What Soro-Boro Is
 
-### Benchmark Tiers
-- **Tier 0 — Unit / Synthetic (Engineering Validation):**
-  - 100–500 hand-built cases covering schema, enum, type coercion, dates, timeouts, rate limits, 403s, unknown state, safe vs unsafe retries.
-  - Target: `false_intervention = 0`, `unsafe_retry = 0`, `classification_accuracy ≈ 100%`.
-- **Tier 1 — ToolMisuseBench (Primary Recovery Benchmark):**
-  - Published benchmark reports 6,800 tasks (5,000 train + 800 dev + 1,000 public test) evaluating deterministic fault injection and budgeted recovery.
-  - Veyra's internal fast regression harness runs a 60-scenario controlled subset across CRUD, retrieval, and rate limits.
-  - Compare 5 systems: (A) Raw agent, (B) Naive retry, (C) Competent boundary baseline, (D) Structured error feedback, (E) Veyra.
-  - Metric: Task success (with 95% Wilson CI), safety (invalid calls, policy violations, harmful interventions, unsafe retries), efficiency, and Boundary Recovery:
-    $$\text{BoundaryRecovery} = \frac{\text{failures resolved without agent planning}}{\text{failures eligible for boundary resolution (from fault metadata)}}$$
-- **Tier 2 — Real MCP Agent Evaluation:** MCP-Universe (Real LLM agent $\to$ Veyra $\to$ real MCP server).
-- **Tier 3 — MCPMark:** 127 expert-curated tasks with programmatic verification (filesystem, GitHub, Notion, Playwright, Postgres).
-- **Tier 4 — MCP-Atlas:** Multi-server workflows across 36 servers and 220 tools.
-- **Tier 5 — ComplexMCP:** 300 stateful interdependent tools (stress test).
-- **Tier 6 — ToolSandbox:** State-dependent workflows & canonicalization.
-- **Tier 7 — Recovery-Bench:** Corrupted environment replaying & trajectory recovery.
-
-### Exact Decision Gates
-- **Gate 0 (Correctness):** 0 unauthorized executions, 0 unsafe retries, 0 silent semantic repairs.
-- **Gate 1 (Product Value):** Demonstrates improved task success or avoided agent re-plans without unacceptable overhead on ToolMisuseBench.
-- **Gate 2 (Real-World Relevance):** Evaluated against 3 real MCP catalogs.
-- **Gate 3 (Routing):** Routing between valid alternatives only after recovery has proven value.
-- **Gate 4 (Learning):** Offline learning (outcome refinement, process graphs, contrastive bandits) only after sufficient trace volume.
+1. **An Audit Tool (`soro-audit`)**: Scans MCP servers and agent tool definitions to uncover missing idempotency declarations, hidden mutations, and unhandled retry loops.
+2. **An Execution Boundary SDK (`soro_boro`)**: Wraps consequential mutations across non-keyed services (SQL, GitHub, Slack, webhooks) with atomic claims and durable Write-Ahead Logging.
+3. **Fail-Closed on Uncertainty**: Unlike naive retries or receipt-only wrappers, Soro-Boro returns an explicit `AMBIGUOUS_DEFERRED` outcome whenever read replica lag or probe errors make upstream state uncertain.
 
 ---
 
-## 7. Product Interfaces
+## What Soro-Boro Is Not
 
-### Python Function Decorator & Wrapper
-```python
-from veyra import Veyra
-
-veyra = Veyra()
-
-@veyra.tool(retryable=True, idempotent=True)
-def get_customer(customer_id: str):
-    ...
-```
-
-### Model Context Protocol (MCP) Middleware
-```
-Existing MCP Client ──▶ Veyra Middleware ──▶ Existing MCP Server
-```
-
-### Standard Execution Trace Format
-```json
-{
-  "trace_id": "trc_849201",
-  "agent": "agent_alpha",
-  "tool_proposed": "get_customer",
-  "arguments_proposed": {"customer_id": "42"},
-  "tool_resolved": "get_customer",
-  "arguments_resolved": {"customer_id": 42},
-  "decision": "corrected_and_executed",
-  "failure": null,
-  "state_before": null,
-  "state_after": null,
-  "latency_ms": 12,
-  "attempt": 1,
-  "safe": true,
-  "outcome": "success"
-}
-```
-
-### CLI Diagnostic Surface: `veyra audit`
-```bash
-veyra audit --traces runs/events.jsonl
-```
-Summarizes tool calls, failure distributions, automatic recoveries, agent re-plans avoided, and verifies 0 unsafe retries.
+- **Not an LLM router or prompt gateway**: Execution safety and deduplication are deterministic systems problems, not prompt-engineering problems.
+- **Not a workflow graph engine**: Soro-Boro does not schedule agent DAGs (like Temporal or LangGraph); it protects the execution boundary of individual tools.
+- **Not a synthetic claim**: All claims are validated against real distributed failure modes (dropped ACKs, replica lag, probe 500s, concurrency races) on services lacking native idempotency keys.
 
 ---
 
-## 8. Final Frozen Roadmap
+## Key Invariants
 
-- **Week 1 — Core:** Veyra interceptor, Python wrapper, MCP middleware, trace format, failure taxonomy, schema validator, safe retry engine, Tier 0 synthetic benchmark suite.
-- **Week 2 — Evidence:** ToolMisuseBench adapter, baseline agents, metrics, fault-by-fault evaluation.
-- **Week 3 — Real Environment:** 3 MCP catalogs, real traces, production-like fault scenarios, benchmark report.
-- **Week 4 — Release:** Docs, examples, CLI audit, README, PyPI, GitHub release.
+1. **Operation Identity**: Derived once from workflow position, not token arguments. Mismatched arguments on replay trigger `MismatchedParametersError`.
+2. **Key Expiration**: Keys older than provider retention windows (e.g. 24h) cannot be re-dispatched automatically.
+3. **Authoritative Reconciliation**: Reconcilers query specific entities with op markers. `NOT_FOUND` is non-authoritative by default under eventual consistency.
+4. **Mutual Exclusion**: Cross-process atomic claim leases prevent racing parallel executions.

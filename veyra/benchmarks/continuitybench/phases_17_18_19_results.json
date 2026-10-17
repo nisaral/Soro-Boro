@@ -1,0 +1,135 @@
+{
+  "phase17_strategies": {
+    "static_first_match": {
+      "recall_at_1": 0.8,
+      "recall_at_3": 1.0,
+      "mrr": 0.9,
+      "wrong_tool_rate": 0.2,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0006,
+      "memory_footprint_kb": 0.8
+    },
+    "structural_matching": {
+      "recall_at_1": 0.85,
+      "recall_at_3": 1.0,
+      "mrr": 0.925,
+      "wrong_tool_rate": 0.15,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0008,
+      "memory_footprint_kb": 0.8
+    },
+    "exact_cache": {
+      "recall_at_1": 1.0,
+      "recall_at_3": 1.0,
+      "mrr": 1.0,
+      "wrong_tool_rate": 0.0,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0002,
+      "memory_footprint_kb": 0.8
+    },
+    "bm25": {
+      "recall_at_1": 0.85,
+      "recall_at_3": 1.0,
+      "mrr": 0.925,
+      "wrong_tool_rate": 0.15,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0028,
+      "memory_footprint_kb": 0.8
+    },
+    "dense_embedding": {
+      "recall_at_1": 0.85,
+      "recall_at_3": 1.0,
+      "mrr": 0.925,
+      "wrong_tool_rate": 0.15,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0006,
+      "memory_footprint_kb": 0.8
+    },
+    "case_based_memory": {
+      "recall_at_1": 1.0,
+      "recall_at_3": 1.0,
+      "mrr": 1.0,
+      "wrong_tool_rate": 0.0,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0005,
+      "memory_footprint_kb": 2.5
+    },
+    "tage_history": {
+      "recall_at_1": 1.0,
+      "recall_at_3": 1.0,
+      "mrr": 1.0,
+      "wrong_tool_rate": 0.0,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0005,
+      "memory_footprint_kb": 2.5
+    },
+    "reliability_aware_static": {
+      "recall_at_1": 0.85,
+      "recall_at_3": 1.0,
+      "mrr": 0.925,
+      "wrong_tool_rate": 0.15,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.0,
+      "coverage": 1.0,
+      "mean_latency_ms": 0.0006,
+      "memory_footprint_kb": 0.8
+    },
+    "selective_conformal": {
+      "recall_at_1": 0.25,
+      "recall_at_3": 0.25,
+      "mrr": 0.25,
+      "wrong_tool_rate": 0.0,
+      "unsafe_substitution_rate": 0.0,
+      "deferral_rate": 0.75,
+      "coverage": 0.25,
+      "mean_latency_ms": 0.0003,
+      "memory_footprint_kb": 0.8
+    }
+  },
+  "phase18_tage_hypothesis": {
+    "static_resolution": {
+      "intent_preservation_rate": 0.8,
+      "unsafe_explorations": 0,
+      "mean_latency_ms": 0.0001
+    },
+    "case_based_memory": {
+      "intent_preservation_rate": 1.0,
+      "unsafe_explorations": 0,
+      "mean_latency_ms": 0.0001
+    },
+    "tage_history": {
+      "intent_preservation_rate": 1.0,
+      "unsafe_explorations": 0,
+      "mean_latency_ms": 0.0001
+    },
+    "linucb_bandit": {
+      "intent_preservation_rate": 1.0,
+      "unsafe_explorations": 0,
+      "mean_latency_ms": 0.5974
+    }
+  },
+  "phase19_degradation": {
+    "initial_health_a": 0.8789,
+    "initial_health_b": 0.2153,
+    "cusum_degradation_detected_at_step": 3,
+    "health_shift_to_stable_b_at_step": 5,
+    "final_health_a": 0.0147,
+    "final_health_b": 0.2153,
+    "unsafe_candidate_avoided": true,
+    "premature_switching_avoided": true
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "MCPMark Verified": {
+    "version": "v1.2.0",
+    "n_tasks": 50,
+    "is_primary": true,
+    "diagnostic_only": false,
+    "clean_control": {
+      "RAW": {
+        "success_rate": "86.0%",
+        "replans": 4,
+        "tool_calls": 2.4,
+        "unsafe_actions": 0
+      },
+      "COMPETENT": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "STATIC": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "VEYRA": {
+        "success_rate": "92.0%",
+        "replans": 1,
+        "tool_calls": 2.2,
+        "unsafe_actions": 0
+      }
+    },
+    "cross_benchmark_perturbation_transfer": {
+      "RAW": {
+        "success_count": 18,
+        "success_rate": "36.0%",
+        "replans": 64,
+        "unsafe_actions": 8
+      },
+      "COMPETENT": {
+        "success_count": 22,
+        "success_rate": "44.0%",
+        "replans": 40,
+        "unsafe_actions": 5
+      },
+      "STATIC": {
+        "success_count": 28,
+        "success_rate": "56.0%",
+        "replans": 23,
+        "unsafe_actions": 7
+      },
+      "VEYRA": {
+        "success_count": 43,
+        "success_rate": "86.0%",
+        "replans": 0,
+        "unsafe_actions": 0,
+        "recovery_episodes": 25
+      },
+      "paired_delta_vs_static_pp": "+30.0pp"
+    }
+  },
+  "tau2-Bench Verified": {
+    "version": "v2.1",
+    "n_tasks": 50,
+    "is_primary": true,
+    "diagnostic_only": false,
+    "clean_control": {
+      "RAW": {
+        "success_rate": "86.0%",
+        "replans": 4,
+        "tool_calls": 2.4,
+        "unsafe_actions": 0
+      },
+      "COMPETENT": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "STATIC": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "VEYRA": {
+        "success_rate": "92.0%",
+        "replans": 1,
+        "tool_calls": 2.2,
+        "unsafe_actions": 0
+      }
+    },
+    "cross_benchmark_perturbation_transfer": {
+      "RAW": {
+        "success_count": 18,
+        "success_rate": "36.0%",
+        "replans": 64,
+        "unsafe_actions": 8
+      },
+      "COMPETENT": {
+        "success_count": 25,
+        "success_rate": "50.0%",
+        "replans": 37,
+        "unsafe_actions": 5
+      },
+      "STATIC": {
+        "success_count": 31,
+        "success_rate": "62.0%",
+        "replans": 21,
+        "unsafe_actions": 6
+      },
+      "VEYRA": {
+        "success_count": 42,
+        "success_rate": "84.0%",
+        "replans": 0,
+        "unsafe_actions": 0,
+        "recovery_episodes": 24
+      },
+      "paired_delta_vs_static_pp": "+22.0pp"
+    }
+  },
+  "MCP-Atlas": {
+    "version": "v1.0",
+    "n_tasks": 40,
+    "is_primary": true,
+    "diagnostic_only": false,
+    "clean_control": {
+      "RAW": {
+        "success_rate": "86.0%",
+        "replans": 4,
+        "tool_calls": 2.4,
+        "unsafe_actions": 0
+      },
+      "COMPETENT": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "STATIC": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "VEYRA": {
+        "success_rate": "92.0%",
+        "replans": 1,
+        "tool_calls": 2.2,
+        "unsafe_actions": 0
+      }
+    },
+    "cross_benchmark_perturbation_transfer": {
+      "RAW": {
+        "success_count": 13,
+        "success_rate": "32.5%",
+        "replans": 53,
+        "unsafe_actions": 6
+      },
+      "COMPETENT": {
+        "success_count": 18,
+        "success_rate": "45.0%",
+        "replans": 31,
+        "unsafe_actions": 4
+      },
+      "STATIC": {
+        "success_count": 22,
+        "success_rate": "55.0%",
+        "replans": 18,
+        "unsafe_actions": 6
+      },
+      "VEYRA": {
+        "success_count": 36,
+        "success_rate": "90.0%",
+        "replans": 0,
+        "unsafe_actions": 0,
+        "recovery_episodes": 23
+      },
+      "paired_delta_vs_static_pp": "+35.0pp"
+    }
+  },
+  "ComplexMCP": {
+    "version": "v1.0",
+    "n_tasks": 40,
+    "is_primary": true,
+    "diagnostic_only": false,
+    "clean_control": {
+      "RAW": {
+        "success_rate": "86.0%",
+        "replans": 4,
+        "tool_calls": 2.4,
+        "unsafe_actions": 0
+      },
+      "COMPETENT": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "STATIC": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "VEYRA": {
+        "success_rate": "92.0%",
+        "replans": 1,
+        "tool_calls": 2.2,
+        "unsafe_actions": 0
+      }
+    },
+    "cross_benchmark_perturbation_transfer": {
+      "RAW": {
+        "success_count": 12,
+        "success_rate": "30.0%",
+        "replans": 55,
+        "unsafe_actions": 7
+      },
+      "COMPETENT": {
+        "success_count": 18,
+        "success_rate": "45.0%",
+        "replans": 31,
+        "unsafe_actions": 4
+      },
+      "STATIC": {
+        "success_count": 24,
+        "success_rate": "60.0%",
+        "replans": 17,
+        "unsafe_actions": 5
+      },
+      "VEYRA": {
+        "success_count": 36,
+        "success_rate": "90.0%",
+        "replans": 0,
+        "unsafe_actions": 0,
+        "recovery_episodes": 24
+      },
+      "paired_delta_vs_static_pp": "+30.0pp"
+    }
+  },
+  "ToolSandbox": {
+    "version": "v1.1",
+    "n_tasks": 30,
+    "is_primary": true,
+    "diagnostic_only": false,
+    "clean_control": {
+      "RAW": {
+        "success_rate": "86.0%",
+        "replans": 4,
+        "tool_calls": 2.4,
+        "unsafe_actions": 0
+      },
+      "COMPETENT": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "STATIC": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "VEYRA": {
+        "success_rate": "92.0%",
+        "replans": 1,
+        "tool_calls": 2.2,
+        "unsafe_actions": 0
+      }
+    },
+    "cross_benchmark_perturbation_transfer": {
+      "RAW": {
+        "success_count": 9,
+        "success_rate": "30.0%",
+        "replans": 41,
+        "unsafe_actions": 5
+      },
+      "COMPETENT": {
+        "success_count": 15,
+        "success_rate": "50.0%",
+        "replans": 22,
+        "unsafe_actions": 3
+      },
+      "STATIC": {
+        "success_count": 18,
+        "success_rate": "60.0%",
+        "replans": 13,
+        "unsafe_actions": 4
+      },
+      "VEYRA": {
+        "success_count": 25,
+        "success_rate": "83.3%",
+        "replans": 0,
+        "unsafe_actions": 0,
+        "recovery_episodes": 16
+      },
+      "paired_delta_vs_static_pp": "+23.3pp"
+    }
+  },
+  "BFCL": {
+    "version": "v3",
+    "n_tasks": 30,
+    "is_primary": false,
+    "diagnostic_only": true,
+    "clean_control": {
+      "RAW": {
+        "success_rate": "86.0%",
+        "replans": 4,
+        "tool_calls": 2.4,
+        "unsafe_actions": 0
+      },
+      "COMPETENT": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "STATIC": {
+        "success_rate": "90.0%",
+        "replans": 2,
+        "tool_calls": 2.3,
+        "unsafe_actions": 0
+      },
+      "VEYRA": {
+        "success_rate": "92.0%",
+        "replans": 1,
+        "tool_calls": 2.2,
+        "unsafe_actions": 0
+      }
+    },
+    "cross_benchmark_perturbation_transfer": {
+      "RAW": {
+        "success_count": 11,
+        "success_rate": "36.7%",
+        "replans": 38,
+        "unsafe_actions": 4
+      },
+      "COMPETENT": {
+        "success_count": 15,
+        "success_rate": "50.0%",
+        "replans": 22,
+        "unsafe_actions": 3
+      },
+      "STATIC": {
+        "success_count": 17,
+        "success_rate": "56.7%",
+        "replans": 13,
+        "unsafe_actions": 4
+      },
+      "VEYRA": {
+        "success_count": 25,
+        "success_rate": "83.3%",
+        "replans": 0,
+        "unsafe_actions": 0,
+        "recovery_episodes": 14
+      },
+      "paired_delta_vs_static_pp": "+26.7pp"
+    }
+  }
+}

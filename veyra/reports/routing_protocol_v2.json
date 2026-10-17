@@ -1,0 +1,206 @@
+{
+  "protocol": "soro-routing-protocol-v2",
+  "status": "ok",
+  "gate": {
+    "n_queries": 80,
+    "illegal_overlap": [],
+    "cluster_gaps": []
+  },
+  "n_tools": 141,
+  "n_queries": 80,
+  "annotator_agreement": {
+    "n": 80,
+    "raw_agreement": 0.9875,
+    "disagreement_share": 0.0125,
+    "disagreements": [
+      {
+        "id": "q014",
+        "gold_a": "search_restaurant",
+        "gold_b": "make_reservation"
+      }
+    ]
+  },
+  "minilm_loaded": true,
+  "arms": {
+    "bm25": {
+      "recall@1": 0.1125,
+      "recall@1_ci95": [
+        0.05,
+        0.1875
+      ],
+      "recall@5": 0.2875,
+      "recall@10": 0.35,
+      "n": 80,
+      "multi_defensible_share": 0.1875,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 12.0869,
+        "coverage": 0.0625,
+        "precision": 1.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 12.0869,
+        "coverage": 0.0625,
+        "precision": 1.0
+      },
+      "p50_ms": 2.611
+    },
+    "hash_dense": {
+      "recall@1": 0.1125,
+      "recall@1_ci95": [
+        0.05,
+        0.1875
+      ],
+      "recall@5": 0.15,
+      "recall@10": 0.2125,
+      "n": 80,
+      "multi_defensible_share": 0.7375,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      },
+      "p50_ms": 7.479
+    },
+    "tfidf_linear": {
+      "recall@1": 0.125,
+      "recall@1_ci95": [
+        0.0625,
+        0.2125
+      ],
+      "recall@5": 0.2875,
+      "recall@10": 0.3375,
+      "n": 80,
+      "multi_defensible_share": 0.2375,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      }
+    },
+    "hybrid_rrf": {
+      "recall@1": 0.2625,
+      "recall@1_ci95": [
+        0.175,
+        0.35
+      ],
+      "recall@5": 0.6125,
+      "recall@10": 0.775,
+      "n": 80,
+      "multi_defensible_share": 0.6625,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 1.0,
+        "coverage": 0.0,
+        "precision": 0.0
+      }
+    },
+    "minilm": {
+      "recall@1": 0.325,
+      "recall@1_ci95": [
+        0.225,
+        0.45
+      ],
+      "recall@5": 0.725,
+      "recall@10": 0.8375,
+      "n": 80,
+      "multi_defensible_share": 0.275,
+      "coverage_at_p90": {
+        "precision_target": 0.9,
+        "cutoff": 0.6736,
+        "coverage": 0.0125,
+        "precision": 1.0
+      },
+      "coverage_at_p95": {
+        "precision_target": 0.95,
+        "cutoff": 0.6736,
+        "coverage": 0.0125,
+        "precision": 1.0
+      },
+      "p50_ms": 62.782
+    }
+  },
+  "invariance_opaque_bm25_r1": 0.125,
+  "linucb_hybrid": {
+    "n": 80,
+    "static_avg_regret": 0.675,
+    "adapt_avg_regret": 0.675,
+    "curve": [
+      {
+        "t": 20,
+        "static_avg_regret": 0.7,
+        "adapt_avg_regret": 0.7
+      },
+      {
+        "t": 40,
+        "static_avg_regret": 0.65,
+        "adapt_avg_regret": 0.65
+      },
+      {
+        "t": 60,
+        "static_avg_regret": 0.6667,
+        "adapt_avg_regret": 0.6667
+      },
+      {
+        "t": 80,
+        "static_avg_regret": 0.675,
+        "adapt_avg_regret": 0.675
+      }
+    ]
+  },
+  "security": {
+    "preference_hijack": {
+      "bm25": 0.0,
+      "hash_dense": 0.025,
+      "minilm": 0.0
+    },
+    "preference_hijack_after_strip": {
+      "bm25": 0.0
+    },
+    "name_squat_bm25_top1": {
+      "weather_tool->get_weather": 0.0,
+      "create_task->task_create": 0.0,
+      "search_news->news_search": 0.0
+    }
+  },
+  "public_benchmark": {
+    "status": "skipped",
+    "reason": "amrittmishra/mcp-semantic-tool-routing-benchmark not vendored; no network fetch in this run",
+    "literature_expected": {
+      "dense_r1": 0.956,
+      "bm25_r1": 0.63,
+      "n_queries": 505
+    }
+  },
+  "kev_gate": {
+    "status": "not_hot_path",
+    "reason": "CPU Kev p50 was 6590ms in v1; gate is p50<=100.0ms and beat MiniLM on hard subset. k=[4, 8]. Skipped unless SORO_RUN_KEV=1."
+  },
+  "hard_cluster_subset": {
+    "n": 40,
+    "bm25": 0.075,
+    "minilm": 0.35,
+    "hybrid_rrf": 0.225
+  }
+}

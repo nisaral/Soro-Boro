@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "n_unique_tasks": 100,
+    "n_seeds": 3,
+    "total_executions": 900,
+    "primary_analysis_unit": "TASK (clustered across seeds)",
+    "resamples": 10000
+  },
+  "veyra_vs_fair_static": {
+    "comparison": "Veyra vs. Fair Static Resolution",
+    "paired_success_delta": "+19.0pp",
+    "bootstrap_95_ci": "[+12.0pp, +27.0pp]",
+    "standard_error": 0.0394,
+    "exact_mcnemar_p_value": 3.814697265625e-06,
+    "p_value_formatted": "< 0.0001 (Extremely Significant)",
+    "odds_ratio": "Infinity (zero discordant failures for Veyra)",
+    "cohens_g_effect_size": 0.5,
+    "turns_delta": "0.0 (equal efficiency between static and veyra on common fallbacks)",
+    "tokens_delta": "0.0 (equal tokens between static and veyra on common fallbacks)",
+    "efficiency_claim_wording": "Efficiency gains are strictly vs Raw Agent, NOT vs Fair Static."
+  },
+  "veyra_vs_raw_agent": {
+    "comparison": "Veyra vs. Raw Agent",
+    "paired_success_delta": "+100.0pp",
+    "bootstrap_95_ci": "[+100.0pp, +100.0pp]",
+    "exact_mcnemar_p_value": 1.5777218104420236e-30,
+    "p_value_formatted": "< 0.0001 (Extremely Significant)",
+    "replan_reduction": "-100.0%",
+    "turn_reduction": "-52.4% (2.0 vs 4.2 turns)",
+    "token_reduction": "-50.5% (960 vs 1940 tokens)"
+  }
+}

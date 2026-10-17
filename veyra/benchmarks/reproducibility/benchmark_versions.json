@@ -1,0 +1,58 @@
+{
+  "protocol_version": "v1.0-release",
+  "generated_at": "2026-10-07T14:30:00Z",
+  "benchmarks": {
+    "continuitybench_v1": {
+      "name": "ContinuityBench-v1.0",
+      "version": "1.0",
+      "task_count": 120,
+      "split_counts": {"repair": 40, "gate": 40, "scorecard": 40},
+      "dataset_path": "benchmarks/continuitybench/tasks.json",
+      "dataset_sha256": "6c130e343f5dcfeecb8cff7647225c56d7821c97a8cb406ba75d4aa0ea9b49fb",
+      "status": "VALIDATED"
+    },
+    "continuitybench_300": {
+      "name": "Harder ContinuityBench 300",
+      "version": "2.0-Scorecard",
+      "task_count": 300,
+      "split_counts": {"repair": 100, "gate": 100, "scorecard": 100},
+      "dataset_path": "benchmarks/continuitybench/tasks_300.json",
+      "dataset_sha256": "4f90fb962cb74d5530ad24e8bd5749923d3a5cb412a2c86702f820cd66a61cc8",
+      "status": "VALIDATED"
+    },
+    "undobench": {
+      "name": "UndoBench Paired Trials",
+      "version": "1.0",
+      "task_count": 120,
+      "environment_oracle": "EnvironmentStateOracle",
+      "status": "PROVISIONAL_UNVERIFIED",
+      "quarantine_reason": "Pending official external release integration with paired environment state oracle"
+    },
+    "mcpmark_verified": {
+      "name": "MCPMark Verified",
+      "version": "v1.2.0",
+      "repo_url": "https://github.com/mcpmark/mcpmark-verified",
+      "status": "PROVISIONAL_UNVERIFIED",
+      "quarantine_reason": "Pending official containerized runner execution"
+    },
+    "tau2_verified": {
+      "name": "tau2-Bench Verified",
+      "version": "v2.1",
+      "repo_url": "https://github.com/sierra-research/tau2-bench",
+      "status": "PROVISIONAL_UNVERIFIED",
+      "quarantine_reason": "Pending official tau2-bench-verified evaluator execution"
+    },
+    "mcp_atlas": {
+      "name": "MCP-Atlas Public",
+      "version": "v1.0",
+      "status": "PROVISIONAL_UNVERIFIED",
+      "quarantine_reason": "Pending real public server execution"
+    },
+    "complex_mcp": {
+      "name": "ComplexMCP Scale Benchmark",
+      "version": "v1.0",
+      "status": "PROVISIONAL_UNVERIFIED",
+      "quarantine_reason": "Pending official ComplexMCP Docker runner execution"
+    }
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "manifest_version": "v0.1-phase0-frozen",
+  "generated_at_utc": "2026-10-07T06:55:00Z",
+  "veyra_commit": "3e5b3f705607d9f6f250bafb4af6d181f7394a12",
+  "dataset": {
+    "name": "ToolMisuseBench",
+    "release": "v0.1-frozen",
+    "paper": "arXiv:2604.01508",
+    "huggingface_repo": "sigdelakshey/ToolMisuseBench",
+    "split": "test_public",
+    "file_path": "data/official_hf/test_public/tasks.jsonl",
+    "sha256": "c1f6dc5f34810ab2303c00dc303129f618cc902a255fca1208985b30f309460d",
+    "total_tasks_in_split": 1000,
+    "evaluated_pilot_task_count": 15,
+    "exact_task_ids": [
+      "test_public_crud_0772",
+      "test_public_crud_0860",
+      "test_public_crud_0908",
+      "test_public_crud_0924",
+      "test_public_files_0050",
+      "test_public_files_0138",
+      "test_public_files_0354",
+      "test_public_files_0358",
+      "test_public_files_0842",
+      "test_public_retrieval_0037",
+      "test_public_retrieval_0045",
+      "test_public_retrieval_0657",
+      "test_public_scheduling_0303",
+      "test_public_scheduling_0335",
+      "test_public_scheduling_0651"
+    ]
+  },
+  "model_configuration": {
+    "provider": "Odyssey API",
+    "base_url": "https://odysseyapi.tech/v1",
+    "model": "openai/gpt-4o",
+    "temperature": 0.0,
+    "max_tokens": 256,
+    "seed": 42
+  },
+  "baselines": {
+    "raw_llm": {
+      "description": "Direct unmediated LLM agent action proposals, errors return raw feedback requiring replan turns"
+    },
+    "competent_baseline": {
+      "version": "v0.1-fair-competent",
+      "features": [
+        "schema_validation",
+        "safe_type_coercion",
+        "retry_after_bounded_backoff",
+        "strict_idempotency_protection",
+        "no_retry_on_ambiguous_mutation",
+        "structured_error_feedback"
+      ]
+    },
+    "veyra_resolver": {
+      "version": "v0.1-resolver",
+      "policy": "DeterministicRoutePolicy (frozen)",
+      "features": [
+        "structural_schema_normalization",
+        "idempotency_safe_retry_policy",
+        "declared_tool_equivalences",
+        "parameter_alias_mapping",
+        "structured_failure_provenance"
+      ]
+    }
+  },
+  "retry_policy": {
+    "max_retries": 2,
+    "base_backoff_sec": 0.05,
+    "idempotent_only": true,
+    "unsafe_retries_committed": 0
+  },
+  "token_accounting": {
+    "raw_llm": {
+      "total_tokens": 20551,
+      "avg_tokens_per_task": 1370.1,
+      "total_llm_calls": 31,
+      "avg_llm_calls": 2.07
+    },
+    "competent_baseline": {
+      "total_tokens": 19250,
+      "avg_tokens_per_task": 1283.3,
+      "total_llm_calls": 29,
+      "avg_llm_calls": 1.93,
+      "token_savings_pct": 6.3,
+      "turn_reduction_pct": 6.5
+    },
+    "veyra_resolver": {
+      "total_tokens": 19250,
+      "avg_tokens_per_task": 1283.3,
+      "total_llm_calls": 29,
+      "avg_llm_calls": 1.93,
+      "token_savings_pct": 6.3,
+      "turn_reduction_pct": 6.5
+    }
+  },
+  "tool_catalog": [
+    {
+      "domain": "crud",
+      "tools": ["get_account", "update_account", "create_account", "close_account"]
+    },
+    {
+      "domain": "files",
+      "tools": ["read_file", "write_file", "append_file", "delete_file"]
+    },
+    {
+      "domain": "retrieval",
+      "tools": ["search", "get_paper"]
+    },
+    {
+      "domain": "scheduling",
+      "tools": ["get_schedule", "schedule_event", "cancel_event", "reschedule_event"]
+    }
+  ]
+}

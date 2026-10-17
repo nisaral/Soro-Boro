@@ -58,10 +58,10 @@ export default function HandoffV1Visual() {
               HandoffV1 Portable State Contract
             </h2>
             <blockquote className="p-4 rounded-lg bg-white border-l-4 border-slate-900 text-xs sm:text-sm text-slate-700 font-medium italic shadow-sm">
-              &ldquo;Veyra treats cross-harness handoff as a state-contract problem, not a prompt-copying problem.&rdquo;
+              &ldquo;Soro-Boro treats cross-harness handoff as a state-contract problem, not a prompt-copying problem.&rdquo;
             </blockquote>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              When an agent harness stalls or hits an execution barrier, Veyra compiles `events.jsonl` into a frozen `HandoffV1` JSON payload. This preserves structural context, workspace diffs, and verification failures across runtime boundaries without ballooning prompt history.
+              When an agent harness stalls or hits an execution barrier, Soro-Boro compiles `events.jsonl` into a frozen `HandoffV1` JSON payload. This preserves structural context, workspace diffs, and verification failures across runtime boundaries without ballooning prompt history.
             </p>
 
             {/* Pipeline Step Indicator */}

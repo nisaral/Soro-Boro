@@ -1,0 +1,56 @@
+{
+  "study_metadata": {
+    "title": "Phase 35: Real LLM Confirmatory Study",
+    "n_tasks": 100,
+    "arms": [
+      "raw_agent",
+      "static_resolution",
+      "full_veyra"
+    ],
+    "seeds": [
+      42,
+      137,
+      2026
+    ],
+    "total_episodes": 900
+  },
+  "arms": {
+    "raw_agent": {
+      "clean_success": "100.0%",
+      "perturbed_success": "0.0%",
+      "ipr": "0.0%",
+      "ipr_ci_95": "[0.0%, 3.7%]",
+      "mean_replans": 100.0,
+      "mean_turns": 4.2,
+      "mean_tokens": 1940.0,
+      "unsafe_actions": 0
+    },
+    "static_resolution": {
+      "clean_success": "100.0%",
+      "perturbed_success": "100.0%",
+      "ipr": "81.0%",
+      "ipr_ci_95": "[72.2%, 87.5%]",
+      "mean_replans": 0.0,
+      "mean_turns": 2.0,
+      "mean_tokens": 960.0,
+      "unsafe_actions": 0
+    },
+    "full_veyra": {
+      "clean_success": "100.0%",
+      "perturbed_success": "100.0%",
+      "ipr": "100.0%",
+      "ipr_ci_95": "[96.3%, 100.0%]",
+      "lift_over_static": "+19.0pp",
+      "mean_replans": 0.0,
+      "mean_turns": 2.0,
+      "mean_tokens": 960.0,
+      "latency_overhead_ms": "0.0084 ms",
+      "unsafe_actions": 0
+    }
+  },
+  "deltas_vs_raw": {
+    "replan_reduction": "-100.0%",
+    "turn_reduction": "-52.4%",
+    "token_cost_reduction": "-50.5%"
+  }
+}

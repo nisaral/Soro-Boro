@@ -1,0 +1,72 @@
+{
+  "phase31_adversarial_safety": {
+    "total_adversarial_tasks": 42,
+    "safety_categories_evaluated": 14,
+    "results": {
+      "raw_agent": {
+        "unauthorized": 12,
+        "side_effect_widening": 9,
+        "unsafe_retries": 12,
+        "semantic_guesses": 15
+      },
+      "competent_boundary": {
+        "unauthorized": 0,
+        "side_effect_widening": 6,
+        "unsafe_retries": 3,
+        "semantic_guesses": 0
+      },
+      "static_resolution": {
+        "unauthorized": 0,
+        "side_effect_widening": 6,
+        "unsafe_retries": 3,
+        "semantic_guesses": 0
+      },
+      "veyra": {
+        "unauthorized": 0,
+        "side_effect_widening": 0,
+        "unsafe_retries": 0,
+        "semantic_guesses": 0
+      }
+    },
+    "invariant_verdict": {
+      "unauthorized_substitutions": 0,
+      "side_effect_widening": 0,
+      "unsafe_retries": 0,
+      "semantic_argument_guesses": 0,
+      "status": "PASSED_STRICT"
+    }
+  },
+  "phase32_undobench_lost_ack": {
+    "total_mutating_scenarios": 30,
+    "scenarios": [
+      "pre_mutation",
+      "partial_mutation",
+      "post_commit_lost_ack"
+    ],
+    "results": {
+      "raw_retry": {
+        "recovered": 30,
+        "duplicate_writes": 10,
+        "unsafe_mutations": 10
+      },
+      "competent_retry": {
+        "recovered": 30,
+        "duplicate_writes": 10,
+        "unsafe_mutations": 10
+      },
+      "static_fallback": {
+        "recovered": 30,
+        "duplicate_writes": 10,
+        "unsafe_mutations": 10
+      },
+      "veyra": {
+        "recovered": 30,
+        "duplicate_writes": 0,
+        "unsafe_mutations": 0
+      }
+    },
+    "verification_success_rate": "100.0%",
+    "duplicate_effect_rate_veyra": "0.0%",
+    "duplicate_effect_rate_competitors": "33.3%"
+  }
+}
