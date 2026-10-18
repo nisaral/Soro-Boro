@@ -338,7 +338,8 @@
       "collision": [
         8,
         52
-      ]
+      ],
+      "collision_only": false
     },
     "dense_cosine": {
       "total": [
@@ -352,7 +353,8 @@
       "collision": [
         11,
         52
-      ]
+      ],
+      "collision_only": false
     },
     "cross_encoder": {
       "total": [
@@ -366,7 +368,8 @@
       "collision": [
         6,
         52
-      ]
+      ],
+      "collision_only": false
     },
     "option_logits": {
       "total": [
@@ -380,7 +383,8 @@
       "collision": [
         11,
         52
-      ]
+      ],
+      "collision_only": false
     },
     "soro_0.8b": {
       "total": [
@@ -394,7 +398,8 @@
       "collision": [
         39,
         52
-      ]
+      ],
+      "collision_only": false
     },
     "soro_4b": {
       "total": [
@@ -408,7 +413,8 @@
       "collision": [
         41,
         52
-      ]
+      ],
+      "collision_only": false
     }
   },
   "bfcl": {
@@ -430,27 +436,29 @@
           12,
           33
         ]
-      }
+      },
+      "median_latency_ms": 0.07
     },
     "dense_cosine": {
       "total": [
-        68,
+        64,
         100
       ],
       "by_file": {
         "BFCL_v3_multiple.json": [
-          34,
+          33,
           34
         ],
         "BFCL_v3_live_multiple.json": [
-          22,
+          20,
           33
         ],
         "BFCL_v3_irrelevance.json": [
-          12,
+          11,
           33
         ]
-      }
+      },
+      "median_latency_ms": 0.38
     },
     "cross_encoder": {
       "total": [
@@ -470,7 +478,8 @@
           5,
           33
         ]
-      }
+      },
+      "median_latency_ms": 0.07
     },
     "option_logits": {
       "total": [
@@ -490,7 +499,8 @@
           8,
           33
         ]
-      }
+      },
+      "median_latency_ms": 0.06
     },
     "soro_0.8b": {
       "total": [
@@ -510,7 +520,8 @@
           17,
           33
         ]
-      }
+      },
+      "median_latency_ms": 124.2
     },
     "soro_4b": {
       "total": [
@@ -530,7 +541,8 @@
           25,
           33
         ]
-      }
+      },
+      "median_latency_ms": 648.56
     }
   }
 }

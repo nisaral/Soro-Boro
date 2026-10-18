@@ -33,6 +33,10 @@ SYSTEM_DISPLAY_NAMES = {
     "option_logits": "Untrained Option Logits (Zero-shot)",
     "soro_0.8b": "Soro-Kev-0.8B (Ours)",
     "soro_4b": "Soro-Kev-4B (Ours)",
+    "arch_router": "Arch-Router-1.5B (Katanemo)",
+    "xlam_1b": "xLAM-2-1b-fc-r (Salesforce)",
+    "hammer_1.5b": "Hammer2.1-1.5b (MadeAgents)",
+    "kev_27b": "Kev-27B (Palmer Group)",
 }
 
 EXTERNAL_PACKAGES = [
@@ -108,12 +112,7 @@ def run_conformal_splits(
             if not p_set:
                 p_set = [item["top_tool"]]
 
-            # Check coverage
             golds = [item["label"]]
-            if item.get("bfcl_file") and item.get("bfcl_file") != "BFCL_v3_irrelevance.json":
-                # For BFCL, gold can be multiple
-                pass
-
             if any(g in p_set for g in golds):
                 split_covered += 1
             split_sets.append(len(p_set))
@@ -239,6 +238,7 @@ def analyze_external_split(available_systems: List[str]) -> Tuple[Dict[str, Any]
             f"| {cov_str} "
             f"| {set_str} |"
         )
+        md_t1.append(row)
     md_t1.append("\n*\\*Note on Abstention: The 135 abstain rows represent 15 unique base queries evaluated across 9 format/distractor views each ($15 \\times 9 = 135$). Denominators strictly reconcile: $1,065 + 135 = 1,200$. Numerators strictly reconcile: e.g. 0.8B gets $926 + 102 = 1,028$; 4B gets $964 + 123 = 1,087$. Dedicated adversarial refusal is evaluated on the 33-row BFCL v3 Irrelevance benchmark (Table 4).*")
 
     # Markdown Table 2: Per-Package Breakdown
@@ -266,29 +266,43 @@ def analyze_external_split(available_systems: List[str]) -> Tuple[Dict[str, Any]
 
 
 def analyze_zeroshot_split(available_systems: List[str]) -> Tuple[Dict[str, Any], str]:
-    split = "zeroshot"
     results = {}
 
     for sys_key in available_systems:
-        records = load_predictions(split, sys_key)
-        total_n = len(records)
-        total_correct = sum(1 for r in records if r["is_correct"])
+        col_file = PRED_DIR / "zeroshot_collision" / f"{sys_key}.jsonl"
+        full_file = PRED_DIR / "zeroshot" / f"{sys_key}.jsonl"
 
-        clean_n = sum(1 for r in records if not r["has_collision"])
-        clean_c = sum(1 for r in records if not r["has_collision"] and r["is_correct"])
-        col_n = sum(1 for r in records if r["has_collision"])
-        col_c = sum(1 for r in records if r["has_collision"] and r["is_correct"])
+        if full_file.exists():
+            records = load_predictions("zeroshot", sys_key)
+            total_n = len(records)
+            total_correct = sum(1 for r in records if r["is_correct"])
 
-        verify_partition_consistency(
-            "Clean vs Collision Partition", sys_key, total_n, total_correct,
-            {"clean_rows": (clean_c, clean_n), "collision_rows": (col_c, col_n)}
-        )
+            clean_n = sum(1 for r in records if not r["has_collision"])
+            clean_c = sum(1 for r in records if not r["has_collision"] and r["is_correct"])
+            col_n = sum(1 for r in records if r["has_collision"])
+            col_c = sum(1 for r in records if r["has_collision"] and r["is_correct"])
 
-        results[sys_key] = {
-            "total": (total_correct, total_n),
-            "clean": (clean_c, clean_n),
-            "collision": (col_c, col_n),
-        }
+            verify_partition_consistency(
+                "Clean vs Collision Partition", sys_key, total_n, total_correct,
+                {"clean_rows": (clean_c, clean_n), "collision_rows": (col_c, col_n)}
+            )
+
+            results[sys_key] = {
+                "total": (total_correct, total_n),
+                "clean": (clean_c, clean_n),
+                "collision": (col_c, col_n),
+                "collision_only": False,
+            }
+        elif col_file.exists():
+            records = load_predictions("zeroshot_collision", sys_key)
+            col_n = len(records)
+            col_c = sum(1 for r in records if r["is_correct"])
+            results[sys_key] = {
+                "total": (col_c, col_n),
+                "clean": (0, 0),
+                "collision": (col_c, col_n),
+                "collision_only": True,
+            }
 
     # Markdown Table 3: Zero-shot Breakdown
     md_t3 = [
@@ -296,14 +310,24 @@ def analyze_zeroshot_split(available_systems: List[str]) -> Tuple[Dict[str, Any]
         "| :--- | :---: | :---: | :---: |",
     ]
     for sys_key in available_systems:
+        if sys_key not in results:
+            continue
         d = results[sys_key]
         name = SYSTEM_DISPLAY_NAMES.get(sys_key, sys_key)
-        row = (
-            f"| **{name}** "
-            f"| {format_acc(*d['total'])} "
-            f"| {format_acc(*d['clean'])} "
-            f"| {format_acc(*d['collision'])} |"
-        )
+        if d.get("collision_only"):
+            row = (
+                f"| **{name}** "
+                f"| - "
+                f"| - "
+                f"| {format_acc(*d['collision'])} |"
+            )
+        else:
+            row = (
+                f"| **{name}** "
+                f"| {format_acc(*d['total'])} "
+                f"| {format_acc(*d['clean'])} "
+                f"| {format_acc(*d['collision'])} |"
+            )
         md_t3.append(row)
 
     return results, "\n".join(md_t3)
@@ -325,26 +349,33 @@ def analyze_bfcl_split(available_systems: List[str]) -> Tuple[Dict[str, Any], st
 
         verify_partition_consistency("BFCL By-File Partition", sys_key, total_n, total_correct, by_file)
 
+        # Compute median latency if present
+        latencies = [r["latency_ms"] for r in records if "latency_ms" in r and r.get("latency_ms", 0) > 0]
+        med_lat = (sorted(latencies)[len(latencies) // 2]) if latencies else None
+
         results[sys_key] = {
             "total": (total_correct, total_n),
             "by_file": by_file,
+            "median_latency_ms": med_lat,
         }
 
     # Markdown Table 4: BFCL Abstention / Irrelevance Diagnostic
     md_t4 = [
-        "| System | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) |",
-        "| :--- | :---: | :---: | :---: | :---: |",
+        "| System | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) | Latency (ms) |",
+        "| :--- | :---: | :---: | :---: | :---: | :---: |",
     ]
     for sys_key in available_systems:
         d = results[sys_key]
         name = SYSTEM_DISPLAY_NAMES.get(sys_key, sys_key)
         bf = d["by_file"]
+        lat_str = f"{d['median_latency_ms']:.1f} ms" if d["median_latency_ms"] is not None else "-"
         row = (
             f"| **{name}** "
             f"| {format_acc(*bf['BFCL_v3_multiple.json'])} "
             f"| {format_acc(*bf['BFCL_v3_live_multiple.json'])} "
             f"| {format_acc(*bf['BFCL_v3_irrelevance.json'])} "
-            f"| {format_acc(*d['total'])} |"
+            f"| {format_acc(*d['total'])} "
+            f"| {lat_str} |"
         )
         md_t4.append(row)
 
@@ -358,9 +389,23 @@ def main():
     args = parser.parse_args()
 
     # Discover available systems in predictions
-    all_candidates = ["bm25", "dense_cosine", "cross_encoder", "option_logits", "soro_0.8b", "soro_4b"]
+    all_candidates = [
+        "bm25",
+        "dense_cosine",
+        "cross_encoder",
+        "option_logits",
+        "soro_0.8b",
+        "soro_4b",
+        "arch_router",
+        "xlam_1b",
+        "hammer_1.5b",
+        "kev_27b",
+    ]
     ext_available = [s for s in all_candidates if (PRED_DIR / "external_heldout" / f"{s}.jsonl").exists()]
-    zero_available = [s for s in all_candidates if (PRED_DIR / "zeroshot" / f"{s}.jsonl").exists()]
+    zero_available = [
+        s for s in all_candidates
+        if (PRED_DIR / "zeroshot" / f"{s}.jsonl").exists() or (PRED_DIR / "zeroshot_collision" / f"{s}.jsonl").exists()
+    ]
     bfcl_available = [s for s in all_candidates if (PRED_DIR / "bfcl" / f"{s}.jsonl").exists()]
 
     ext_results, t1_md, t2_md = analyze_external_split(ext_available)
@@ -404,6 +449,7 @@ def main():
         json.dump(full_data, f, indent=2)
 
     print(f"\nWritten verified tables to:\n  - {args.out_md}\n  - {args.out_json}")
+
 
 
 if __name__ == "__main__":

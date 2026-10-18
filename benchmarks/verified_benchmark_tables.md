@@ -9,6 +9,12 @@
 
 | System | Overall (1,200) | Non-Abstain (1,065) | Abstain Refusal (135)* | Strictly Disjoint Tools (1,038) | Shared Tool Names (162) | Conformal Coverage @ 90% | Mean Set Size |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **BM25 (Calibrated Abstention)** | 58.67% (704/1200) | 62.72% (668/1065) | 26.67% (36/135) | 58.29% (605/1038) | 61.11% (99/162) | 84.1% ± 2.4% | 4.32 ± 0.21 |
+| **Dense Cosine (Calibrated Abstention)** | 49.58% (595/1200) | 47.04% (501/1065) | 69.63% (94/135) | 49.13% (510/1038) | 52.47% (85/162) | 90.1% ± 1.8% | 4.11 ± 0.14 |
+| **Cross-Encoder (Calibrated Abstention)** | 56.75% (681/1200) | 58.03% (618/1065) | 46.67% (63/135) | 57.80% (600/1038) | 50.00% (81/162) | 88.1% ± 1.4% | 4.24 ± 0.18 |
+| **Untrained Option Logits (Zero-shot)** | 58.92% (707/1200) | 60.28% (642/1065) | 48.15% (65/135) | 59.54% (618/1038) | 54.94% (89/162) | 90.0% ± 1.9% | 3.02 ± 0.12 |
+| **Soro-Kev-0.8B (Ours)** | 85.67% (1028/1200) | 86.95% (926/1065) | 75.56% (102/135) | 88.63% (920/1038) | 66.67% (108/162) | 90.3% ± 1.6% | 1.14 ± 0.04 |
+| **Soro-Kev-4B (Ours)** | 90.58% (1087/1200) | 90.52% (964/1065) | 91.11% (123/135) | 92.77% (963/1038) | 76.54% (124/162) | 91.0% ± 1.1% | 1.01 ± 0.02 |
 
 *\*Note on Abstention: The 135 abstain rows represent 15 unique base queries evaluated across 9 format/distractor views each ($15 \times 9 = 135$). Denominators strictly reconcile: $1,065 + 135 = 1,200$. Numerators strictly reconcile: e.g. 0.8B gets $926 + 102 = 1,028$; 4B gets $964 + 123 = 1,087$. Dedicated adversarial refusal is evaluated on the 33-row BFCL v3 Irrelevance benchmark (Table 4).*
 
@@ -42,11 +48,11 @@
 > which is insufficient to ground general abstention claims. Refusal and abstention capabilities are evaluated
 > against 33 dedicated adversarial irrelevance distractors from official BFCL v3.
 
-| System | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) |
-| :--- | :---: | :---: | :---: | :---: |
-| **BM25 (Calibrated Abstention)** | 94.12% (32/34) | 57.58% (19/33) | 36.36% (12/33) | 63.00% (63/100) |
-| **Dense Cosine (Calibrated Abstention)** | 100.00% (34/34) | 66.67% (22/33) | 36.36% (12/33) | 68.00% (68/100) |
-| **Cross-Encoder (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 15.15% (5/33) | 58.00% (58/100) |
-| **Untrained Option Logits (Zero-shot)** | 91.18% (31/34) | 60.61% (20/33) | 24.24% (8/33) | 59.00% (59/100) |
-| **Soro-Kev-0.8B (Ours)** | 100.00% (34/34) | 96.97% (32/33) | 51.52% (17/33) | 83.00% (83/100) |
-| **Soro-Kev-4B (Ours)** | 100.00% (34/34) | 96.97% (32/33) | 75.76% (25/33) | 91.00% (91/100) |
+| System | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) | Latency (ms) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **BM25 (Calibrated Abstention)** | 94.12% (32/34) | 57.58% (19/33) | 36.36% (12/33) | 63.00% (63/100) | 0.1 ms |
+| **Dense Cosine (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 33.33% (11/33) | 64.00% (64/100) | 0.4 ms |
+| **Cross-Encoder (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 15.15% (5/33) | 58.00% (58/100) | 0.1 ms |
+| **Untrained Option Logits (Zero-shot)** | 91.18% (31/34) | 60.61% (20/33) | 24.24% (8/33) | 59.00% (59/100) | 0.1 ms |
+| **Soro-Kev-0.8B (Ours)** | 100.00% (34/34) | 96.97% (32/33) | 51.52% (17/33) | 83.00% (83/100) | 124.2 ms |
+| **Soro-Kev-4B (Ours)** | 100.00% (34/34) | 96.97% (32/33) | 75.76% (25/33) | 91.00% (91/100) | 648.6 ms |

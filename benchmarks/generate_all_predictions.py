@@ -13,6 +13,7 @@ Each line contains:
   "is_shared_tool": bool,
   "has_collision": bool,
   "bfcl_file": str,
+  "latency_ms": float,
   "probabilities": dict[str, float]
 }
 
@@ -32,7 +33,7 @@ import sys
 import time
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
@@ -94,11 +95,13 @@ class BM25Scorer:
         self.b = b
         self.abstain_threshold = abstain_threshold
 
-    def score(self, query: str, candidates: Dict[str, str]) -> Dict[str, float]:
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
         q_tokens = tokenize(query)
         tool_candidates = {k: v for k, v in candidates.items() if k != "__abstain__"}
         if not tool_candidates:
-            return {"__abstain__": 1.0}
+            latency = (time.perf_counter() - t0) * 1000
+            return {"__abstain__": 1.0}, latency
 
         doc_tokens = {name: tokenize(parse_candidate_text(name, desc)) for name, desc in tool_candidates.items()}
         N = len(tool_candidates)
@@ -137,7 +140,8 @@ class BM25Scorer:
             scale = 0.98
             res = {k: v * scale for k, v in tool_probs.items()}
             res["__abstain__"] = p_abstain
-        return res
+        latency = (time.perf_counter() - t0) * 1000
+        return res, latency
 
 
 class DenseCosineScorer:
@@ -158,11 +162,13 @@ class DenseCosineScorer:
         norm = math.sqrt(sum(v * v for v in vec))
         return [v / norm for v in vec] if norm > 0.0 else vec
 
-    def score(self, query: str, candidates: Dict[str, str]) -> Dict[str, float]:
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
         q_vec = self._embed(query)
         tool_candidates = {k: v for k, v in candidates.items() if k != "__abstain__"}
         if not tool_candidates:
-            return {"__abstain__": 1.0}
+            latency = (time.perf_counter() - t0) * 1000
+            return {"__abstain__": 1.0}, latency
 
         raw_sims = {}
         for name, desc in tool_candidates.items():
@@ -185,18 +191,21 @@ class DenseCosineScorer:
             scale = 0.98
             res = {k: v * scale for k, v in tool_probs.items()}
             res["__abstain__"] = p_abstain
-        return res
+        latency = (time.perf_counter() - t0) * 1000
+        return res, latency
 
 
 class CrossEncoderScorer:
     def __init__(self, abstain_threshold: float = 2.0):
         self.abstain_threshold = abstain_threshold
 
-    def score(self, query: str, candidates: Dict[str, str]) -> Dict[str, float]:
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
         q_tokens = set(tokenize(query))
         tool_candidates = {k: v for k, v in candidates.items() if k != "__abstain__"}
         if not tool_candidates:
-            return {"__abstain__": 1.0}
+            latency = (time.perf_counter() - t0) * 1000
+            return {"__abstain__": 1.0}, latency
 
         raw_scores = {}
         for name, desc in tool_candidates.items():
@@ -223,11 +232,13 @@ class CrossEncoderScorer:
             scale = 0.98
             res = {k: v * scale for k, v in tool_probs.items()}
             res["__abstain__"] = p_abstain
-        return res
+        latency = (time.perf_counter() - t0) * 1000
+        return res, latency
 
 
 class UntrainedOptionLogitsScorer:
-    def score(self, query: str, candidates: Dict[str, str]) -> Dict[str, float]:
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
         q_tokens = set(tokenize(query))
         raw_logits = {}
         for idx, (k, desc) in enumerate(candidates.items()):
@@ -242,7 +253,8 @@ class UntrainedOptionLogitsScorer:
         max_l = max(raw_logits.values()) if raw_logits else 0.0
         exp_l = {k: math.exp((v - max_l) / 1.6) for k, v in raw_logits.items()}
         sum_exp = sum(exp_l.values())
-        return {k: v / sum_exp for k, v in exp_l.items()}
+        latency = (time.perf_counter() - t0) * 1000
+        return {k: v / sum_exp for k, v in exp_l.items()}, latency
 
 
 # ---------------------------------------------------------
@@ -256,9 +268,272 @@ class SoroKevEvaluator:
         if not loaded:
             raise RuntimeError(f"Could not load neural SoroKev checkpoint from {checkpoint_path}")
 
-    def score(self, state: str, candidates: Dict[str, str]) -> Dict[str, float]:
+    def score(self, state: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
         with torch.inference_mode():
-            return self.scorer.probabilities(state, candidates)
+            probs = self.scorer.probabilities(state, candidates)
+        latency = (time.perf_counter() - t0) * 1000
+        return probs, latency
+
+
+# ---------------------------------------------------------
+# Local Dedicated Routing & Function-Calling Evaluators
+# ---------------------------------------------------------
+
+class ArchRouterEvaluator:
+    """
+    Evaluator for katanemo/Arch-Router-1.5B
+    Outputs JSON: {"route": "..."}
+    Maps {"route": "other"} or no-match to "__abstain__".
+    """
+    def __init__(self, model_id: str = "katanemo/Arch-Router-1.5B", device: str = "cuda"):
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        self.device = device
+        print(f"Loading {model_id} on {device}...")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            dtype=torch.float16,
+            device_map=device,
+        )
+
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
+        tool_candidates = {k: v for k, v in candidates.items() if k != "__abstain__"}
+        if not tool_candidates:
+            latency = (time.perf_counter() - t0) * 1000
+            return {"__abstain__": 1.0}, latency
+
+        routes = [
+            {"name": k, "description": parse_candidate_text(k, desc)[:250]}
+            for k, desc in tool_candidates.items()
+        ]
+
+        prompt = (
+            f"You are a helpful assistant designed to find the best suited route.\n"
+            f"You are provided with route description within <routes></routes> XML tags:\n"
+            f"<routes>\n{json.dumps(routes)}\n</routes>\n\n"
+            f"<conversation>\n{json.dumps([{'role': 'user', 'content': query}])}\n</conversation>\n\n"
+            f"Based on your analysis, provide your response in the following JSON formats if you find a matching route:\n"
+            f'{{"route": "route_name"}}'
+        )
+
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        with torch.inference_mode():
+            outputs = self.model.generate(**inputs, max_new_tokens=48, do_sample=False)
+        gen_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
+        resp = self.tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
+        latency = (time.perf_counter() - t0) * 1000
+
+        chosen_tool = "__abstain__"
+        route_match = re.search(r'\{[^{}]*"route"\s*:\s*"([^"]+)"[^{}]*\}', resp)
+        if route_match:
+            r = route_match.group(1).strip()
+            if r.lower() in ("other", "__abstain__", "none"):
+                chosen_tool = "__abstain__"
+            elif r in tool_candidates:
+                chosen_tool = r
+            else:
+                for cand in tool_candidates:
+                    if cand.lower() == r.lower():
+                        chosen_tool = cand
+                        break
+
+        probs = {k: (0.95 if k == chosen_tool else 0.05 / max(len(candidates) - 1, 1)) for k in candidates}
+        return probs, latency
+
+
+class XLAMEvaluator:
+    """
+    Evaluator for Salesforce/xLAM-2-1b-fc-r
+    Extracts selected tool name from its JSON tool_calls output.
+    Maps empty list [] or no tool call to "__abstain__".
+    """
+    def __init__(self, model_id: str = "Salesforce/xLAM-2-1b-fc-r", device: str = "cuda"):
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        self.device = device
+        print(f"Loading {model_id} on {device}...")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            dtype=torch.float16,
+            device_map=device,
+        )
+
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
+        tool_candidates = {k: v for k, v in candidates.items() if k != "__abstain__"}
+        if not tool_candidates:
+            latency = (time.perf_counter() - t0) * 1000
+            return {"__abstain__": 1.0}, latency
+
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "description": parse_candidate_text(name, desc)[:250],
+                    "parameters": {"type": "object", "properties": {}},
+                },
+            }
+            for name, desc in tool_candidates.items()
+        ]
+
+        messages = [{"role": "user", "content": query}]
+        try:
+            inputs = self.tokenizer.apply_chat_template(
+                messages,
+                tools=tools,
+                add_generation_prompt=True,
+                return_dict=True,
+                return_tensors="pt",
+            )
+            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            input_len = inputs["input_ids"].shape[-1]
+            with torch.inference_mode():
+                outputs = self.model.generate(**inputs, max_new_tokens=96, do_sample=False)
+            gen_tokens = outputs[:, input_len:]
+            resp = self.tokenizer.decode(gen_tokens[0], skip_special_tokens=True).strip()
+        except Exception:
+            prompt = (
+                f"Available tools:\n{json.dumps(tools)}\n\n"
+                f"User request: {query}\n"
+                f"Select tool in JSON format or return [] if none applies:"
+            )
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+            with torch.inference_mode():
+                outputs = self.model.generate(**inputs, max_new_tokens=96, do_sample=False)
+            gen_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
+            resp = self.tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
+
+        latency = (time.perf_counter() - t0) * 1000
+
+        chosen_tool = "__abstain__"
+        if resp.strip().startswith("[]") or "[]" in resp:
+            chosen_tool = "__abstain__"
+        else:
+            name_match = re.search(r'"name"\s*:\s*"([^"]+)"', resp)
+            if name_match:
+                t_name = name_match.group(1).strip()
+                if t_name in tool_candidates:
+                    chosen_tool = t_name
+                else:
+                    for cand in tool_candidates:
+                        if cand.lower() == t_name.lower():
+                            chosen_tool = cand
+                            break
+
+        probs = {k: (0.95 if k == chosen_tool else 0.05 / max(len(candidates) - 1, 1)) for k in candidates}
+        return probs, latency
+
+
+class HammerEvaluator:
+    """
+    Evaluator for MadeAgents/Hammer2.1-1.5b
+    Extracts tool name from output.
+    Maps no-call output or refusal to "__abstain__".
+    """
+    def __init__(self, model_id: str = "MadeAgents/Hammer2.1-1.5b", device: str = "cuda"):
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        self.device = device
+        print(f"Loading {model_id} on {device}...")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            dtype=torch.float16,
+            device_map=device,
+        )
+
+    def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
+        tool_candidates = {k: v for k, v in candidates.items() if k != "__abstain__"}
+        if not tool_candidates:
+            latency = (time.perf_counter() - t0) * 1000
+            return {"__abstain__": 1.0}, latency
+
+        tools = [
+            {"name": k, "description": parse_candidate_text(k, desc)[:250], "parameters": {"type": "object", "properties": {}}}
+            for k, desc in tool_candidates.items()
+        ]
+
+        prompt = (
+            "[BEGIN OF TASK INSTRUCTION]\n"
+            "You are a tool calling assistant. In order to complete the user's request, you need to select one or more appropriate tools from the following tools.\n"
+            "If none of the tools can be used, point it out and refuse to answer.\n"
+            "[END OF TASK INSTRUCTION]\n\n"
+            f"[BEGIN OF AVAILABLE TOOLS]\n{json.dumps(tools)}\n[END OF AVAILABLE TOOLS]\n\n"
+            "[BEGIN OF FORMAT INSTRUCTION]\n"
+            "The output MUST strictly adhere to the following JSON format:\n"
+            '{"name": "function_name", "arguments": {}}\n'
+            "[END OF FORMAT INSTRUCTION]\n\n"
+            f"[BEGIN OF QUERY]\n{query}\n[END OF QUERY]\n"
+        )
+
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        with torch.inference_mode():
+            outputs = self.model.generate(**inputs, max_new_tokens=96, do_sample=False)
+        gen_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
+        resp = self.tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
+        latency = (time.perf_counter() - t0) * 1000
+
+        chosen_tool = "__abstain__"
+        name_match = re.search(r'"name"\s*:\s*"([^"]+)"', resp)
+        if name_match:
+            t_name = name_match.group(1).strip()
+            if t_name in tool_candidates:
+                chosen_tool = t_name
+            else:
+                for cand in tool_candidates:
+                    if cand.lower() == t_name.lower():
+                        chosen_tool = cand
+                        break
+
+        probs = {k: (0.95 if k == chosen_tool else 0.05 / max(len(candidates) - 1, 1)) for k in candidates}
+        return probs, latency
+
+
+class KevRemoteEndpointEvaluator:
+    """
+    Evaluator for jaredpalmer/kev-27b via HTTP endpoint.
+    Sends (state, question, options) payload to a /v1/systemone or HF Inference Endpoint.
+    """
+    def __init__(self, endpoint_url: str, timeout: float = 30.0):
+        self.endpoint_url = endpoint_url.rstrip("/")
+        self.timeout = timeout
+        import httpx
+        self.client = httpx.Client(timeout=timeout)
+
+    def score(self, state: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
+        t0 = time.perf_counter()
+        url = self.endpoint_url if self.endpoint_url.endswith("/v1/systemone") else f"{self.endpoint_url}/v1/systemone"
+        body = {
+            "model": "jaredpalmer/kev-27b",
+            "state": state,
+            "questions": {
+                "tool_route": {
+                    "type": "choice",
+                    "instructions": "Which single tool should be routed?",
+                    "criteria": candidates,
+                }
+            },
+        }
+        resp = self.client.post(url, json=body)
+        resp.raise_for_status()
+        data = resp.json()
+        latency = (time.perf_counter() - t0) * 1000
+
+        answers = data.get("answers") or {}
+        answer = answers.get("tool_route") or answers.get("next_action") or {}
+        raw_probs = answer.get("probabilities")
+        if isinstance(raw_probs, dict) and raw_probs:
+            probs = {cid: float(raw_probs.get(cid, 0.0)) for cid in candidates}
+            tot = sum(probs.values())
+            if tot > 0:
+                return {k: v / tot for k, v in probs.items()}, latency
+        choice = answer.get("choice")
+        if choice in candidates:
+            return {cid: (0.95 if cid == choice else 0.05 / max(len(candidates) - 1, 1)) for cid in candidates}, latency
+        return {"__abstain__": 1.0}, latency
 
 
 # ---------------------------------------------------------
@@ -277,7 +552,7 @@ def load_external_dataset() -> List[Dict[str, Any]]:
     return records
 
 
-def load_zeroshot_dataset() -> List[Dict[str, Any]]:
+def load_zeroshot_dataset(collision_only: bool = False) -> List[Dict[str, Any]]:
     path = REPO_ROOT / "releases" / "soro-universal-tool-harness" / "val_zeroshot.jsonl"
     records = []
     with open(path, "r", encoding="utf-8") as f:
@@ -285,6 +560,8 @@ def load_zeroshot_dataset() -> List[Dict[str, Any]]:
             if line.strip():
                 r = json.loads(line)
                 r["_row_id"] = idx
+                if collision_only and not r.get("has_collision_distractor", False):
+                    continue
                 records.append(r)
     return records
 
@@ -292,7 +569,6 @@ def load_zeroshot_dataset() -> List[Dict[str, Any]]:
 def load_bfcl_slice() -> List[Dict[str, Any]]:
     path = REPO_ROOT / "veyra" / "data" / "bfcl" / "soro" / "bfcl_routing.jsonl"
     all_rows = []
-    seen: dict[str, int] = defaultdict(int)
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             if not line.strip():
@@ -303,14 +579,12 @@ def load_bfcl_slice() -> List[Dict[str, Any]]:
                 continue
             all_rows.append(r)
 
-    # Deterministic stratified sample matching benchmark_decision_models.py (n=100, seed=42)
     rng = random.Random(42)
     by_file = defaultdict(list)
     for r in all_rows:
         by_file[r.get("bfcl_file")].append(r)
 
     sampled = []
-    # 34 multiple, 33 live_multiple, 33 irrelevance
     counts = {"BFCL_v3_multiple.json": 34, "BFCL_v3_live_multiple.json": 33, "BFCL_v3_irrelevance.json": 33}
     for fname, target_n in counts.items():
         sub = by_file[fname]
@@ -332,10 +606,11 @@ def evaluate_system_on_dataset(
     records: List[Dict[str, Any]],
     split_name: str,
     output_path: Path,
+    overwrite: bool = False,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     existing_preds = []
-    if output_path.exists():
+    if output_path.exists() and not overwrite:
         with open(output_path, "r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
@@ -355,6 +630,7 @@ def evaluate_system_on_dataset(
     print(f"\nEvaluating '{system_name}' on '{split_name}' (resuming from {start_idx}/{len(records)} rows)...")
 
     t0 = time.time()
+    latencies: List[float] = [p["latency_ms"] for p in existing_preds if "latency_ms" in p]
     mode = "a" if start_idx > 0 else "w"
 
     with open(output_path, mode, encoding="utf-8") as out_f:
@@ -370,10 +646,17 @@ def evaluate_system_on_dataset(
             has_collision = bool(r.get("has_collision_distractor", False))
 
             # Score candidates
-            if isinstance(system_obj, SoroKevEvaluator):
-                probs = system_obj.score(state, candidates)
+            if isinstance(system_obj, (SoroKevEvaluator, KevRemoteEndpointEvaluator)):
+                res = system_obj.score(state, candidates)
             else:
-                probs = system_obj.score(query, candidates)
+                res = system_obj.score(query, candidates)
+
+            if isinstance(res, tuple):
+                probs, lat_ms = res
+            else:
+                probs, lat_ms = res, 0.0
+
+            latencies.append(lat_ms)
 
             # Normalize probs
             tot_p = sum(probs.values())
@@ -405,30 +688,56 @@ def evaluate_system_on_dataset(
                 "is_shared_tool": is_shared_tool,
                 "has_collision": has_collision,
                 "bfcl_file": bfcl_file,
+                "latency_ms": round(lat_ms, 2),
                 "probabilities": {k: round(v, 6) for k, v in probs.items()},
             }
             predictions.append(row_pred)
             out_f.write(json.dumps(row_pred) + "\n")
             out_f.flush()
 
-            if (idx + 1) % 50 == 0 or (idx + 1) == len(records):
+            if (idx + 1) % 25 == 0 or (idx + 1) == len(records):
                 elapsed = time.time() - t0
                 rate = (idx + 1) / max(elapsed, 0.001)
-                remaining = (len(records) - (idx + 1)) / max(rate, 0.001)
+                med_lat = (sorted(latencies)[len(latencies) // 2]) if latencies else 0.0
                 print(
                     f"  [{idx+1}/{len(records)}] Correct: {n_correct}/{idx+1} ({n_correct/(idx+1)*100:.2f}%) "
-                    f"- {elapsed:.1f}s ({rate:.1f} rows/s, ~{remaining:.0f}s left)",
+                    f"| Median Latency: {med_lat:.1f}ms | Rate: {rate:.1f} rows/s",
                     flush=True,
                 )
 
-    print(f"Saved {len(predictions)} predictions to: {output_path}", flush=True)
+    med_lat = (sorted(latencies)[len(latencies) // 2]) if latencies else 0.0
+    print(f"Saved {len(predictions)} predictions to: {output_path} (Median latency: {med_lat:.1f}ms)", flush=True)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Generate per-row prediction files for all systems")
-    parser.add_argument("--split", choices=["external_heldout", "zeroshot", "bfcl", "all"], default="all")
-    parser.add_argument("--system", choices=["bm25", "dense_cosine", "cross_encoder", "option_logits", "soro_0.8b", "soro_4b", "all_baselines", "all"], default="all")
+    parser.add_argument(
+        "--split",
+        choices=["external_heldout", "zeroshot", "zeroshot_collision", "bfcl", "all"],
+        default="all",
+    )
+    parser.add_argument(
+        "--system",
+        choices=[
+            "bm25",
+            "dense_cosine",
+            "cross_encoder",
+            "option_logits",
+            "soro_0.8b",
+            "soro_4b",
+            "arch_router",
+            "xlam_1b",
+            "hammer_1.5b",
+            "kev_27b",
+            "all_baselines",
+            "all_dedicated",
+            "all",
+        ],
+        default="all",
+    )
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--endpoint-url", default=os.environ.get("KEV_ENDPOINT", None), help="URL for remote Kev-27B /v1/systemone endpoint")
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing prediction files instead of resuming")
     args = parser.parse_args()
 
     pred_dir = REPO_ROOT / "benchmarks" / "predictions"
@@ -438,7 +747,9 @@ def main():
     if args.split in ("external_heldout", "all"):
         splits_to_run.append(("external_heldout", load_external_dataset()))
     if args.split in ("zeroshot", "all"):
-        splits_to_run.append(("zeroshot", load_zeroshot_dataset()))
+        splits_to_run.append(("zeroshot", load_zeroshot_dataset(collision_only=False)))
+    if args.split == "zeroshot_collision":
+        splits_to_run.append(("zeroshot_collision", load_zeroshot_dataset(collision_only=True)))
     if args.split in ("bfcl", "all"):
         splits_to_run.append(("bfcl", load_bfcl_slice()))
 
@@ -459,10 +770,25 @@ def main():
         ckpt_4b = str(REPO_ROOT / "releases" / "soro-kev-4b")
         systems["soro_4b"] = SoroKevEvaluator(ckpt_4b, device=args.device)
 
+    # Dedicated local models
+    if args.system in ("arch_router", "all_dedicated", "all"):
+        systems["arch_router"] = ArchRouterEvaluator(device=args.device)
+    if args.system in ("xlam_1b", "all_dedicated", "all"):
+        systems["xlam_1b"] = XLAMEvaluator(device=args.device)
+    if args.system in ("hammer_1.5b", "all_dedicated", "all"):
+        systems["hammer_1.5b"] = HammerEvaluator(device=args.device)
+
+    # Remote Kev-27B Endpoint
+    if args.system in ("kev_27b", "all"):
+        if args.endpoint_url:
+            systems["kev_27b"] = KevRemoteEndpointEvaluator(args.endpoint_url)
+        elif args.system == "kev_27b":
+            raise ValueError("Must provide --endpoint-url or set KEV_ENDPOINT to evaluate kev_27b")
+
     for split_name, dataset in splits_to_run:
         for sys_name, sys_obj in systems.items():
             out_file = pred_dir / split_name / f"{sys_name}.jsonl"
-            evaluate_system_on_dataset(sys_name, sys_obj, dataset, split_name, out_file)
+            evaluate_system_on_dataset(sys_name, sys_obj, dataset, split_name, out_file, overwrite=args.overwrite)
 
 
 if __name__ == "__main__":
