@@ -6,7 +6,7 @@
     "base_model_class": "Qwen3_5TextModel",
     "parent_library": "transformers.models.qwen3_5.modeling_qwen3_5"
   },
-  "base_model_name_or_path": null,
+  "base_model_name_or_path": "Qwen/Qwen3.5-0.8B-Base",
   "bias": "none",
   "corda_config": null,
   "ensure_weight_tying": false,
@@ -41,7 +41,7 @@
     "q_proj"
   ],
   "target_parameters": null,
-  "task_type": null,
+  "task_type": "FEATURE_EXTRACTION",
   "trainable_token_indices": null,
   "use_bdlora": null,
   "use_dora": false,
