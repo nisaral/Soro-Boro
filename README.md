@@ -20,6 +20,18 @@ Soro-Kev builds directly on Jared Palmer's [Kev decision model architecture](htt
 - **Sub-420ms Latency**: Evaluates catalogs in a single prefill forward pass on consumer hardware (NVIDIA RTX 4050 Laptop GPU).
 - **Split-Conformal Action Boundaries**: Returns calibrated prediction sets ($S$) where $|S| = 1 \implies \text{EXECUTE}$, $|S| \in [2, 8] \implies \text{ASK}$, and `__abstain__` halts execution.
 
+### Why Decision Pointers Outperform Standard Agent Stacks
+
+| Dimension | Classical Retrievers (BM25 / Embeddings / Cross-Encoder) | Generative LLMs (JSON Decoding) | Soro-Kev-4B (Single-Pass Pointer) |
+| :--- | :---: | :---: | :---: |
+| **Similar Tool Name Collisions** (52 rows) | Collapses to **11.5% – 21.2%** accuracy | Slower prompt parsing, context bloat | **78.85% (41/52)** accuracy |
+| **Irrelevant / Conversational Queries** | Forces false tool call **63.6% – 84.8%** of time | Hallucinates plausible tools | **75.76% (25/33)** calibrated refusal |
+| **Tool Name Hallucinations** | Possible if ranking corrupted | 2% – 8% invented tool names on 50+ tools | **0.00%** (bounded by pointer architecture) |
+| **Prediction Uncertainty** | Raw heuristic scores, uncalibrated | Arbitrary verbalized confidence | **Conformal Set $\|S\| = 1.01$ tools** @ 90% coverage |
+| **Broken Parameter Keys** | None (crashes downstream runtime) | Requires costly retry token generations | **99.1% automatic semantic argument repair** |
+| **Duplicate Mutating Loops** | None (retries double-bill or double-write) | High risk on transport timeouts | **`@soro_wrap` 120s duplicate mutation guard** |
+| **Median Inference Latency** | 5 – 40 ms (retriever only, no execution logic) | 1,500 – 3,500 ms (autoregressive decode) | **413 ms (4B)** / **80 ms (0.8B)** |
+
 ```text
 User State + Tool Catalog
   [0] get_weather: {location: str}
@@ -160,12 +172,15 @@ All retrievers were evaluated with clean schema text parsing and calibrated with
 
 ### 4. Berkeley Function Calling Leaderboard (BFCL v3 Diagnostic, 100 rows)
 
-| Slice | BM25 | Dense Cosine | Cross-Encoder | Untrained Logits | Soro-Kev-0.8B | Soro-Kev-4B |
+| Slice / Metric | BM25 | Dense Cosine | Cross-Encoder | Untrained Logits | Soro-Kev-0.8B | Soro-Kev-4B |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **BFCL Multiple Tools (34 rows)** | 94.12% (32/34) | 100.0% (34/34) | 97.06% (33/34) | 91.18% (31/34) | **100.0% (34/34)** | **100.0% (34/34)** |
 | **BFCL Live Multiple (33 rows)** | 57.58% (19/33) | 66.67% (22/33) | 60.61% (20/33) | 60.61% (20/33) | **96.97% (32/33)** | **96.97% (32/33)** |
 | **BFCL Irrelevance Abstention (33 rows)** | 36.36% (12/33) | 36.36% (12/33) | 15.15% (5/33) | 24.24% (8/33) | **51.52% (17/33)** | **75.76% (25/33)** |
 | **Overall Diagnostic (100 rows)** | 63.00% (63/100) | 68.00% (68/100) | 58.00% (58/100) | 59.00% (59/100) | **83.00% (83/100)** | **91.00% (91/100)** |
+| **Median Latency (ms/query, RTX 4050)** | **4.2 ms** | **18.4 ms** | **42.1 ms** | 410 ms | **80 ms** | **413 ms** |
+
+*\*Note on Generative vs. Pointer Latency: Standard autoregressive LLMs generating JSON tool calls (e.g. Qwen3-4B-Instruct) average 1,800–2,600 ms/query on this same GPU. Soro-Kev requires no token decoding loop, completing inference in a single prefill pass (80 ms on 0.8B, 413 ms on 4B).*
 
 ---
 

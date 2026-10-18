@@ -1,24 +1,18 @@
 ---
 license: apache-2.0
-base_model: Qwen/Qwen3.5-0.8B-Base
-tags:
-  - decision-model
-  - tool-calling
-  - function-calling
-  - mcp
-  - model-context-protocol
-  - pointer-network
-  - conformal-prediction
-  - system-one
-  - multiple-choice
-  - calibration
-  - typesafe
-  - agent-harness
-  - edge-ai
-  - qwen3.5
+library_name: peft
+pipeline_tag: text-classification
+base_model:
+  - Qwen/Qwen3.5-0.8B-Base
 datasets:
   - nisaralll/soro-universal-tool-harness
-pipeline_tag: text-classification
+tags:
+  - mcp
+  - tool-calling
+  - agent-harness
+  - decision-model
+  - pointer-network
+  - conformal-prediction
 ---
 
 # Soro-Kev-0.8B
@@ -202,12 +196,15 @@ All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop G
 
 ### 3. Berkeley Function Calling Leaderboard (BFCL Slices)
 
-| Slice | BM25 | Dense Cosine | Cross-Encoder | Untrained Logits | Soro-Kev-0.8B | Soro-Kev-4B |
+| Slice / Metric | BM25 | Dense Cosine | Cross-Encoder | Untrained Logits | Soro-Kev-0.8B | Soro-Kev-4B |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **BFCL Multiple Tools (34 rows)** | 94.12% (32/34) | 100.0% (34/34) | 97.06% (33/34) | 91.18% (31/34) | **100.0% (34/34)** | **100.0% (34/34)** |
 | **BFCL Live Multiple (33 rows)** | 57.58% (19/33) | 66.67% (22/33) | 60.61% (20/33) | 60.61% (20/33) | **96.97% (32/33)** | **96.97% (32/33)** |
 | **BFCL Irrelevance Abstention (33 rows)** | 36.36% (12/33) | 36.36% (12/33) | 15.15% (5/33) | 24.24% (8/33) | **51.52% (17/33)** | **75.76% (25/33)** |
 | **Overall Diagnostic (100 rows)** | 63.00% (63/100) | 68.00% (68/100) | 58.00% (58/100) | 59.00% (59/100) | **83.00% (83/100)** | **91.00% (91/100)** |
+| **Median Latency (ms/query, RTX 4050)** | **4.2 ms** | **18.4 ms** | **42.1 ms** | 410 ms | **80 ms** | **413 ms** |
+
+*\*Note on Generative vs. Pointer Latency: Standard autoregressive LLMs generating JSON tool calls average 1,800–2,600 ms/query on this same GPU. Soro-Kev requires no token decoding loop, completing inference in a single prefill pass (80 ms on 0.8B, 413 ms on 4B).*
 
 ---
 
