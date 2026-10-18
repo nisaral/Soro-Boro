@@ -72,7 +72,7 @@ def main():
     repo_root = Path(__file__).resolve().parent.parent
     data_dir = repo_root / "releases" / "soro-universal-tool-harness"
     train_path = data_dir / "train.jsonl"
-    val_ext_path = data_dir / "val_external_human.jsonl"
+    val_ext_path = data_dir / "val_external_heldout.jsonl"
     val_zero_path = data_dir / "val_zeroshot.jsonl"
     output_dir = repo_root / "benchmarks"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -251,7 +251,7 @@ def main():
             "val_zeroshot_rows": len(zero_records),
             "timestamp": "2026-10-17T22:50:00Z",
             "provenance": {
-                "val_external_human": "Held-out, independently sourced benchmark composed of Tau-2 dialogue tasks (Sierra Research MIT, simulated customer personas against fixed schemas) and MCP Semantic Benchmark (Mishra et al., 2026 CC BY 4.0, manually authored queries against live reference MCP server tools). Gold labels verified by task execution targets.",
+                "val_external_heldout": "Held-out, independently sourced benchmark composed of Tau-2 dialogue tasks (Sierra Research MIT, simulated customer personas against fixed schemas) and MCP Semantic Benchmark (Mishra et al., 2026 CC BY 4.0, manually authored queries against live reference MCP server tools). Gold labels verified by task execution targets.",
                 "val_zeroshot": "Synthetic multi-domain tool execution scenarios across 54 unseen packages, generated via instruction prompting and validated for semantic collision distractors."
             }
         },
@@ -291,7 +291,7 @@ def main():
         },
         "stratification": {
             "train": train_strat,
-            "val_external_human": ext_strat,
+            "val_external_heldout": ext_strat,
             "val_zeroshot": zero_strat
         }
     }

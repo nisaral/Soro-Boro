@@ -14,7 +14,7 @@ from soro_boro.lifecycle import (
 )
 from soro_boro.wal import WALRecord, WriteAheadLog
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "SoroBoundary",
     "TimeoutException",
@@ -26,4 +26,12 @@ __all__ = [
     "TerminalOutcome",
     "WriteAheadLog",
     "WALRecord",
+    "SoroHarness",
 ]
+
+
+def __getattr__(name: str):
+    if name == "SoroHarness":
+        from soro.harness.pipeline import SoroHarness
+        return SoroHarness
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")

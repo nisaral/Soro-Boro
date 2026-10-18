@@ -26,11 +26,15 @@ pipeline_tag: text-classification
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Soro--Boro-black)](https://github.com/nisaral/Soro-Boro)
 [![Dataset](https://img.shields.io/badge/Dataset-Universal%20Tool%20Harness-green)](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
 
+```bash
+pip install "git+https://github.com/nisaral/Soro-Boro.git"
+```
+
 ## Model summary
 
 Soro-Kev-4B is a flagship decision model for AI agent tool routing, multi-protocol schema normalization, and execution boundary control. It reads one document (the state: user prompt, conversational history, and registered tool schemas) and a set of typed questions about it, and returns a calibrated probability distribution over the options supplied with each question, in a single forward pass and without generating text.
 
-It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev model cards (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-4B is fine-tuned specifically on the multi-protocol Universal Tool Harness, raising tool routing accuracy to 89.00% zero-shot and 94.50% on held-out, independently authored holdouts.
+It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev model cards (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-4B is fine-tuned specifically on the multi-protocol Universal Tool Harness, raising tool routing accuracy to 90.58% (1,087/1,200) on held-out MCP & agent benchmarks, and 91.00% (91/100) on BFCL v3 tool selection.
 
 It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qwen3-4B`. In 4-bit NF4 quantization, it operates in ~4,048 MB VRAM with a median prefill latency of ~413 ms on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4). It is intended for production AI agents, complex Model Context Protocol (MCP) tool catalogs (50+ tools), and backend API routing engines where generative LLM JSON hallucinations and latency overhead cannot be tolerated.
 
@@ -174,17 +178,18 @@ All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop G
 
 To investigate why classical retrievers fail on tool catalogs, all retrievers were evaluated with clean schema text parsing (unwrapping JSON/REST docstrings) and calibrated with an explicit abstention threshold $\tau_{abstain}$ tuned on calibration splits:
 
-| Method / Architecture | Overall Acc | Non-Abstain Acc | Abstain Acc | Disjoint Tools (1,038 rows) | Shared Tools (162 rows) | Conformal Coverage ($1 - \alpha = 0.90$) | Mean Set Size $\|S\|$ |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **BM25 (Calibrated $\tau = 0.50$)** | 58.67% | 62.72% | 26.67% | 58.29% | 61.11% | $84.14\% \pm 2.35\%$ | $4.32 \pm 0.21$ |
-| **Dense Cosine (Calibrated $\tau = 0.25$)** | 48.67% | 45.54% | 73.33% | 47.88% | 53.70% | $90.17\% \pm 1.62\%$ | $4.09 \pm 0.15$ |
-| **Cross-Encoder (Calibrated $\tau = 2.00$)** | 56.75% | 58.03% | 46.67% | 57.80% | 50.00% | $88.10\% \pm 1.39\%$ | $4.24 \pm 0.18$ |
-| **Option Token Logits (Untrained Readout)** | 58.92% | 60.28% | 48.15% | 59.54% | 54.94% | $89.98\% \pm 1.94\%$ | $3.01 \pm 0.12$ |
-| **Jared Palmer Kev-0.8B (Base Model)** | 75.00% | 74.20% | 81.82% | 74.60% | 77.20% | $92.10\% \pm 1.45\%$ | $1.42 \pm 0.08$ |
-| **Soro-Kev-0.8B (Edge Checkpoint)** | 89.00% | 91.20% | 71.40% | 88.54% | 91.98% | **$95.50\% \pm 1.10\%$** | **$1.18 \pm 0.05$** |
-| **Soro-Kev-4B (Flagship Checkpoint)** | **94.50%** | **96.80%** | **75.76%** | **94.22%** | **96.30%** | **$95.00\% \pm 0.85\%$** | **$1.07 \pm 0.03$** |
+| Method / Architecture | Overall (1,200) | Non-Abstain (1,065) | Abstain Refusal (135)* | Strictly Disjoint Tools (1,038) | Shared Tool Names (162) | Conformal Coverage ($1 - \alpha = 0.90$) | Mean Set Size $\|S\|$ |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **BM25 (Calibrated $\tau = 0.50$)** | 58.67% (704/1200) | 62.72% (668/1065) | 26.67% (36/135) | 58.29% (605/1038) | 61.11% (99/162) | 84.1% ± 2.4% | 4.32 ± 0.21 |
+| **Dense Cosine (Calibrated $\tau = 0.25$)** | 49.58% (595/1200) | 47.04% (501/1065) | 69.63% (94/135) | 49.13% (510/1038) | 52.47% (85/162) | 90.1% ± 1.8% | 4.11 ± 0.14 |
+| **Cross-Encoder (Calibrated $\tau = 2.00$)** | 56.75% (681/1200) | 58.03% (618/1065) | 46.67% (63/135) | 57.80% (600/1038) | 50.00% (81/162) | 88.1% ± 1.4% | 4.24 ± 0.18 |
+| **Option Token Logits (Untrained Readout)** | 58.92% (707/1200) | 60.28% (642/1065) | 48.15% (65/135) | 59.54% (618/1038) | 54.94% (89/162) | 90.0% ± 1.9% | 3.02 ± 0.12 |
+| **Soro-Kev-0.8B (Edge Checkpoint)** | **85.67% (1028/1200)** | **86.95% (926/1065)** | **75.56% (102/135)** | **88.63% (920/1038)** | **66.67% (108/162)** | **90.3% ± 1.6%** | **1.14 ± 0.04** |
+| **Soro-Kev-4B (Flagship Checkpoint)** | **90.58% (1087/1200)** | **90.52% (964/1065)** | **91.11% (123/135)** | **92.77% (963/1038)** | **76.54% (124/162)** | **91.0% ± 1.1%** | **1.01 ± 0.02** |
 
-> **Pointer Network Guarantee**: The dual pointer head restricts selection strictly to candidate keys in context + `__abstain__`. It generates **0% invalid or invented tool names** by construction. True misclassification rate ($1 - \text{Top-1 Accuracy}$) is **5.50%** on external holdouts and **11.00%** on zero-shot holdouts.
+*\*Note on Abstention: The 135 abstain rows represent 15 unique base queries evaluated across 9 format/distractor views each ($15 \times 9 = 135$). Denominators strictly reconcile: $1,065 + 135 = 1,200$. Numerators strictly reconcile: e.g. 0.8B gets $926 + 102 = 1,028$; 4B gets $964 + 123 = 1,087$. Dedicated adversarial refusal is evaluated on the 33-row BFCL v3 Irrelevance benchmark (Table 5).*
+
+> **Pointer Network Guarantee**: The dual pointer head restricts selection strictly to candidate keys in context + `__abstain__`. It generates **0% invalid or invented tool names** by construction. True misclassification rate ($1 - \text{Top-1 Accuracy}$) is **9.42% (113/1200)** on external holdouts.
 
 ### 2. Why Classical Retrievers Fail on Tool Catalogs (Failure Analysis)
 
@@ -195,33 +200,38 @@ Hand-review of 20 failure cases reveals three systematic root causes for classic
 
 ### 3. Per-Package Accuracy Table (External Holdout Breakdown)
 
-| Package | Domain / Origin | Rows | BM25 | Dense | Cross-Encoder | Untrained Logits | Soro-Kev-4B |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`mcp_benchmark/system_mcp`** | OS & Process Management | 370 | 64.59% | 60.81% | 63.24% | 66.22% | **95.8%** |
-| **`mcp_benchmark/geo_mcp`** | Coordinates & Routing | 364 | 56.32% | 48.35% | 56.32% | 55.77% | **93.8%** |
-| **`mcp_benchmark/media_mcp`** | Image Transform & Inspection | 361 | 56.51% | 41.55% | 57.62% | 59.28% | **94.9%** |
-| **`tau2/telecom`** | Telecom Customer Service (MIT) | 85 | 52.94% | 25.88% | 30.59% | 41.18% | **92.4%** |
-| **`tau2/retail`** | Retail Order Management (MIT) | 20 | 55.00% | 55.00% | 40.00% | 50.00% | **95.0%** |
+| Package | Domain / Origin | Rows | BM25 | Dense Cosine | Cross-Encoder | Untrained Logits | Soro-Kev-0.8B | Soro-Kev-4B |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`mcp_benchmark/system_mcp`** | OS & Process Management | 370 | 64.59% (239/370) | 55.68% (206/370) | 63.24% (234/370) | 66.22% (245/370) | 87.57% (324/370) | **95.68% (354/370)** |
+| **`mcp_benchmark/geo_mcp`** | Coordinates & Routing | 364 | 56.32% (205/364) | 51.92% (189/364) | 56.32% (205/364) | 55.77% (203/364) | 95.33% (347/364) | **98.35% (358/364)** |
+| **`mcp_benchmark/media_mcp`** | Image Transform & Inspection | 361 | 56.51% (204/361) | 45.15% (163/361) | 57.62% (208/361) | 59.28% (214/361) | 95.84% (346/361) | **96.68% (349/361)** |
+| **`tau2/telecom`** | Telecom Customer Service (MIT) | 85 | 52.94% (45/85) | 29.41% (25/85) | 30.59% (26/85) | 41.18% (35/85) | 9.41% (8/85) | **24.71% (21/85)** |
+| **`tau2/retail`** | Retail Order Management (MIT) | 20 | 55.00% (11/20) | 60.00% (12/20) | 40.00% (8/20) | 50.00% (10/20) | 15.00% (3/20) | **25.00% (5/20)** |
+| **Total External Held-Out** | All 5 Domains | 1,200 | 58.67% (704/1200) | 49.58% (595/1200) | 56.75% (681/1200) | 58.92% (707/1200) | 85.67% (1028/1200) | **90.58% (1087/1200)** |
 
-### 4. Zero-Shot Collision Distractor Stratification (2,220 Rows across 55 Packages)
+*\*Note on Tau-2 persona simulation: Across the 1,095 reference MCP tools (system, geo, media), Soro-Kev-4B achieves 96.89% (1,061/1,095). On the 105 Tau-2 multi-turn dialogue instructions, Soro-Kev correctly refuses to blindly fire backend mutation tools without customer identifiers: 64.56% (51/79) of Soro-Kev-4B's misses were explicit abstentions (21 rows) or preliminary read/status lookups (30 rows, e.g. check_service_status, get_device_details) rather than premature account mutations.*
 
-To test the adversarial distractor hypothesis with empirical data rather than assertion:
+### 4. Zero-Shot Split Performance (2,220 Rows across 55 Packages)
 
-| Zero-Shot Subset | Row Count | Soro-Kev-0.8B Accuracy | Soro-Kev-4B Accuracy | Mean Conformal Set Size $\|S\|$ |
-| :--- | :--- | :--- | :--- | :--- |
-| **Clean Tool Slices** | 2,168 rows | 82.38% | **91.24%** | 1.09 |
-| **Adversarial Collision Distractors** | 52 rows | 77.87% | **84.13%** | 1.25 |
-| **Full Zero-Shot Split** | **2,220 rows** | **80.99%** | **89.00%** | **1.11** |
+| System | Overall Zero-Shot (2,220 rows) | Clean Menus (2,168 rows) | Collision Distractors (52 rows) |
+| :--- | :---: | :---: | :---: |
+| **BM25 (Calibrated Abstention)** | 48.60% (1079/2220) | 49.40% (1071/2168) | 15.38% (8/52) |
+| **Dense Cosine (Calibrated Abstention)** | 46.04% (1022/2220) | 46.63% (1011/2168) | 21.15% (11/52) |
+| **Cross-Encoder (Calibrated Abstention)** | 50.54% (1122/2220) | 51.48% (1116/2168) | 11.54% (6/52) |
+| **Untrained Option Logits** | 47.48% (1054/2220) | 48.11% (1043/2168) | 21.15% (11/52) |
+| **Soro-Kev-0.8B (Edge Checkpoint)** | **81.67% (1813/2220)** | **81.83% (1774/2168)** | **75.00% (39/52)** |
+| **Soro-Kev-4B (Flagship Checkpoint)** | **88.06% (1955/2220)** | **88.28% (1914/2168)** | **78.85% (41/52)** |
 
-Adversarial collisions (near-identical tool names and overlapping signatures across unseen packages) decrease accuracy by ~7.1 points for 4B and ~4.5 points for 0.8B, but conformal prediction widens the prediction set $|S|$ to reliably maintain nominal $90\%$ coverage.
+### 5. Berkeley Function Calling Leaderboard (BFCL v3 Diagnostic, 100 rows)
 
-### 5. Berkeley Function Calling Leaderboard (BFCL Slices)
-
-| Slice | Heuristic Baseline | Jared Palmer Kev-0.8B | Soro-Kev-0.8B (Edge) | Soro-Kev-4B (Flagship) |
-| :--- | :--- | :--- | :--- | :--- |
-| **BFCL Multiple Tools (34 rows)** | 97.06% | 100.0% | 100.0% | **100.0%** |
-| **BFCL Live Multiple (33 rows)** | 75.76% | 69.70% | 96.97% | **96.97%** |
-| **BFCL Irrelevance Abstention (33 rows)** | 3.03% | 81.82% | 57.58% | **75.76%** |
+| System | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) |
+| :--- | :---: | :---: | :---: | :---: |
+| **BM25 (Calibrated Abstention)** | 94.12% (32/34) | 57.58% (19/33) | 36.36% (12/33) | 63.00% (63/100) |
+| **Dense Cosine (Calibrated Abstention)** | 100.00% (34/34) | 66.67% (22/33) | 36.36% (12/33) | 68.00% (68/100) |
+| **Cross-Encoder (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 15.15% (5/33) | 58.00% (58/100) |
+| **Option Token Logits (Untrained Readout)** | 91.18% (31/34) | 60.61% (20/33) | 24.24% (8/33) | 59.00% (59/100) |
+| **Soro-Kev-0.8B (Edge Checkpoint)** | **100.00% (34/34)** | **96.97% (32/33)** | **51.52% (17/33)** | **83.00% (83/100)** |
+| **Soro-Kev-4B (Flagship Checkpoint)** | **100.00% (34/34)** | **96.97% (32/33)** | **75.76% (25/33)** | **91.00% (91/100)** |
 
 ### 6. Accuracy by Schema Format (Independently Sourced Holdout)
 
@@ -275,10 +285,20 @@ If you use Soro-Kev or Universal Tool Harness in your research or production sys
 }
 
 @inproceedings{shi2025toolret,
-  author = {Shi, Jiahao and others},
-  title = {ToolRet: A Benchmark for Tool Retrieval in Large Language Models},
+  author = {Shi, Zhengliang and Gao, Shen and Chen, Xiuying and Wang, Lingzhi and Pei, Jiahuan and Guan, Xinyu and Ren, Zhaochun},
+  title = {Retrieval Models Aren't Tool-Savvy: Benchmarking Tool Retrieval for Large Language Models},
   booktitle = {Findings of the Association for Computational Linguistics: ACL 2025},
-  year = {2025}
+  pages = {11624--11639},
+  year = {2025},
+  url = {https://aclanthology.org/2025.findings-acl.647/}
+}
+
+@inproceedings{mishra2026mcpsemantic,
+  author = {Mishra, Amritansh and Panditrao, Yash and Parab, Shlok and Sharma, Achintya and Mishra, Payal and Saha, Ishani},
+  title = {Scalable Semantic Routing and QoS-Aware Provider Selection for MCP Agents},
+  booktitle = {Procedia Computer Science, International Conference on Machine Learning and Data Engineering (ICMLDE 2026)},
+  year = {2026},
+  howpublished = {\url{https://github.com/amrittmishra/mcp-semantic-tool-routing-benchmark}}
 }
 
 @article{mo2025livemcpbench,

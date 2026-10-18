@@ -22,3 +22,6 @@ third_party/mcpmark/
 third_party/tau2-bench/
 third_party/undobench/
 skills-lock.json
+build/
+dist/
+*.egg-info/

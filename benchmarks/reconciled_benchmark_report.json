@@ -1,0 +1,536 @@
+{
+  "external_heldout": {
+    "bm25": {
+      "total": [
+        704,
+        1200
+      ],
+      "misclassification_rate": [
+        496,
+        1200
+      ],
+      "non_abstain": [
+        668,
+        1065
+      ],
+      "abstain": [
+        36,
+        135
+      ],
+      "strictly_disjoint": [
+        605,
+        1038
+      ],
+      "shared_tools": [
+        99,
+        162
+      ],
+      "per_package": {
+        "mcp_benchmark/system_mcp": [
+          239,
+          370
+        ],
+        "mcp_benchmark/geo_mcp": [
+          205,
+          364
+        ],
+        "mcp_benchmark/media_mcp": [
+          204,
+          361
+        ],
+        "tau2/telecom": [
+          45,
+          85
+        ],
+        "tau2/retail": [
+          11,
+          20
+        ]
+      },
+      "conformal": {
+        "mean_coverage": 0.8414,
+        "std_coverage": 0.0235,
+        "mean_set_size": 4.3202,
+        "std_set_size": 0.207
+      }
+    },
+    "dense_cosine": {
+      "total": [
+        595,
+        1200
+      ],
+      "misclassification_rate": [
+        605,
+        1200
+      ],
+      "non_abstain": [
+        501,
+        1065
+      ],
+      "abstain": [
+        94,
+        135
+      ],
+      "strictly_disjoint": [
+        510,
+        1038
+      ],
+      "shared_tools": [
+        85,
+        162
+      ],
+      "per_package": {
+        "mcp_benchmark/system_mcp": [
+          206,
+          370
+        ],
+        "mcp_benchmark/geo_mcp": [
+          189,
+          364
+        ],
+        "mcp_benchmark/media_mcp": [
+          163,
+          361
+        ],
+        "tau2/telecom": [
+          25,
+          85
+        ],
+        "tau2/retail": [
+          12,
+          20
+        ]
+      },
+      "conformal": {
+        "mean_coverage": 0.9008,
+        "std_coverage": 0.0175,
+        "mean_set_size": 4.1127,
+        "std_set_size": 0.1444
+      }
+    },
+    "cross_encoder": {
+      "total": [
+        681,
+        1200
+      ],
+      "misclassification_rate": [
+        519,
+        1200
+      ],
+      "non_abstain": [
+        618,
+        1065
+      ],
+      "abstain": [
+        63,
+        135
+      ],
+      "strictly_disjoint": [
+        600,
+        1038
+      ],
+      "shared_tools": [
+        81,
+        162
+      ],
+      "per_package": {
+        "mcp_benchmark/system_mcp": [
+          234,
+          370
+        ],
+        "mcp_benchmark/geo_mcp": [
+          205,
+          364
+        ],
+        "mcp_benchmark/media_mcp": [
+          208,
+          361
+        ],
+        "tau2/telecom": [
+          26,
+          85
+        ],
+        "tau2/retail": [
+          8,
+          20
+        ]
+      },
+      "conformal": {
+        "mean_coverage": 0.881,
+        "std_coverage": 0.0139,
+        "mean_set_size": 4.2401,
+        "std_set_size": 0.1754
+      }
+    },
+    "option_logits": {
+      "total": [
+        707,
+        1200
+      ],
+      "misclassification_rate": [
+        493,
+        1200
+      ],
+      "non_abstain": [
+        642,
+        1065
+      ],
+      "abstain": [
+        65,
+        135
+      ],
+      "strictly_disjoint": [
+        618,
+        1038
+      ],
+      "shared_tools": [
+        89,
+        162
+      ],
+      "per_package": {
+        "mcp_benchmark/system_mcp": [
+          245,
+          370
+        ],
+        "mcp_benchmark/geo_mcp": [
+          203,
+          364
+        ],
+        "mcp_benchmark/media_mcp": [
+          214,
+          361
+        ],
+        "tau2/telecom": [
+          35,
+          85
+        ],
+        "tau2/retail": [
+          10,
+          20
+        ]
+      },
+      "conformal": {
+        "mean_coverage": 0.9004,
+        "std_coverage": 0.0188,
+        "mean_set_size": 3.016,
+        "std_set_size": 0.1172
+      }
+    },
+    "soro_0.8b": {
+      "total": [
+        1028,
+        1200
+      ],
+      "misclassification_rate": [
+        172,
+        1200
+      ],
+      "non_abstain": [
+        926,
+        1065
+      ],
+      "abstain": [
+        102,
+        135
+      ],
+      "strictly_disjoint": [
+        920,
+        1038
+      ],
+      "shared_tools": [
+        108,
+        162
+      ],
+      "per_package": {
+        "mcp_benchmark/system_mcp": [
+          324,
+          370
+        ],
+        "mcp_benchmark/geo_mcp": [
+          347,
+          364
+        ],
+        "mcp_benchmark/media_mcp": [
+          346,
+          361
+        ],
+        "tau2/telecom": [
+          8,
+          85
+        ],
+        "tau2/retail": [
+          3,
+          20
+        ]
+      },
+      "conformal": {
+        "mean_coverage": 0.9029,
+        "std_coverage": 0.0161,
+        "mean_set_size": 1.1413,
+        "std_set_size": 0.0398
+      }
+    },
+    "soro_4b": {
+      "total": [
+        1087,
+        1200
+      ],
+      "misclassification_rate": [
+        113,
+        1200
+      ],
+      "non_abstain": [
+        964,
+        1065
+      ],
+      "abstain": [
+        123,
+        135
+      ],
+      "strictly_disjoint": [
+        963,
+        1038
+      ],
+      "shared_tools": [
+        124,
+        162
+      ],
+      "per_package": {
+        "mcp_benchmark/system_mcp": [
+          354,
+          370
+        ],
+        "mcp_benchmark/geo_mcp": [
+          358,
+          364
+        ],
+        "mcp_benchmark/media_mcp": [
+          349,
+          361
+        ],
+        "tau2/telecom": [
+          21,
+          85
+        ],
+        "tau2/retail": [
+          5,
+          20
+        ]
+      },
+      "conformal": {
+        "mean_coverage": 0.9095,
+        "std_coverage": 0.0112,
+        "mean_set_size": 1.0132,
+        "std_set_size": 0.0207
+      }
+    }
+  },
+  "zeroshot": {
+    "bm25": {
+      "total": [
+        1079,
+        2220
+      ],
+      "clean": [
+        1071,
+        2168
+      ],
+      "collision": [
+        8,
+        52
+      ]
+    },
+    "dense_cosine": {
+      "total": [
+        1022,
+        2220
+      ],
+      "clean": [
+        1011,
+        2168
+      ],
+      "collision": [
+        11,
+        52
+      ]
+    },
+    "cross_encoder": {
+      "total": [
+        1122,
+        2220
+      ],
+      "clean": [
+        1116,
+        2168
+      ],
+      "collision": [
+        6,
+        52
+      ]
+    },
+    "option_logits": {
+      "total": [
+        1054,
+        2220
+      ],
+      "clean": [
+        1043,
+        2168
+      ],
+      "collision": [
+        11,
+        52
+      ]
+    },
+    "soro_0.8b": {
+      "total": [
+        1813,
+        2220
+      ],
+      "clean": [
+        1774,
+        2168
+      ],
+      "collision": [
+        39,
+        52
+      ]
+    },
+    "soro_4b": {
+      "total": [
+        1955,
+        2220
+      ],
+      "clean": [
+        1914,
+        2168
+      ],
+      "collision": [
+        41,
+        52
+      ]
+    }
+  },
+  "bfcl": {
+    "bm25": {
+      "total": [
+        63,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          32,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          19,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          12,
+          33
+        ]
+      }
+    },
+    "dense_cosine": {
+      "total": [
+        68,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          34,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          22,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          12,
+          33
+        ]
+      }
+    },
+    "cross_encoder": {
+      "total": [
+        58,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          33,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          20,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          5,
+          33
+        ]
+      }
+    },
+    "option_logits": {
+      "total": [
+        59,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          31,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          20,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          8,
+          33
+        ]
+      }
+    },
+    "soro_0.8b": {
+      "total": [
+        83,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          34,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          32,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          17,
+          33
+        ]
+      }
+    },
+    "soro_4b": {
+      "total": [
+        91,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          34,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          32,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          25,
+          33
+        ]
+      }
+    }
+  }
+}

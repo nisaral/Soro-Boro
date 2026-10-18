@@ -8,10 +8,12 @@ version = "0.2.0"
 description = "Soro-Kev: System-One Conformal Tool Router (4B & 0.8B) on Qwen3 Decision Models"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 dependencies = [
   "torch>=2.0",
   "transformers>=4.40",
+  "peft>=0.10.0",
+  "safetensors>=0.4.0",
   "huggingface-hub>=0.20",
   "httpx>=0.27",
   "PyYAML>=6.0",

@@ -29,11 +29,11 @@ Unlike standard function-calling datasets that train models to emit token-by-tok
 
 ## Files & Split Breakdown
 
-| Split File | Rows | Delexicalized (`op_N`) | Real-World & Human Held-Out |
+| Split File | Rows | Delexicalized (`op_N`) | Real-World & Held-Out Description |
 | :--- | :--- | :--- | :--- |
 | **`train.jsonl`** | 23,192 | 5,853 (25.2%) | Real MCP, REST, GraphQL, Agent Skills, Python |
 | **`val_zeroshot.jsonl`** | 2,220 | 693 (31.2%) | Tools never seen during training (strict tool-identity split) |
-| **`val_external_human.jsonl`** | 1,200 | 0 (0.0%) | Completely held-out human user queries (Tau-2 & live MCP benchmarks) |
+| **`val_external_heldout.jsonl`** | 1,200 | 0 (0.0%) | Completely held-out queries (Tau-2 simulated personas & live MCP authored queries) |
 
 ---
 
@@ -80,7 +80,7 @@ from huggingface_hub import hf_hub_download
 
 file_path = hf_hub_download(
     repo_id="nisaralll/soro-universal-tool-harness",
-    filename="val_external_human.jsonl",
+    filename="val_external_heldout.jsonl",
     repo_type="dataset"
 )
 

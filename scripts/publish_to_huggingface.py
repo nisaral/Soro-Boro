@@ -18,7 +18,7 @@ BUNDLES = {
 REQUIRED = {
     "soro-kev-4b": ["head.pt", "adapter_model.safetensors", "adapter_config.json", "config.json", "temperature.json", "README.md"],
     "soro-kev-0.8b": ["head.pt", "adapter_model.safetensors", "adapter_config.json", "config.json", "temperature.json", "README.md"],
-    "soro-universal-tool-harness": ["train.jsonl", "val_zeroshot.jsonl", "val_external_human.jsonl", "README.md"],
+    "soro-universal-tool-harness": ["train.jsonl", "val_zeroshot.jsonl", "val_external_heldout.jsonl", "README.md"],
 }
 
 
