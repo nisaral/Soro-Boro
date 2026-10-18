@@ -1,5 +1,6 @@
 # Soro-Kev: System-One Conformal Tool Router (4B & 0.8B)
 
+[![PyPI Version](https://img.shields.io/pypi/v/soro-boro.svg?color=blue)](https://pypi.org/project/soro-boro/)
 [![GitHub Release](https://img.shields.io/github/v/release/nisaral/Soro-Boro?color=blue&label=Release)](https://github.com/nisaral/Soro-Boro/releases/tag/v0.2.0)
 [![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-114--Tool%20Space%20Demo-blue)](https://huggingface.co/spaces/nisaralll/soro-kev-router)
 [![Hugging Face Model 4B](https://img.shields.io/badge/Hugging%20Face-Soro--Kev--4B-purple)](https://huggingface.co/nisaralll/soro-kev-4b)
@@ -8,7 +9,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-black.svg)](LICENSE)
 
 ```bash
-pip install "git+https://github.com/nisaral/Soro-Boro.git"
+pip install soro-boro
 ```
 
 **Soro-Kev** is an open-weights decision model family (4B flagship & 0.8B edge) for ultra-fast AI agent tool routing, schema normalization, and execution boundary control.
@@ -50,10 +51,10 @@ User State + Tool Catalog
 
 ## Quickstart & Installation
 
-Install directly from GitHub into your environment:
+Install directly from PyPI into your environment:
 
 ```bash
-pip install git+https://github.com/nisaral/Soro-Boro.git
+pip install soro-boro
 ```
 
 Or for local development:
