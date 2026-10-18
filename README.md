@@ -123,7 +123,10 @@ sequenceDiagram
     Note over Boundary: Enforces Idempotency Key & Mutation Guard
     Boundary->>MCP: JSON-RPC Call (tools/call)
     MCP-->>Boundary: Result JSON
-    Boundary-->---
+    Boundary-->>User: Verified Result (0 duplicate executions)
+```
+
+---
 
 ## Empirical Benchmark Results
 
