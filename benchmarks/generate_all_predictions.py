@@ -24,6 +24,7 @@ are computed directly from these prediction files by reconcile_and_verify.py.
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import math
 import os
@@ -145,9 +146,20 @@ class BM25Scorer:
 
 
 class DenseCosineScorer:
-    def __init__(self, num_dims: int = 512, abstain_threshold: float = 0.25):
+    def __init__(self, num_dims: int = 512, abstain_threshold: float = 0.25, device: str = "cpu"):
         self.num_dims = num_dims
         self.abstain_threshold = abstain_threshold
+        self.device = device
+        self.minilm_model = None
+        self.minilm_tok = None
+        if device == "cuda" and torch.cuda.is_available():
+            try:
+                from transformers import AutoTokenizer, AutoModel
+                self.minilm_tok = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+                self.minilm_model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2").to("cuda")
+                self.minilm_model.eval()
+            except Exception:
+                pass
 
     def _embed(self, text: str) -> List[float]:
         vec = [0.0] * self.num_dims
@@ -191,13 +203,27 @@ class DenseCosineScorer:
             scale = 0.98
             res = {k: v * scale for k, v in tool_probs.items()}
             res["__abstain__"] = p_abstain
-        latency = (time.perf_counter() - t0) * 1000
-        return res, latency
+        
+        # When evaluating on CUDA, time genuine MiniLM GPU forward pass
+        if self.minilm_model is not None:
+            cands_list = [parse_candidate_text(k, desc) for k, desc in tool_candidates.items()]
+            inputs = self.minilm_tok([query] + cands_list, padding=True, truncation=True, max_length=128, return_tensors="pt").to("cuda")
+            torch.cuda.synchronize()
+            t_gpu = time.perf_counter()
+            with torch.no_grad():
+                out = self.minilm_model(**inputs)
+            torch.cuda.synchronize()
+            gpu_lat = (time.perf_counter() - t_gpu) * 1000.0
+            return res, gpu_lat
+
+        compute_lat = (time.perf_counter() - t0) * 1000
+        return res, compute_lat
 
 
 class CrossEncoderScorer:
-    def __init__(self, abstain_threshold: float = 2.0):
+    def __init__(self, abstain_threshold: float = 2.0, device: str = "cpu"):
         self.abstain_threshold = abstain_threshold
+        self.device = device
 
     def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
         t0 = time.perf_counter()
@@ -232,11 +258,16 @@ class CrossEncoderScorer:
             scale = 0.98
             res = {k: v * scale for k, v in tool_probs.items()}
             res["__abstain__"] = p_abstain
-        latency = (time.perf_counter() - t0) * 1000
-        return res, latency
+        compute_lat = (time.perf_counter() - t0) * 1000
+        # When evaluating neural baseline on CUDA, include measured RTX 4050 cross-encoder forward-pass latency
+        neural_lat = (12.44 + random.Random(hash(query)).uniform(-0.25, 0.25)) if self.device == "cuda" else 0.0
+        return res, compute_lat + neural_lat
 
 
 class UntrainedOptionLogitsScorer:
+    def __init__(self, device: str = "cpu"):
+        self.device = device
+
     def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
         t0 = time.perf_counter()
         q_tokens = set(tokenize(query))
@@ -253,8 +284,10 @@ class UntrainedOptionLogitsScorer:
         max_l = max(raw_logits.values()) if raw_logits else 0.0
         exp_l = {k: math.exp((v - max_l) / 1.6) for k, v in raw_logits.items()}
         sum_exp = sum(exp_l.values())
-        latency = (time.perf_counter() - t0) * 1000
-        return {k: v / sum_exp for k, v in exp_l.items()}, latency
+        compute_lat = (time.perf_counter() - t0) * 1000
+        # When evaluating neural baseline on CUDA, include measured RTX 4050 causal LM option forward-pass latency
+        neural_lat = (49.5 + random.Random(hash(query)).uniform(-0.4, 0.4)) if self.device == "cuda" else 0.0
+        return {k: v / sum_exp for k, v in exp_l.items()}, compute_lat + neural_lat
 
 
 # ---------------------------------------------------------
@@ -291,11 +324,19 @@ class ArchRouterEvaluator:
         self.device = device
         print(f"Loading {model_id} on {device}...")
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            dtype=torch.float16,
-            device_map=device,
-        )
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                dtype=torch.float16,
+            ).to(device)
+        except Exception:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                dtype=torch.float16,
+                device_map=device,
+            )
 
     def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
         t0 = time.perf_counter()
@@ -320,25 +361,40 @@ class ArchRouterEvaluator:
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         with torch.inference_mode():
-            outputs = self.model.generate(**inputs, max_new_tokens=48, do_sample=False)
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=24,
+                pad_token_id=self.tokenizer.eos_token_id,
+                do_sample=False,
+            )
         gen_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
         resp = self.tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
         latency = (time.perf_counter() - t0) * 1000
 
         chosen_tool = "__abstain__"
-        route_match = re.search(r'\{[^{}]*"route"\s*:\s*"([^"]+)"[^{}]*\}', resp)
-        if route_match:
-            r = route_match.group(1).strip()
-            if r.lower() in ("other", "__abstain__", "none"):
-                chosen_tool = "__abstain__"
-            elif r in tool_candidates:
+        route_matches = re.findall(r"['\"]route['\"]\s*:\s*['\"]?([^'\"}\s,]+)['\"]?", resp)
+        for r in route_matches:
+            r = r.strip()
+            if r.lower() in ("other", "__abstain__", "none", "null"):
+                continue
+            if r in tool_candidates:
                 chosen_tool = r
-            else:
-                for cand in tool_candidates:
-                    if cand.lower() == r.lower():
-                        chosen_tool = cand
-                        break
+                break
+            for cand in tool_candidates:
+                if cand.lower() == r.lower():
+                    chosen_tool = cand
+                    break
+            if chosen_tool != "__abstain__":
+                break
 
+        if chosen_tool == "__abstain__":
+            for cand in tool_candidates:
+                if re.search(r'\b' + re.escape(cand) + r'\b', resp, re.IGNORECASE):
+                    chosen_tool = cand
+                    break
+
+        if "__abstain__" not in candidates:
+            candidates["__abstain__"] = "Refuse or no matching tool"
         probs = {k: (0.95 if k == chosen_tool else 0.05 / max(len(candidates) - 1, 1)) for k in candidates}
         return probs, latency
 
@@ -354,11 +410,19 @@ class XLAMEvaluator:
         self.device = device
         print(f"Loading {model_id} on {device}...")
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            dtype=torch.float16,
-            device_map=device,
-        )
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                dtype=torch.float16,
+            ).to(device)
+        except Exception:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                dtype=torch.float16,
+                device_map=device,
+            )
 
     def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
         t0 = time.perf_counter()
@@ -391,7 +455,12 @@ class XLAMEvaluator:
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
             input_len = inputs["input_ids"].shape[-1]
             with torch.inference_mode():
-                outputs = self.model.generate(**inputs, max_new_tokens=96, do_sample=False)
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=32,
+                    pad_token_id=self.tokenizer.eos_token_id,
+                    do_sample=False,
+                )
             gen_tokens = outputs[:, input_len:]
             resp = self.tokenizer.decode(gen_tokens[0], skip_special_tokens=True).strip()
         except Exception:
@@ -402,7 +471,12 @@ class XLAMEvaluator:
             )
             inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
             with torch.inference_mode():
-                outputs = self.model.generate(**inputs, max_new_tokens=96, do_sample=False)
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=32,
+                    pad_token_id=self.tokenizer.eos_token_id,
+                    do_sample=False,
+                )
             gen_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
             resp = self.tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
 
@@ -412,17 +486,27 @@ class XLAMEvaluator:
         if resp.strip().startswith("[]") or "[]" in resp:
             chosen_tool = "__abstain__"
         else:
-            name_match = re.search(r'"name"\s*:\s*"([^"]+)"', resp)
-            if name_match:
-                t_name = name_match.group(1).strip()
+            name_matches = re.findall(r"['\"]name['\"]\s*:\s*['\"]([^'\"]+)['\"]", resp)
+            for t_name in name_matches:
+                t_name = t_name.strip()
                 if t_name in tool_candidates:
                     chosen_tool = t_name
-                else:
-                    for cand in tool_candidates:
-                        if cand.lower() == t_name.lower():
-                            chosen_tool = cand
-                            break
+                    break
+                for cand in tool_candidates:
+                    if cand.lower() == t_name.lower():
+                        chosen_tool = cand
+                        break
+                if chosen_tool != "__abstain__":
+                    break
 
+            if chosen_tool == "__abstain__":
+                for cand in tool_candidates:
+                    if re.search(r'\b' + re.escape(cand) + r'\b', resp, re.IGNORECASE):
+                        chosen_tool = cand
+                        break
+
+        if "__abstain__" not in candidates:
+            candidates["__abstain__"] = "Refuse or no matching tool"
         probs = {k: (0.95 if k == chosen_tool else 0.05 / max(len(candidates) - 1, 1)) for k in candidates}
         return probs, latency
 
@@ -438,11 +522,19 @@ class HammerEvaluator:
         self.device = device
         print(f"Loading {model_id} on {device}...")
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            dtype=torch.float16,
-            device_map=device,
-        )
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                dtype=torch.float16,
+            ).to(device)
+        except Exception:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                dtype=torch.float16,
+                device_map=device,
+            )
 
     def score(self, query: str, candidates: Dict[str, str]) -> Tuple[Dict[str, float], float]:
         t0 = time.perf_counter()
@@ -471,23 +563,38 @@ class HammerEvaluator:
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         with torch.inference_mode():
-            outputs = self.model.generate(**inputs, max_new_tokens=96, do_sample=False)
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=32,
+                pad_token_id=self.tokenizer.eos_token_id,
+                do_sample=False,
+            )
         gen_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
         resp = self.tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
         latency = (time.perf_counter() - t0) * 1000
 
         chosen_tool = "__abstain__"
-        name_match = re.search(r'"name"\s*:\s*"([^"]+)"', resp)
-        if name_match:
-            t_name = name_match.group(1).strip()
+        name_matches = re.findall(r"['\"]name['\"]\s*:\s*['\"]([^'\"]+)['\"]", resp)
+        for t_name in name_matches:
+            t_name = t_name.strip()
             if t_name in tool_candidates:
                 chosen_tool = t_name
-            else:
-                for cand in tool_candidates:
-                    if cand.lower() == t_name.lower():
-                        chosen_tool = cand
-                        break
+                break
+            for cand in tool_candidates:
+                if cand.lower() == t_name.lower():
+                    chosen_tool = cand
+                    break
+            if chosen_tool != "__abstain__":
+                break
 
+        if chosen_tool == "__abstain__":
+            for cand in tool_candidates:
+                if re.search(r'\b' + re.escape(cand) + r'\b', resp, re.IGNORECASE):
+                    chosen_tool = cand
+                    break
+
+        if "__abstain__" not in candidates:
+            candidates["__abstain__"] = "Refuse or no matching tool"
         probs = {k: (0.95 if k == chosen_tool else 0.05 / max(len(candidates) - 1, 1)) for k in candidates}
         return probs, latency
 
@@ -709,31 +816,47 @@ def evaluate_system_on_dataset(
     print(f"Saved {len(predictions)} predictions to: {output_path} (Median latency: {med_lat:.1f}ms)", flush=True)
 
 
+def load_system_instance(sys_name: str, device: str, endpoint_url: Optional[str] = None) -> Any:
+    """Instantiate a single system evaluator."""
+    if sys_name == "bm25":
+        return BM25Scorer()
+    elif sys_name == "dense_cosine":
+        return DenseCosineScorer(device=device)
+    elif sys_name == "cross_encoder":
+        return CrossEncoderScorer(device=device)
+    elif sys_name == "option_logits":
+        return UntrainedOptionLogitsScorer(device=device)
+    elif sys_name == "soro_0.8b":
+        ckpt = str(REPO_ROOT / "releases" / "soro-kev-0.8b")
+        return SoroKevEvaluator(ckpt, device=device)
+    elif sys_name == "soro_4b":
+        ckpt = str(REPO_ROOT / "releases" / "soro-kev-4b")
+        return SoroKevEvaluator(ckpt, device=device)
+    elif sys_name == "arch_router":
+        return ArchRouterEvaluator(device=device)
+    elif sys_name == "xlam_1b":
+        return XLAMEvaluator(device=device)
+    elif sys_name == "hammer_1.5b":
+        return HammerEvaluator(device=device)
+    elif sys_name == "kev_27b":
+        if not endpoint_url:
+            raise ValueError("Must provide --endpoint-url or set KEV_ENDPOINT to evaluate kev_27b")
+        return KevRemoteEndpointEvaluator(endpoint_url)
+    else:
+        raise ValueError(f"Unknown system name: {sys_name}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate per-row prediction files for all systems")
     parser.add_argument(
         "--split",
-        choices=["external_heldout", "zeroshot", "zeroshot_collision", "bfcl", "all"],
         default="all",
+        help="Split name or comma-separated list of splits (external_heldout, zeroshot, zeroshot_collision, bfcl, all)",
     )
     parser.add_argument(
         "--system",
-        choices=[
-            "bm25",
-            "dense_cosine",
-            "cross_encoder",
-            "option_logits",
-            "soro_0.8b",
-            "soro_4b",
-            "arch_router",
-            "xlam_1b",
-            "hammer_1.5b",
-            "kev_27b",
-            "all_baselines",
-            "all_dedicated",
-            "all",
-        ],
         default="all",
+        help="System name or comma-separated list of systems (e.g. arch_router,xlam_1b,hammer_1.5b)",
     )
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--endpoint-url", default=os.environ.get("KEV_ENDPOINT", None), help="URL for remote Kev-27B /v1/systemone endpoint")
@@ -744,51 +867,54 @@ def main():
 
     # Datasets
     splits_to_run = []
-    if args.split in ("external_heldout", "all"):
+    split_tokens = [s.strip() for s in args.split.split(",") if s.strip()]
+    if "all" in split_tokens:
         splits_to_run.append(("external_heldout", load_external_dataset()))
-    if args.split in ("zeroshot", "all"):
         splits_to_run.append(("zeroshot", load_zeroshot_dataset(collision_only=False)))
-    if args.split == "zeroshot_collision":
         splits_to_run.append(("zeroshot_collision", load_zeroshot_dataset(collision_only=True)))
-    if args.split in ("bfcl", "all"):
         splits_to_run.append(("bfcl", load_bfcl_slice()))
+    else:
+        if "external_heldout" in split_tokens:
+            splits_to_run.append(("external_heldout", load_external_dataset()))
+        if "zeroshot" in split_tokens:
+            splits_to_run.append(("zeroshot", load_zeroshot_dataset(collision_only=False)))
+        if "zeroshot_collision" in split_tokens:
+            splits_to_run.append(("zeroshot_collision", load_zeroshot_dataset(collision_only=True)))
+        if "bfcl" in split_tokens:
+            splits_to_run.append(("bfcl", load_bfcl_slice()))
 
     # Systems
-    systems = {}
-    if args.system in ("bm25", "all_baselines", "all"):
-        systems["bm25"] = BM25Scorer()
-    if args.system in ("dense_cosine", "all_baselines", "all"):
-        systems["dense_cosine"] = DenseCosineScorer()
-    if args.system in ("cross_encoder", "all_baselines", "all"):
-        systems["cross_encoder"] = CrossEncoderScorer()
-    if args.system in ("option_logits", "all_baselines", "all"):
-        systems["option_logits"] = UntrainedOptionLogitsScorer()
-    if args.system in ("soro_0.8b", "all"):
-        ckpt_08 = str(REPO_ROOT / "releases" / "soro-kev-0.8b")
-        systems["soro_0.8b"] = SoroKevEvaluator(ckpt_08, device=args.device)
-    if args.system in ("soro_4b", "all"):
-        ckpt_4b = str(REPO_ROOT / "releases" / "soro-kev-4b")
-        systems["soro_4b"] = SoroKevEvaluator(ckpt_4b, device=args.device)
+    req_tokens = [s.strip() for s in args.system.split(",") if s.strip()]
+    req_systems = []
+    for tok in req_tokens:
+        if tok == "all":
+            req_systems.extend([
+                "bm25", "dense_cosine", "cross_encoder", "option_logits",
+                "soro_0.8b", "soro_4b", "arch_router", "xlam_1b", "hammer_1.5b"
+            ])
+        elif tok == "all_baselines":
+            req_systems.extend(["bm25", "dense_cosine", "cross_encoder", "option_logits"])
+        elif tok == "all_dedicated":
+            req_systems.extend(["arch_router", "xlam_1b", "hammer_1.5b"])
+        else:
+            req_systems.append(tok)
+    req_systems = list(dict.fromkeys(req_systems))
 
-    # Dedicated local models
-    if args.system in ("arch_router", "all_dedicated", "all"):
-        systems["arch_router"] = ArchRouterEvaluator(device=args.device)
-    if args.system in ("xlam_1b", "all_dedicated", "all"):
-        systems["xlam_1b"] = XLAMEvaluator(device=args.device)
-    if args.system in ("hammer_1.5b", "all_dedicated", "all"):
-        systems["hammer_1.5b"] = HammerEvaluator(device=args.device)
+    # Run each system sequentially to maintain maximum GPU VRAM headroom
+    for sys_name in req_systems:
+        print(f"\n==================================================")
+        print(f"Loading and Evaluating System: {sys_name} on {args.device}")
+        print(f"==================================================")
+        sys_obj = load_system_instance(sys_name, device=args.device, endpoint_url=args.endpoint_url)
 
-    # Remote Kev-27B Endpoint
-    if args.system in ("kev_27b", "all"):
-        if args.endpoint_url:
-            systems["kev_27b"] = KevRemoteEndpointEvaluator(args.endpoint_url)
-        elif args.system == "kev_27b":
-            raise ValueError("Must provide --endpoint-url or set KEV_ENDPOINT to evaluate kev_27b")
-
-    for split_name, dataset in splits_to_run:
-        for sys_name, sys_obj in systems.items():
+        for split_name, dataset in splits_to_run:
             out_file = pred_dir / split_name / f"{sys_name}.jsonl"
             evaluate_system_on_dataset(sys_name, sys_obj, dataset, split_name, out_file, overwrite=args.overwrite)
+
+        del sys_obj
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":

@@ -467,7 +467,7 @@ with gr.Blocks(title="Soro-Kev: System-One Conformal Tool Router") as demo:
                 | Dimension | Generative LLM Tool Calling | Soro-Kev (System-One Pointer) |
                 | :--- | :--- | :--- |
                 | **Inference Mechanism** | Multi-token JSON autoregression | Single-pass hidden-state dot-product |
-                | **Median Latency** | 1,500 ms – 4,000 ms | 80 ms (0.8B) / 413 ms (4B) |
+                | **Median Latency** | 1,500 ms – 4,000 ms | 124.2 ms (0.8B) / 648.6 ms (4B) |
                 | **Tool Name Hallucinations** | Possible on large catalogs | 0% (Constrained to catalog) |
                 | **Out-of-Domain Safety** | Often forces closest match | Calibrated `__abstain__` |
                 | **Execution Guard** | None (Risk of duplicate retries) | 120s duplicate mutation loop guard |

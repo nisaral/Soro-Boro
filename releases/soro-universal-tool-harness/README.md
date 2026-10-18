@@ -29,11 +29,11 @@ Unlike standard function-calling datasets that train models to emit token-by-tok
 
 ## Files & Split Breakdown
 
-| Split File | Rows | Delexicalized (`op_N`) | Real-World & Held-Out Description |
-| :--- | :--- | :--- | :--- |
-| **`train.jsonl`** | 23,192 | 5,853 (25.2%) | Real MCP, REST, GraphQL, Agent Skills, Python |
-| **`val_zeroshot.jsonl`** | 2,220 | 693 (31.2%) | Tools never seen during training (strict tool-identity split) |
-| **`val_external_heldout.jsonl`** | 1,200 | 0 (0.0%) | Completely held-out queries (Tau-2 simulated personas & live MCP authored queries) |
+| Split File | Rows | Supervision Targets | Package Count | Real-World & Held-Out Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **`train.jsonl`** | 23,192 | 115,960 | 319 packages | Diverse real-world MCP, REST, GraphQL, Agent Skills, and Python signatures. 5,853 rows (25.2%) feature delexicalized option keys (`op_N`). |
+| **`val_zeroshot.jsonl`** | 2,220 | 11,100 | 55 held-out pkgs | Strictly disjoint tool schemas and packages never seen during training (0 package overlap with train). Contains 52 collision distractors. |
+| **`val_external_heldout.jsonl`** | 1,200 | 6,000 | 5 held-out pkgs | 115 unique base queries evaluated across ~10 format/distractor views: 1,095 reference MCP server tool rows + 105 $\tau^2$ multi-turn customer persona rows. |
 
 ---
 
@@ -94,6 +94,36 @@ with open(file_path, "r", encoding="utf-8") as f:
 
 ---
 
-## Citation & License
+## Citation & Upstream Licenses
 
-Released under the Apache-2.0 License.
+Released under the **Apache-2.0 License**.
+
+This dataset compiles, normalizes, and evaluates against tool schemas and interaction traces from several open benchmark initiatives. We gratefully acknowledge and credit upstream works under their respective open-source licenses:
+
+1. **$\tau^2$ (Tau-2) Benchmark** (Sierra Research / Tao et al., 2024):
+   - License: **MIT License**
+   - Source: [github.com/sierra-research/tau2-bench](https://github.com/sierra-research/tau2-bench)
+   - Used for multi-turn customer persona simulations and service domain tool definitions (`tau2/telecom`, `tau2/retail`).
+2. **MCPAgentBench** (Mo et al., 2025):
+   - License: **MIT License**
+   - Source: [github.com/guozhao-mo/MCPAgentBench](https://github.com/guozhao-mo/MCPAgentBench)
+   - Used for live FastMCP reference server tool schemas.
+3. **MCP Semantic Tool Routing Benchmark** (Mishra et al., 2026):
+   - License: **Creative Commons Attribution 4.0 International (CC BY 4.0)**
+   - Source: [github.com/amrittmishra/mcp-semantic-tool-routing-benchmark](https://github.com/amrittmishra/mcp-semantic-tool-routing-benchmark)
+   - Used for reference Model Context Protocol tool catalogs (`system_mcp`, `geo_mcp`, `media_mcp`).
+4. **Berkeley Function-Calling Leaderboard (BFCL v3)** (Gorilla / Patil et al., 2024):
+   - License: **Apache-2.0 License**
+   - Source: [github.com/ShishirPatil/gorilla](https://github.com/ShishirPatil/gorilla)
+   - Diagnostic slices (`multiple`, `live_multiple`, `irrelevance`) evaluated for tool selection and refusal.
+
+```bibtex
+@software{nisar2026sorokev,
+  author = {Nisar, Keyush},
+  title = {Soro Universal Tool Harness: Multi-Protocol Pointer Benchmark & Dataset},
+  year = {2026},
+  publisher = {Hugging Face},
+  howpublished = {\url{https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness}},
+  note = {Version 1.0}
+}
+```

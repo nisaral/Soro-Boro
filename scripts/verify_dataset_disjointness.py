@@ -252,7 +252,7 @@ def main():
             "timestamp": "2026-10-17T22:50:00Z",
             "provenance": {
                 "val_external_heldout": "Held-out, independently sourced benchmark composed of Tau-2 dialogue tasks (Sierra Research MIT, simulated customer personas against fixed schemas) and MCP Semantic Benchmark (Mishra et al., 2026 CC BY 4.0, manually authored queries against live reference MCP server tools). Gold labels verified by task execution targets.",
-                "val_zeroshot": "Synthetic multi-domain tool execution scenarios across 54 unseen packages, generated via instruction prompting and validated for semantic collision distractors."
+                "val_zeroshot": "Synthetic multi-domain tool execution scenarios across 55 unseen packages, generated via instruction prompting and validated for semantic collision distractors."
             }
         },
         "tier_1_packages": {

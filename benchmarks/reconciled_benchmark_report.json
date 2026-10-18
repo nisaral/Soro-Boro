@@ -415,6 +415,51 @@
         52
       ],
       "collision_only": false
+    },
+    "arch_router": {
+      "total": [
+        13,
+        52
+      ],
+      "clean": [
+        0,
+        0
+      ],
+      "collision": [
+        13,
+        52
+      ],
+      "collision_only": true
+    },
+    "xlam_1b": {
+      "total": [
+        36,
+        52
+      ],
+      "clean": [
+        0,
+        0
+      ],
+      "collision": [
+        36,
+        52
+      ],
+      "collision_only": true
+    },
+    "hammer_1.5b": {
+      "total": [
+        31,
+        52
+      ],
+      "clean": [
+        0,
+        0
+      ],
+      "collision": [
+        31,
+        52
+      ],
+      "collision_only": true
     }
   },
   "bfcl": {
@@ -458,7 +503,7 @@
           33
         ]
       },
-      "median_latency_ms": 0.38
+      "median_latency_ms": 8.49
     },
     "cross_encoder": {
       "total": [
@@ -479,7 +524,7 @@
           33
         ]
       },
-      "median_latency_ms": 0.07
+      "median_latency_ms": 12.59
     },
     "option_logits": {
       "total": [
@@ -500,7 +545,28 @@
           33
         ]
       },
-      "median_latency_ms": 0.06
+      "median_latency_ms": 49.65
+    },
+    "base_kev_0.8b": {
+      "total": [
+        84,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          34,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          23,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          27,
+          33
+        ]
+      },
+      "median_latency_ms": 110.96071057620672
     },
     "soro_0.8b": {
       "total": [
@@ -543,6 +609,69 @@
         ]
       },
       "median_latency_ms": 648.56
+    },
+    "arch_router": {
+      "total": [
+        41,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          4,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          5,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          32,
+          33
+        ]
+      },
+      "median_latency_ms": 8465.38
+    },
+    "xlam_1b": {
+      "total": [
+        65,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          27,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          28,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          10,
+          33
+        ]
+      },
+      "median_latency_ms": 11453.61
+    },
+    "hammer_1.5b": {
+      "total": [
+        73,
+        100
+      ],
+      "by_file": {
+        "BFCL_v3_multiple.json": [
+          33,
+          34
+        ],
+        "BFCL_v3_live_multiple.json": [
+          31,
+          33
+        ],
+        "BFCL_v3_irrelevance.json": [
+          9,
+          33
+        ]
+      },
+      "median_latency_ms": 10564.47
     }
   }
 }

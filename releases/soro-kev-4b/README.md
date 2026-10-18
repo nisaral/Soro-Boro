@@ -32,7 +32,7 @@ Soro-Kev-4B is a flagship decision model for AI agent tool routing, multi-protoc
 
 It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev model cards (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-4B is fine-tuned specifically on the multi-protocol Universal Tool Harness, raising tool routing accuracy to 90.58% (1,087/1,200) on held-out MCP & agent benchmarks, and 91.00% (91/100) on BFCL v3 tool selection.
 
-It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qwen3-4B`. In 4-bit NF4 quantization, it operates in ~4,048 MB VRAM with a median prefill latency of ~413 ms on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4). It is intended for production AI agents, complex Model Context Protocol (MCP) tool catalogs (50+ tools), and backend API routing engines where generative LLM JSON hallucinations and latency overhead cannot be tolerated.
+It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qwen3-4B`. In 4-bit NF4 quantization, it operates in ~4,048 MB VRAM with a median prefill latency of ~648.6 ms on an NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4). It is intended for production AI agents, complex Model Context Protocol (MCP) tool catalogs (50+ tools), and backend API routing engines where generative LLM JSON hallucinations and latency overhead cannot be tolerated.
 
 ---
 
@@ -157,7 +157,7 @@ Soro-Kev-4B was trained on the `nisaralll/soro-universal-tool-harness` dataset (
 | **`missing_required`** | `noul` (bool) | 23,192 | **6,034** `yes` (missing required), **17,158** `no` (complete) | Guards against calling tools with incomplete required arguments |
 | **Total** | — | **23,192** | **115,960 Supervision Targets** | Single-pass multi-task representation sharing |
 
-Evaluation suites (`val_external_human.jsonl` with 1,200 held-out queries, and `val_zeroshot.jsonl` with 2,220 queries across 54 unseen packages) are strictly disjoint from training:
+Evaluation suites (`val_external_human.jsonl` with 1,200 held-out queries, and `val_zeroshot.jsonl` with 2,220 queries across 55 unseen packages) are strictly disjoint from training:
 - **Package Overlap**: 0 packages (0 / 5 external, 0 / 55 zero-shot).
 - **Exact Query Overlap**: 0 queries across all splits.
 - **Near-Duplicate Queries**: 0 pairs at 3-gram Jaccard $\ge 0.75$, 1 pair at dense embedding cosine $\ge 0.88$.
@@ -170,7 +170,11 @@ Evaluation suites (`val_external_human.jsonl` with 1,200 held-out queries, and `
 
 All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop GPU** (6GB VRAM, PCIe 4.0 x4, PyTorch 2.6.0, CUDA 12.4). Conformal prediction metrics report empirical coverage and prediction set size ($|S|$) over **100 random splits** ($N_{cal} = 500$, nominal coverage $1 - \alpha = 0.90$).
 
-### 1. Decision Model & Retrieval Baseline Comparison (Full 1,200 External Rows)
+### 1. Decision Model & Retrieval Baseline Comparison (Full 1,200 External Rows across 115 Unique Base Queries)
+
+> **Note on Query Stratification**: The 1,200 evaluations comprise 115 unique base queries tested across ~10 format/distractor views
+> (1,095 reference MCP rows + 105 $\tau^2$ persona-dialogue rows). Soro-Kev-4B achieves **96.89% (1,061/1,095)** on reference MCP tools
+> and **24.76% (26/105)** on $\tau^2$, where 64.56% of misses are calibrated abstentions or preliminary status checks.
 
 To investigate why classical retrievers fail on tool catalogs, all retrievers were evaluated with clean schema text parsing (unwrapping JSON/REST docstrings) and calibrated with an explicit abstention threshold $\tau_{abstain}$ tuned on calibration splits:
 
@@ -207,30 +211,42 @@ Hand-review of 20 failure cases reveals three systematic root causes for classic
 
 *\*Note on Tau-2 persona simulation: Across the 1,095 reference MCP tools (system, geo, media), Soro-Kev-4B achieves 96.89% (1,061/1,095). On the 105 Tau-2 multi-turn dialogue instructions, Soro-Kev correctly refuses to blindly fire backend mutation tools without customer identifiers: 64.56% (51/79) of Soro-Kev-4B's misses were explicit abstentions (21 rows) or preliminary read/status lookups (30 rows, e.g. check_service_status, get_device_details) rather than premature account mutations.*
 
-### 4. Zero-Shot Split Performance (2,220 Rows across 55 Packages)
+### 4. Unseen Tool Package Split (2,220 evaluations across 55 held-out packages)
+
+> **Note on Queries & Schemas**: Queries share structural template distributions with training while all 55 tool schemas
+> and packages are strictly disjoint (0 package overlap with the 319 training packages).
 
 | System | Overall Zero-Shot (2,220 rows) | Clean Menus (2,168 rows) | Collision Distractors (52 rows) |
 | :--- | :---: | :---: | :---: |
 | **BM25 (Calibrated Abstention)** | 48.60% (1079/2220) | 49.40% (1071/2168) | 15.38% (8/52) |
 | **Dense Cosine (Calibrated Abstention)** | 46.04% (1022/2220) | 46.63% (1011/2168) | 21.15% (11/52) |
 | **Cross-Encoder (Calibrated Abstention)** | 50.54% (1122/2220) | 51.48% (1116/2168) | 11.54% (6/52) |
-| **Untrained Option Logits** | 47.48% (1054/2220) | 48.11% (1043/2168) | 21.15% (11/52) |
+| **Untrained Option Logits (Zero-shot)** | 47.48% (1054/2220) | 48.11% (1043/2168) | 21.15% (11/52) |
 | **Soro-Kev-0.8B (Edge Checkpoint)** | **81.67% (1813/2220)** | **81.83% (1774/2168)** | **75.00% (39/52)** |
 | **Soro-Kev-4B (Flagship Checkpoint)** | **88.06% (1955/2220)** | **88.28% (1914/2168)** | **78.85% (41/52)** |
+| **Arch-Router-1.5B (Katanemo)** | - | - | 25.00% (13/52) |
+| **xLAM-2-1b-fc-r (Salesforce)** | - | - | 69.23% (36/52) |
+| **Hammer2.1-1.5b (MadeAgents)** | - | - | 59.62% (31/52) |
 
-### 5. Berkeley Function Calling Leaderboard (BFCL v3 Diagnostic, 100 rows)
+### 5. Berkeley Function-Calling Leaderboard (BFCL v3 Diagnostic, 100 rows)
 
-| System / Metric | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) |
-| :--- | :---: | :---: | :---: | :---: |
-| **BM25 (Calibrated Abstention)** | 94.12% (32/34) | 57.58% (19/33) | 36.36% (12/33) | 63.00% (63/100) |
-| **Dense Cosine (Calibrated Abstention)** | 100.00% (34/34) | 66.67% (22/33) | 36.36% (12/33) | 68.00% (68/100) |
-| **Cross-Encoder (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 15.15% (5/33) | 58.00% (58/100) |
-| **Option Token Logits (Untrained Readout)** | 91.18% (31/34) | 60.61% (20/33) | 24.24% (8/33) | 59.00% (59/100) |
-| **Soro-Kev-0.8B (Edge Checkpoint)** | **100.00% (34/34)** | **96.97% (32/33)** | **51.52% (17/33)** | **83.00% (83/100)** |
-| **Soro-Kev-4B (Flagship Checkpoint)** | **100.00% (34/34)** | **96.97% (32/33)** | **75.76% (25/33)** | **91.00% (91/100)** |
-| **Median Latency (ms/query, RTX 4050)** | **4.2 ms** | **18.4 ms** | **42.1 ms** | **413 ms** (80 ms for 0.8B) |
+| System | Multiple Tools (34) | Live Multiple (33) | Irrelevance / Abstention (33) | Overall Diagnostic (100) | Latency (ms) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **BM25 (Calibrated Abstention)** | 94.12% (32/34) | 57.58% (19/33) | 36.36% (12/33) | 63.00% (63/100) | 0.1 ms |
+| **Dense Cosine (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 33.33% (11/33) | 64.00% (64/100) | 8.5 ms |
+| **Cross-Encoder (Calibrated Abstention)** | 97.06% (33/34) | 60.61% (20/33) | 15.15% (5/33) | 58.00% (58/100) | 12.6 ms |
+| **Untrained Option Logits (Zero-shot)** | 91.18% (31/34) | 60.61% (20/33) | 24.24% (8/33) | 59.00% (59/100) | 49.6 ms |
+| **jaredpalmer/kev-0.8b (Base Checkpoint)** | 100.00% (34/34) | 69.70% (23/33) | 81.82% (27/33) | 84.00% (84/100) | 111.0 ms |
+| **Soro-Kev-0.8B (Edge Checkpoint)** | **100.00% (34/34)** | **96.97% (32/33)** | **51.52% (17/33)** | **83.00% (83/100)** | **124.2 ms** |
+| **Soro-Kev-4B (Flagship Checkpoint)** | **100.00% (34/34)** | **96.97% (32/33)** | **75.76% (25/33)** | **91.00% (91/100)** | **648.6 ms** |
+| **Arch-Router-1.5B (Katanemo)** | 11.76% (4/34) | 15.15% (5/33) | 96.97% (32/33) | 41.00% (41/100) | 8465.4 ms |
+| **xLAM-2-1b-fc-r (Salesforce)** | 79.41% (27/34) | 84.85% (28/33) | 30.30% (10/33) | 65.00% (65/100) | 11453.6 ms |
+| **Hammer2.1-1.5b (MadeAgents)** | 97.06% (33/34) | 93.94% (31/33) | 27.27% (9/33) | 73.00% (73/100) | 10564.5 ms |
 
-*\*Note on Generative vs. Pointer Latency: Standard autoregressive LLMs generating JSON tool calls (e.g. Qwen3-4B-Instruct) average 1,800–2,600 ms/query on this same GPU. Soro-Kev requires no token decoding loop, completing inference in a single prefill pass (80 ms on 0.8B, 413 ms on 4B).*
+*\*Hardware & Latency Note (RTX 4050 6GB Laptop GPU, Windows WDDM):*
+- **Architecture Difference (Prefill vs. Autoregressive Decode):** Soro-Kev outputs routing + key-mapping decisions scoring candidate tools and an explicit `__abstain__` anchor via a dual linear pointer head in **1 single prefill forward pass** (124.2 ms for 0.8B, 648.6 ms for 4B) with 0 generated decode tokens. In contrast, generative models (`xLAM-2-1b-fc-r`, `Hammer2.1-1.5b`) generate full JSON tool calls with argument values (~27–32 decode tokens), requiring 1 prefill pass plus 24-32 sequential autoregressive decode steps (one forward pass per token).
+- **In-VRAM vs. Sustained / Paged Latency:** In clean isolated VRAM bursts, `Arch-Router-1.5B` achieves a median latency of **1,212.9 ms** (~24 tokens generated). `xLAM-2-1b-fc-r` (mean prompt 406 tokens, mean gen 27 tokens) achieves **7,106.9 ms** median in clean VRAM (initial queries: ~1,458-2,549 ms; laptop GPU thermal throttling at 85C settles to ~7.1s). `Hammer2.1-1.5b` (generating full markdown JSON arrays of ~32 tokens) settles to **10,564.5 ms** median. When multiple generative models were evaluated sequentially without intermediate process garbage collection, Windows WDDM silently paged KV caches into Shared GPU Memory across PCIe, increasing latencies to ~10.4s-11.5s.
+- **Dense Cosine & Neural Baselines:** All 100 BFCL rows for Dense Cosine were evaluated directly using `SentenceTransformer` / `all-MiniLM-L6-v2` forward passes on CUDA timed with `time.perf_counter()`, yielding a genuine hardware median latency of **8.5 ms** (6.3-60.4 ms range, 64/100 correct).
 
 ### 6. Accuracy by Schema Format (Independently Sourced Holdout)
 
@@ -247,7 +263,7 @@ Hand-review of 20 failure cases reveals three systematic root causes for classic
 
 - **No Generative Argument Synthesis**: Soro-Kev routes tools, normalizes parameter keys, and validates completeness; it does not author free-text string values. In production pipelines, arguments are drafted by a fast parameter extractor, normalized via `arg_mapping`, and guarded by `missing_required` before execution.
 - **Single-Turn Model**: Soro-Kev evaluates single routing turns. Multi-tool sequential chaining ("call tool A, then tool B") is an architectural runtime design and has not yet been benchmarked on multi-step traces.
-- **Hardware & VRAM**: Soro-Kev-4B requires ~4,048 MB VRAM in NF4 4-bit quantization. For edge devices with <2 GB VRAM, deploy Soro-Kev-0.8B (~1,563 MB, ~80 ms).
+- **Hardware & VRAM**: Soro-Kev-4B requires ~4,048 MB VRAM in NF4 4-bit quantization. For edge devices with <2 GB VRAM, deploy Soro-Kev-0.8B (~1,563 MB, ~124.2 ms).
 - **Option Presentation Order**: While option order is shuffled during training, slight score variances ($< 1.5\%$) can occur across permutations. Evaluate with averaged permutations for safety-critical tasks.
 
 ---
@@ -300,10 +316,10 @@ If you use Soro-Kev or Universal Tool Harness in your research or production sys
   howpublished = {\url{https://github.com/amrittmishra/mcp-semantic-tool-routing-benchmark}}
 }
 
-@article{mo2025livemcpbench,
+@misc{mo2025livemcpbench,
   author = {Mo, Guozhao and others},
   title = {LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools?},
-  journal = {arXiv preprint arXiv:2508.01780},
+  howpublished = {Preprint},
   year = {2025}
 }
 
