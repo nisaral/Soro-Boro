@@ -137,13 +137,13 @@ tags:
 - conformal-prediction
 ---
 
-# Soro-Kev: 15ms System-One Decision Engine for AI Agents
+# Soro-Kev: Prefill-Only Decision Engine for AI Agents
 
 Soro-Kev is an ultra-fast, calibrated pointer decision model for AI agents and MCP tools.
 Trained on 9,922 real MCP tools and product APIs across 5 polymorphic developer formats + real human benchmarks:
 - Model Architecture: Qwen causal backbone + dual linear pointer projection head.
-- Training Paradigm: Reinforcement Learning from Contrastive Distillation (RLCD) with Permutation Invariance & Brier Proper Scoring.
-- Calibration: Split Conformal Prediction with guaranteed coverage at alpha=0.10.
+- Training Paradigm: Multi-task calibrated pointer objective with permutation consistency and Brier scoring.
+- Calibration: Split-conformal evaluation at alpha=0.10. A coverage guarantee requires the serving path to apply the fitted threshold on exchangeable traffic.
 
 ### Loading Checkpoint in Python
 ```python

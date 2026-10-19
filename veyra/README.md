@@ -99,7 +99,7 @@ User / Agent Query
         │
         ▼
 ┌────────────────────────────────────────────────────────┐
-│  1. ROUTE: Local Conformal Router (Fast Shortlisting)  │
+│  1. ROUTE: Calibration-Aware Router (Shortlist + Scorer)│
 │  2. REPAIR: Auto-Coerce Types & JSON Schema (Kev)      │
 │  3. GUARD: Soro-Boro Boundary & 120s Loop Guard        │
 └────────────────────────────────────────────────────────┘

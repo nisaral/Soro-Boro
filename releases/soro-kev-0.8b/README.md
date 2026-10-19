@@ -28,7 +28,7 @@ pip install soro-boro
 
 ## Model summary
 
-Soro-Kev-0.8B is a specialized decision model for AI agent tool routing, schema normalization, and execution boundary control. It reads one document (the state: user prompt, conversational history, and available tool schemas) and a set of typed questions about it, and returns a calibrated probability distribution over the options supplied with each question, in a single forward pass and without generating text.
+Soro-Kev-0.8B is a specialized decision model for AI agent tool routing, schema normalization, and execution boundary control. It reads the state (user prompt, conversational history, and available tool schemas) and returns a closed-set probability distribution over the options supplied with a question. Each question is scored in a prefill-only forward pass; the model does not generate text.
 
 It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev-0.8B model card (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-0.8B is trained specifically on multi-protocol tool catalogs (Model Context Protocol, REST/OpenAPI, Agent Skills, and Python signatures), raising tool routing accuracy to 85.67% (1,028/1,200) on held-out MCP & agent benchmarks, and 83.00% (83/100) on BFCL v3 tool selection.
 
@@ -43,12 +43,12 @@ It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qw
 | **Developer** | Keyush Nisar ([github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro)) |
 | **Model type** | Decision model: causal language-model backbone run prefill-only, with a pointer head over candidate options |
 | **Backbone** | `Qwen/Qwen3.5-0.8B-Base`: 24 layers (18 Gated DeltaNet linear attention, 6 full attention); frozen |
-| **Adapter** | LoRA, rank 16, $\alpha$ 32, on attention, MLP, and DeltaNet projections (11.3M parameters) |
-| **Head** | Pointer head: hidden-state projections score each option's closing token against the question's final token ($h_{query} \cdot h_{option} / T$) |
+| **Adapter** | LoRA, rank 16, $\alpha$ 32, on `q_proj`, `k_proj`, `v_proj`, `o_proj` only. The adapter has 24 modules on the six full-attention layers (`[3, 7, 11, 15, 19, 23]`), about 1.08M parameters. There are no MLP or DeltaNet adapters. |
+| **Head** | Two 256-d projections from each selected hidden state; each option's closing token is scored against the question's final token (`h_query · h_option / (sqrt(256) · T)`) |
 | **Precision** | Trained in bf16/fp16; served in bf16 (merged at load) or fp32; evaluated in fp32 |
-| **Context length** | States of up to 32,768 tokens; training states were at most 4,096 tokens |
-| **Validated context** | 8,192 tokens |
-| **Calibration** | One temperature ($T = 1.84$) and split-conformal threshold ($q_{hat} = 0.9518$ at $1 - \alpha = 0.90$) |
+| **Context length** | Backbone supports up to 262,144 positions. The public T4-oriented training recipe used a 1,536-token cap, so the adapter was not trained on the full context. |
+| **Validated context** | 8,192 tokens in evaluation; not the training cap |
+| **Calibration** | Learned temperature `0.075487` and split-conformal quantile `q_hat = 0.9518` at `1 - alpha = 0.90`. The calibration is fitted in training/evaluation; the current production gate does not apply `q_hat`. |
 | **Languages** | English (prose, tool descriptions, OpenAPI schemas, JSON-RPC, Python docstrings) |
 | **License** | Apache-2.0 |
 | **Version** | Soro-Kev 1.0 (release `v0.2.0`, 2026-10-17) |
@@ -62,20 +62,20 @@ Soro-Kev-0.8B evaluates a state and any number of named questions across three t
 
 | Type | Options | Output | Intended Purpose |
 | :--- | :--- | :--- | :--- |
-| **choice (`tool_route`)** | 1–255 candidate tool schemas + `__abstain__` | Probability per tool, top tool, and conformal prediction set $S$ | Selects the single correct tool to execute, or abstains |
+| **choice (`tool_route`)** | Up to 8 tool schemas + `__abstain__` per forward; larger catalogs use 6-tool chunks and a final top-two pass | Probability per listed tool and `__abstain__`; evaluation also reports calibration sets | Selects the single correct tool to execute, or abstains |
 | **choice (`arg_mapping`)** | Schema property keys + `__drop__` | Probability distribution over candidate property names | Maps unrecognized LLM argument keys to target schema parameters |
 | **noul (`missing_required`)** | `yes` / `no` with descriptions | Probability that required arguments are missing | Determines whether harness must ask user before calling tool |
 | **noul (`is_mutation`)** | `yes` / `no` with descriptions | Probability that action mutates external state | Classifies side-effect tier when MCP tool annotations are absent |
 
-Each question is evaluated as its own forward path branching from the shared state hidden representation; questions cannot cross-contaminate one another, and the state prefix is computed once and cached.
+Each question is scored by its own forward pass in the current inference code. Questions do not share a cached state prefix, and the model does not promise a fixed number of questions per forward.
 
 ---
 
 ## Intended Uses
 
-- **AI Agent Tool Routing**: Selecting tools from catalogs of 10 to 100+ schemas in sub-100ms without consuming context tokens on JSON generation.
+- **AI Agent Tool Routing**: Selecting tools from catalogs of 10 to 100+ schemas through a shortlist/chunking path without token-by-token JSON generation. The measured 0.8B prefill latency is about 124 ms, not a sub-100 ms guarantee.
 - **Model Context Protocol (MCP) Sidecars**: Routing queries to local tools exposed by MCP servers over stdio or SSE.
-- **Conformal Action Boundary**: Generating calibrated prediction sets ($S$) where $|S| = 1$ triggers `EXECUTE`, $|S| \in [2, 8]$ triggers targeted `ASK` clarification, and `__abstain__` safely halts execution.
+- **Calibration-Aware Action Boundary**: Training/evaluation can fit LAC prediction sets. The current harness uses a documented top-mass gate; consumers should not assume a finite-sample coverage guarantee from `route()` until `q_hat` loading is wired in.
 - **On-Device & Edge Routing**: Running alongside small edge LLMs on consumer laptops, Apple Silicon, or 4 GB GPUs.
 - **Duplicate Mutation Protection**: When integrated with the Soro-Boro execution boundary, enforcing the 0-duplicate execution invariant under network dropouts.
 
@@ -106,7 +106,7 @@ def get_balance(customer_id: str) -> dict:
 def refund_order(order_id: str, amount: float) -> dict:
     return {"order_id": order_id, "refunded": amount}
 
-# Sub-100ms Conformal Routing
+# Fast Calibrated Routing
 decision = harness.route("Refund customer $45.00 for order ORD-9921")
 print(decision.action)          # "EXECUTE"
 print(decision.selected_tool)   # "refund_order"
@@ -145,7 +145,7 @@ print(result["probabilities"]["tool_route"])
 
 ## Training Data & Target Reconciliation
 
-Soro-Kev-0.8B was trained on the `nisaralll/soro-universal-tool-harness` dataset (`train.jsonl`), consisting of exactly **23,192 multi-task state rows**. Each row contains exactly 5 question instances evaluated concurrently in a single forward pass, yielding **115,960 machine-counted supervision targets**:
+Soro-Kev-0.8B was trained on the `nisaralll/soro-universal-tool-harness` dataset (`train.jsonl`), consisting of exactly **23,192 multi-task state rows**. Each row contains five question targets. During training, the non-permuted questions are packed into one sequence and the permutation probe is a second sequence in the same batch; this is a training batching strategy, not a guarantee that inference evaluates all questions in one pass. The run yields **115,960 machine-counted supervision targets**:
 
 | Question Head | Question Type | Rows Present | Ground Truth Breakdown | Purpose & Learning Task |
 | :--- | :--- | :--- | :--- | :--- |
@@ -167,7 +167,7 @@ Evaluation suites (`val_external_human.jsonl` with 1,200 held-out queries, and `
 
 ## Evaluation Results
 
-All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop GPU** (6GB VRAM, PCIe 4.0 x4, PyTorch 2.6.0, CUDA 12.4). Conformal prediction metrics report empirical coverage and prediction set size ($|S|$) over **100 random splits** ($N_{cal} = 500$, nominal coverage $1 - \alpha = 0.90$).
+All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop GPU** (6GB VRAM, PCIe 4.0 x4, PyTorch 2.6.0, CUDA 12.4). The coverage and prediction-set metrics below come from the calibration/evaluation pipeline over **100 random splits** (`N_cal = 500`, nominal coverage `1 - alpha = 0.90`). They are distinct from the production top-mass gate.
 
 ### 1. Decision Model & Retrieval Baseline Comparison (Full 1,200 External Rows across 115 Unique Base Queries)
 
@@ -239,7 +239,7 @@ All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop G
 ## Provenance and Reproducibility
 
 - **Repository**: [github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro) (release tag `v0.2.0`)
-- **Trained Checkpoint**: Adapter weights and `head.pt` with learned temperature ($T = 1.84$) and global conformal quantile ($q_{hat} = 0.9518$)
+- **Trained Checkpoint**: Adapter weights and `head.pt` with learned temperature `0.075487` and calibration quantile `q_hat = 0.9518`
 - **Harness Dataset**: [huggingface.co/datasets/nisaralll/soro-universal-tool-harness](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
 - **Disjointness Audit**: Committed in `benchmarks/disjointness_audit.json`
 
@@ -252,7 +252,7 @@ If you use Soro-Kev or Universal Tool Harness in your research or production sys
 ```bibtex
 @software{nisar2026sorokev,
   author = {Nisar, Keyush},
-  title = {Soro-Kev: System-One Conformal Tool Router and Execution Boundary},
+  title = {Soro-Kev: Calibration-Aware System-One Tool Router and Execution Boundary},
   year = {2026},
   publisher = {GitHub},
   howpublished = {\url{https://github.com/nisaral/Soro-Boro}},
@@ -298,5 +298,4 @@ If you use Soro-Kev or Universal Tool Harness in your research or production sys
   year = {2025}
 }
 ```
-
 

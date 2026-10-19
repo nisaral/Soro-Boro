@@ -28,12 +28,14 @@ def compute_rlcd_loss(
     mutation_ce: torch.Tensor,
     intent_ce: torch.Tensor | None = None,
 ) -> torch.Tensor:
-    """Reinforcement Learning from Contrastive Distillation.
+    """Weighted multi-task routing objective (legacy ``RLCD`` name).
 
-    L_RLCD = L_CE + 0.25 L_Brier + 0.30 L_JSD
-    plus the pointer-head auxiliary CEs for argument repair, missing
-    parameters, and mutation detection. JSD is the permutation term:
-    the route distribution must match the same options in a new order.
+    L = L_CE + 0.25 L_Brier + 0.30 L_JSD plus the pointer-head auxiliary
+    CEs for argument repair, missing parameters, and mutation detection.
+    JSD is the permutation-consistency term: the route distribution should
+    match the same options in a new order. This is not the RLCD alignment
+    method from Yang et al. (ICLR 2024); the function name is retained for
+    import compatibility.
     """
     if intent_ce is None:
         intent_ce = route_ce * 0.0

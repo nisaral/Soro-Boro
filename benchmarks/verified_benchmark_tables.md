@@ -4,6 +4,10 @@
 > prediction logs in `benchmarks/predictions/`. Each percentage is presented with its exact integer
 > rational fraction `(n/N)`. Subgroup row counts and correct counts strictly partition overall totals
 > with mathematical consistency checks enforced via `reconcile_and_verify.py`.
+>
+> **Calibration Note**: “Conformal Coverage” columns are measured by the calibration/evaluation
+> pipeline. The current `SoroHarness.route()` production gate uses a top-mass rule and does not
+> apply the fitted `q_hat`; these columns are not a production coverage guarantee.
 
 ### Table 1: External Held-Out Generalization (1,200 rows across 115 unique base queries)
 

@@ -23,7 +23,7 @@ size_categories:
 
 The Soro Universal Tool Harness dataset contains high-quality, multi-format routing, argument repair, and safety classification records designed for training and calibrating System-One pointer routers.
 
-Unlike standard function-calling datasets that train models to emit token-by-token JSON strings, this dataset formats agent tasks as System-One Pointer Queries over explicit option lists, enabling zero-hallucination routing and split-conformal coverage guarantees.
+Unlike standard function-calling datasets that train models to emit token-by-token JSON strings, this dataset formats agent tasks as closed-set pointer queries over explicit option lists. That closed output space prevents invented tool names. The dataset also supports calibration and split-conformal evaluation, but a coverage guarantee depends on the training and serving implementation; it is not created by the dataset alone.
 
 ---
 
@@ -55,7 +55,7 @@ The dataset balances 6 diverse tool declaration formats to prevent syntactic ove
 Each row provides a user state and query alongside options for:
 
 1. **`tool_route`**: Pointer choice selecting the correct candidate tool, or `__abstain__` when the request cannot be fulfilled.
-2. **`tool_route_perm`**: Permuted order of the same tool candidates to enforce order-invariance.
+2. **`tool_route_perm`**: Permuted order of the same tool candidates, provided for permutation-consistency training. Its effect depends on whether the training path actually consumes the permutation sequence.
 3. **`arg_mapping`**: Maps misnamed or stray argument keys back to canonical schema fields.
 4. **`missing_required`**: Binary prediction of whether mandatory arguments are missing from user context.
 5. **`is_mutation`**: Side-effect classification (whether the tool performs non-idempotent state mutations).

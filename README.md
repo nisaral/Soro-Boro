@@ -1,4 +1,4 @@
-# Soro-Kev: System-One Conformal Tool Router (4B & 0.8B)
+# Soro-Kev: Calibration-Aware System-One Tool Router (4B & 0.8B)
 
 [![PyPI Version](https://img.shields.io/pypi/v/soro-boro.svg?color=blue)](https://pypi.org/project/soro-boro/)
 [![GitHub Release](https://img.shields.io/github/v/release/nisaral/Soro-Boro?color=blue&label=Release)](https://github.com/nisaral/Soro-Boro/releases/tag/v0.2.0)
@@ -12,26 +12,28 @@
 pip install soro-boro
 ```
 
-**Soro-Kev** is an open-weights decision model family (4B flagship & 0.8B edge) for ultra-fast AI agent tool routing, schema normalization, and execution boundary control.
+**Soro-Kev** is an open-weights decision model family (4B flagship & 0.8B edge) for prefill-only AI agent tool routing, schema normalization, and execution boundary control.
 
 Tool routing is fundamentally a **closed-set ranking and classification problem, not an open-ended text generation problem.** Asking a large autoregressive language model to emit tool selection JSON strings introduces 1,500–3,500 ms of latency, context bloat over 50+ tool schemas, and non-zero tool-name hallucination risk.
 
-Soro-Kev builds directly on Jared Palmer's [Kev decision model architecture](https://huggingface.co/jaredpalmer/kev-0.8b), adapting pointer networks for heterogeneous tool routing:
-- **Zero Invalid Tool Names**: Pointer scoring mathematically bounds outputs to registered tool schemas or `__abstain__`.
-- **Single-Pass Prefill Latency**: Evaluates catalogs in a single forward pass without token generation (124.2 ms on 0.8B, 648.6 ms on 4B) on consumer hardware (NVIDIA RTX 4050 Laptop GPU).
-- **Split-Conformal Action Boundaries**: Returns calibrated prediction sets ($S$) where $|S| = 1 \implies \text{EXECUTE}$, $|S| \in [2, 8] \implies \text{ASK}$, and `__abstain__` halts execution.
+Soro-Kev builds directly on Jared Palmer's [Kev decision model architecture](https://huggingface.co/jaredpalmer/kev-0.8b), adapting closed-set span scoring for heterogeneous tool routing:
+- **Zero Invalid Tool Names**: The output space is restricted to registered candidate keys or `__abstain__`; the model cannot emit an arbitrary tool name.
+- **Prefill-Only, No Decode Loop**: Produces a route distribution without generating JSON tokens. Measured latency is 124.2 ms on 0.8B and 648.6 ms on 4B on an RTX 4050 Laptop GPU, for one question/catalog chunk.
+- **Calibration-Aware Boundaries**: Training and evaluation support split-conformal LAC. The current public harness uses a top-mass gate documented below; `q_hat` is stored in the checkpoints but is not yet applied by `SoroHarness.route()`.
 
-### Why Decision Pointers Outperform Standard Agent Stacks
+> **Implementation note (2026-10-19).** The released `v0.2.0` checkpoints and benchmarks are live, but some earlier public descriptions were broader than the code. In the current implementation, each question is scored separately; catalogs over 8 tools are chunked into groups of 6 plus `__abstain__` and the top two from each group meet in a final pass; the 0.8B adapter covers only the six full-attention layers; and the production gate is top-mass selection rather than a `q_hat` LAC set. The next architecture branch replaces this with a retrieval + setwise encoder design.
 
-| Dimension | Classical Retrievers (BM25 / Embeddings / Cross-Encoder) | Generative LLMs (JSON Decoding) | Soro-Kev-4B (Single-Pass Pointer) |
+### Why Closed-Set Decision Models Fit Tool Routing
+
+| Dimension | Classical Retrievers (BM25 / Embeddings / Cross-Encoder) | Generative LLMs (JSON Decoding) | Soro-Kev-4B (Prefill-Only Pointer) |
 | :--- | :---: | :---: | :---: |
 | **Similar Tool Name Collisions** (52 rows) | Collapses to **11.5% – 21.2%** accuracy | Slower prompt parsing, context bloat | **78.85% (41/52)** accuracy |
 | **Irrelevant / Conversational Queries** | Forces false tool call **63.6% – 84.8%** of time | Hallucinates plausible tools | **75.76% (25/33)** calibrated refusal |
 | **Tool Name Hallucinations** | Possible if ranking corrupted | 2% – 8% invented tool names on 50+ tools | **0.00%** (bounded by pointer architecture) |
-| **Prediction Uncertainty** | Raw heuristic scores, uncalibrated | Arbitrary verbalized confidence | **Conformal Set $\|S\| = 1.01$ tools** @ 90% coverage |
+| **Prediction Uncertainty** | Raw heuristic scores, uncalibrated | Arbitrary verbalized confidence | **Evaluation set size $\|S\| = 1.01$ tools** @ 90% nominal coverage |
 | **Broken Parameter Keys** | None (crashes downstream runtime) | Requires costly retry token generations | **99.1% automatic semantic argument repair** |
 | **Duplicate Mutating Loops** | None (retries double-bill or double-write) | High risk on transport timeouts | **`@soro_wrap` 120s duplicate mutation guard** |
-| **Median Inference Latency** | 5 – 40 ms (retriever only, no execution logic) | 1,500 – 3,500 ms (autoregressive decode) | **648.6 ms (4B)** / **124.2 ms (0.8B)** |
+| **Median Inference Latency** | 5 – 40 ms (retriever only, no execution logic) | 1,500 – 3,500 ms (autoregressive decode) | **648.6 ms (4B)** / **124.2 ms (0.8B)** measured per question/chunk |
 
 ```text
 User State + Tool Catalog
@@ -41,11 +43,21 @@ User State + Tool Catalog
         │
         h_query · h_candidate / Temperature
         │
-        Split Conformal Set S (Nominal 90% Coverage)
+        Calibration-aware decision set S (evaluation/eval harness)
           ├── |S| = 1 and tool != __abstain__  ──> EXECUTE (immediate dispatch)
           ├── |S| ∈ [2, 8]                     ──> ASK (targeted user clarification)
           └── Top = __abstain__ or |S| empty   ──> ABSTAIN (out-of-domain safe halt)
 ```
+
+### What Is Implemented Today
+
+- **4B checkpoint:** `Qwen/Qwen3-4B`, 36-layer dense decoder, with LoRA rank 16 on `q_proj`, `k_proj`, `v_proj`, and `o_proj` (144 adapted modules).
+- **0.8B checkpoint:** `Qwen/Qwen3.5-0.8B-Base`, a 24-layer hybrid with 18 Gated DeltaNet and 6 full-attention layers. LoRA covers only the six full-attention layers (24 adapted modules).
+- **Readout:** last-layer hidden states at the question end and each option end, projected to 256 dimensions, scored by `q · k / (sqrt(256) · T)`, then softmaxed over the listed options plus `__abstain__`.
+- **Question handling:** inference calls the scorer once per question. It does not share or cache a multi-question state prefix.
+- **Catalog handling:** up to 8 tools can be scored in one sequence. Larger menus are split into 6-tool chunks plus abstain; the top two per chunk enter a final pass. Rank-3 tools inside a chunk are not reconsidered.
+- **Calibration artifacts:** `temperature.json` stores the learned temperature and `q_hat`. The released values are `0.070878` / `0.8066` for 4B and `0.075487` / `0.9518` for 0.8B.
+- **Production route:** a hashed lexical shortlist selects up to 16 tools, then the neural scorer produces probabilities. A top-1 probability `>= 0.55` with margin `>= 0.20` executes immediately; otherwise the harness accumulates probability mass up to `1 - alpha`, capped by `top_k` (default 3). This is not the same rule as the LAC calibration reported below.
 
 ---
 
@@ -81,7 +93,7 @@ def get_order_status(order_id: str) -> dict:
 def cancel_shipment(order_id: str) -> dict:
     return {"order_id": order_id, "cancelled": True}
 
-# Fast Conformal Routing (124.2 ms on 0.8B / 648.6 ms on 4B)
+# Calibrated routing (124.2 ms on 0.8B / 648.6 ms on 4B; production top-mass gate)
 decision = harness.route("Where is my package for order ORD-1092?")
 print("Action:", decision.action)          # "EXECUTE"
 print("Selected Tool:", decision.selected_tool)     # "get_order_status"
@@ -108,7 +120,7 @@ sequenceDiagram
     participant MCP as MCP Tool Server
 
     User->>Router: "Send $50 to Alice with note 'rent'"
-    Note over Router: Single Prefill Forward Pass (124.2 ms on 0.8B / 648.6 ms on 4B)
+    Note over Router: Prefill-only, one pass per question/chunk (124.2 ms on 0.8B / 648.6 ms on 4B)
     Router-->>Router: tool_route: "send_payment" (conf: 0.98, |S|=1 -> EXECUTE)
     Router-->>Router: is_mutation: "yes" (mutation tier)
     
@@ -131,7 +143,7 @@ sequenceDiagram
 
 ## Empirical Benchmark Results
 
-All evaluations were benchmarked on a dedicated single-GPU node: **NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4)**. Conformal prediction metrics report empirical coverage and prediction set size ($|S|$) over **100 random splits** ($N_{cal} = 500$, nominal coverage $1 - \alpha = 0.90$).
+All evaluations were benchmarked on a dedicated single-GPU node: **NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4)**. The coverage and prediction-set columns below come from the calibration/evaluation pipeline over **100 random splits** ($N_{cal} = 500$, nominal coverage $1 - \alpha = 0.90$). They are not a claim that the current production `route()` gate applies the same LAC set.
 
 ### 1. Decision Model & Retrieval Baseline Comparison (Full 1,200 External Rows across 115 Unique Base Queries)
 
@@ -152,7 +164,7 @@ All retrievers were evaluated with clean schema text parsing and calibrated with
 
 *\*Note on Abstention: The 135 abstain rows represent 15 unique base queries evaluated across 9 format/distractor views each ($15 \times 9 = 135$). Denominators strictly reconcile: $1,065 + 135 = 1,200$. Numerators strictly reconcile: e.g. 0.8B gets $926 + 102 = 1,028$; 4B gets $964 + 123 = 1,087$. Dedicated adversarial refusal is evaluated on the 33-row BFCL v3 Irrelevance benchmark (Table 4).*
 
-> **Pointer Network Guarantee**: Restricts candidate selection strictly to the closed candidate pool in context + `__abstain__` (0% invalid tool-name hallucination). True misclassification rate ($1 - \text{Top-1}$) is **9.42% (113/1200)** on external holdouts.
+> **Closed-set output guarantee:** Selection is restricted to the candidate pool in context plus `__abstain__` (0% invalid tool-name generation). This is an output-space guarantee, not an accuracy or calibration guarantee. True misclassification rate ($1 - \text{Top-1}$) is **9.42% (113/1200)** on external holdouts.
 
 ### 2. Unseen Tool Package Split (2,220 evaluations across 55 held-out packages)
 
@@ -200,7 +212,7 @@ All retrievers were evaluated with clean schema text parsing and calibrated with
 | **Hammer2.1-1.5b (MadeAgents)** | 97.06% (33/34) | 93.94% (31/33) | 27.27% (9/33) | 73.00% (73/100) | 10564.5 ms |
 
 *\*Hardware & Latency Note (RTX 4050 6GB Laptop GPU, Windows WDDM):*
-- **Architecture Difference (Prefill vs. Autoregressive Decode):** Soro-Kev outputs routing + key-mapping decisions scoring candidate tools and an explicit `__abstain__` anchor via a dual linear pointer head in **1 single prefill forward pass** (124.2 ms for 0.8B, 648.6 ms for 4B) with 0 generated decode tokens. In contrast, generative models (`xLAM-2-1b-fc-r`, `Hammer2.1-1.5b`) generate full JSON tool calls with argument values (~27–32 decode tokens), requiring 1 prefill pass plus 24-32 sequential autoregressive decode steps (one forward pass per token).
+- **Architecture Difference (Prefill vs. Autoregressive Decode):** Soro-Kev outputs routing + key-mapping decisions over closed candidate sets via a prefill-only span scorer (124.2 ms for 0.8B, 648.6 ms for 4B) with 0 generated decode tokens. The measurement is per question/catalog chunk, not one pass over an arbitrarily large catalog; catalogs over 8 tools use the chunking path above. In contrast, generative models (`xLAM-2-1b-fc-r`, `Hammer2.1-1.5b`) generate full JSON tool calls with argument values (~27–32 decode tokens), requiring 1 prefill pass plus 24-32 sequential autoregressive decode steps.
 - **In-VRAM vs. Sustained / Paged Latency:** In clean isolated VRAM bursts, `Arch-Router-1.5B` achieves a median latency of **1,212.9 ms** (~24 tokens generated). `xLAM-2-1b-fc-r` (mean prompt 406 tokens, mean gen 27 tokens) achieves **7,106.9 ms** median in clean VRAM (initial queries: ~1,458-2,549 ms; laptop GPU thermal throttling at 85C settles to ~7.1s). `Hammer2.1-1.5b` (generating full markdown JSON arrays of ~32 tokens) settles to **10,564.5 ms** median. When multiple generative models were evaluated sequentially without intermediate process garbage collection, Windows WDDM silently paged KV caches into Shared GPU Memory across PCIe, increasing latencies to ~10.4s-11.5s.
 - **Dense Cosine & Neural Baselines:** All 100 BFCL rows for Dense Cosine were evaluated directly using `SentenceTransformer` / `all-MiniLM-L6-v2` forward passes on CUDA timed with `time.perf_counter()`, yielding a genuine hardware median latency of **8.5 ms** (6.3-60.4 ms range, 64/100 correct).
 
@@ -240,7 +252,7 @@ To verify train/test integrity, we executed and committed a complete 3-tier mach
 ```bibtex
 @software{nisar2026sorokev,
   author = {Nisar, Keyush},
-  title = {Soro-Kev: System-One Conformal Tool Router and Execution Boundary},
+  title = {Soro-Kev: Calibration-Aware System-One Tool Router and Execution Boundary},
   year = {2026},
   publisher = {GitHub},
   howpublished = {\url{https://github.com/nisaral/Soro-Boro}},

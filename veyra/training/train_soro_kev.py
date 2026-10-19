@@ -1,8 +1,8 @@
 """System-One Soro-Kev Decision Model Training Loop.
 
 Trains dual linear pointer projection heads + LoRA adapter on Qwen/Qwen2.5-0.5B (or Qwen3-0.6B)
-using Reinforcement Learning from Contrastive Distillation (RLCD) with Permutation Invariance,
-Brier Proper Scoring calibration, and periodic Split Conformal Validation.
+with a weighted multi-task objective: route CE, Brier scoring, permutation consistency, and
+auxiliary decision heads, followed by periodic split-conformal validation.
 """
 
 from __future__ import annotations
@@ -35,10 +35,12 @@ DEFAULT_OUTPUT_DIR = ROOT_DIR / "runs" / "soro_kev_run"
 
 
 class RLCDLoss(nn.Module):
-    """RLCD objective used by the training step.
+    """Legacy-named multi-task routing objective used by the training step.
 
     The batched forward pass reduces each term. This module is the single
     weighted sum: CE + 0.25 Brier + 0.30 permutation JSD + auxiliary CEs.
+    The name is retained for checkpoint/import compatibility; it is not the
+    RLCD alignment method from Yang et al. (ICLR 2024).
     """
 
     def forward(
