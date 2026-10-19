@@ -53,6 +53,7 @@ class RouteResult:
     probabilities: dict[str, float] = field(default_factory=dict)
     scores: dict[str, float] = field(default_factory=dict)
     alpha: float = 0.10
+    q_hat: float | None = None
     reason: str = ""
 
     def __iter__(self):
@@ -399,6 +400,7 @@ class SoroHarness:
         candidates: list[dict[str, Any]] | dict[str, str] | None = None,
         top_k: int = 3,
         alpha: float | None = None,
+        q_hat: float | None = None,
         **kwargs: Any,
     ) -> RouteResult:
         """2-stage Conformal Router returning calibrated prediction set S and action."""
@@ -415,55 +417,77 @@ class SoroHarness:
                 for c_name, c_desc in candidates.items():
                     self.register_action(c_name, str(c_desc), {}, lambda **kw: {"status": "mock", **kw})
 
+        # Resolve q_hat and alpha: default to checkpoint's calibrated q_hat if present
+        scorer_q_hat = getattr(self._scorer, "q_hat", None)
+        if q_hat is not None:
+            eff_q_hat = float(q_hat)
+            eff_alpha = alpha if alpha is not None else max(0.0, 1.0 - eff_q_hat)
+        elif scorer_q_hat is not None and alpha is None:
+            eff_q_hat = float(scorer_q_hat)
+            eff_alpha = max(0.0, 1.0 - eff_q_hat)
+        else:
+            eff_alpha = float(alpha if alpha is not None else self.default_alpha)
+            eff_q_hat = float(scorer_q_hat) if scorer_q_hat is not None else (1.0 - eff_alpha)
+
         if not self._tools:
             return RouteResult(
                 action="ABSTAIN",
                 selected_tool=None,
                 candidates=[],
-                alpha=alpha or self.default_alpha,
+                alpha=eff_alpha,
+                q_hat=eff_q_hat,
                 reason="No tools registered",
             )
 
-        eff_alpha = alpha if alpha is not None else self.default_alpha
         query_vec = _text_to_vec(query)
         query_terms = set(re.findall(r"\w+", query.lower()))
 
-        # Stage 1: Fast Dense Shortlist (up to 16 candidates)
-        shortlist_scores: list[tuple[float, str]] = []
-        for name, entry in self._tools.items():
-            text = f"{name} {entry.description}"
-            tool_vec = _text_to_vec(text)
-            sim = _cosine(query_vec, tool_vec)
+        # If a neural LocalKevScorer is active and len(self._tools) <= 16,
+        # pass all candidate tools directly to the neural scorer without dropping candidates in a lexical hash filter!
+        is_neural = getattr(self._scorer, "is_neural", False) or (
+            hasattr(self._scorer, "_neural_model") and self._scorer._neural_model is not None
+        )
+        if is_neural and len(self._tools) <= 16:
+            top_candidates = list(self._tools.keys())
+            shortlist_scores = [(1.0, name) for name in top_candidates]
+        else:
+            # Stage 1: Fast Dense Shortlist (up to 16 candidates)
+            shortlist_scores: list[tuple[float, str]] = []
+            for name, entry in self._tools.items():
+                text = f"{name} {entry.description}"
+                tool_vec = _text_to_vec(text)
+                sim = _cosine(query_vec, tool_vec)
 
-            entry_terms = set(re.findall(r"\w+", text.lower()))
-            overlap = query_terms.intersection(entry_terms)
-            # If no term overlaps, dense similarity must be at least 0.28 to be considered relevant
-            if not overlap and sim < 0.28:
-                sim = 0.0
+                entry_terms = set(re.findall(r"\w+", text.lower()))
+                overlap = query_terms.intersection(entry_terms)
+                # If no term overlaps, dense similarity must be at least 0.28 to be considered relevant
+                if not overlap and sim < 0.28:
+                    sim = 0.0
 
-            # Name match bonus
-            for q in query_terms:
-                if q in name.lower() and len(q) >= 3:
-                    sim += 0.35
+                # Name match bonus
+                for q in query_terms:
+                    if q in name.lower() and len(q) >= 3:
+                        sim += 0.35
 
-            shortlist_scores.append((sim, name))
+                shortlist_scores.append((sim, name))
 
-        shortlist_scores.sort(key=lambda x: x[0], reverse=True)
-        max_raw_sim = shortlist_scores[0][0] if shortlist_scores else 0.0
+            shortlist_scores.sort(key=lambda x: x[0], reverse=True)
+            max_raw_sim = shortlist_scores[0][0] if shortlist_scores else 0.0
 
-        # Out-of-domain check: if best raw similarity is essentially zero/noise (< 0.15), abstain immediately
-        if max_raw_sim < 0.15:
-            return RouteResult(
-                action="ABSTAIN",
-                selected_tool=None,
-                candidates=[],
-                probabilities={},
-                scores={name: s for s, name in shortlist_scores},
-                alpha=eff_alpha,
-                reason=f"Top candidate similarity {max_raw_sim:.3f} below minimum semantic threshold",
-            )
+            # Out-of-domain check for heuristic fallback
+            if max_raw_sim < 0.15 and not is_neural:
+                return RouteResult(
+                    action="ABSTAIN",
+                    selected_tool=None,
+                    candidates=[],
+                    probabilities={},
+                    scores={name: s for s, name in shortlist_scores},
+                    alpha=eff_alpha,
+                    q_hat=eff_q_hat,
+                    reason=f"Top candidate similarity {max_raw_sim:.3f} below minimum semantic threshold",
+                )
 
-        top_candidates = [name for _, name in shortlist_scores[:16]]
+            top_candidates = [name for _, name in shortlist_scores[:16]]
 
         # Stage 2: Calibrated System-One Scoring via LocalKevScorer
         options = {name: self._tools[name].description for name in top_candidates}
@@ -480,6 +504,7 @@ class SoroHarness:
                 probabilities=probs,
                 scores=scores_map,
                 alpha=eff_alpha,
+                q_hat=eff_q_hat,
                 reason="No candidate probabilities available",
             )
 
@@ -493,13 +518,22 @@ class SoroHarness:
                 probabilities=probs,
                 scores=scores_map,
                 alpha=eff_alpha,
+                q_hat=eff_q_hat,
                 reason=(
                     "Ordered multi-tool plan "
                     + ", ".join(multi_plan)
                     + f" (intent={getattr(self._scorer, 'last_intent', None)})"
                 ),
             )
-        if top_tool == "__abstain__":
+
+        # Form the prediction set strictly via Split Conformal LAC: S = { i | p_i >= 1 - q_hat }
+        lac_threshold = 1.0 - eff_q_hat
+        S = [name for name, p in sorted_by_prob if p >= lac_threshold]
+        s_tools = [name for name in S if name != "__abstain__"]
+
+        # Decision policy:
+        # 1. If S = empty or S = {"__abstain__"} (or "__abstain__" is top-1 and exceeds non-abstain tools): return ABSTAIN
+        if not s_tools or top_tool == "__abstain__":
             return RouteResult(
                 action="ABSTAIN",
                 selected_tool=None,
@@ -507,57 +541,34 @@ class SoroHarness:
                 probabilities=probs,
                 scores=scores_map,
                 alpha=eff_alpha,
-                reason=f"Neural scorer abstained (p={top_prob:.3f})",
+                q_hat=eff_q_hat,
+                reason=f"Conformal abstention (top={top_tool}, p={top_prob:.3f}, |S|={len(S)}, q_hat={eff_q_hat:.4f})",
             )
-        second_prob = sorted_by_prob[1][1] if len(sorted_by_prob) > 1 else 0.0
-        gap = top_prob - second_prob
 
-        # Clear dominant winner check (e.g. margin gap >= 0.20 and prob >= 0.55)
-        if top_prob >= 0.55 and gap >= 0.20:
+        # 2. If |S \ {"__abstain__"}| == 1: return EXECUTE with that single tool
+        if len(s_tools) == 1:
+            selected = s_tools[0]
             return RouteResult(
                 action="EXECUTE",
-                selected_tool=top_tool,
-                candidates=[top_tool],
+                selected_tool=selected,
+                candidates=s_tools,
                 probabilities=probs,
                 scores=scores_map,
                 alpha=eff_alpha,
-                reason=f"Clear dominant top-1 candidate ({top_tool}, p={top_prob:.3f}, gap={gap:.3f})",
+                q_hat=eff_q_hat,
+                reason=f"Singleton conformal set ({selected}, p={probs.get(selected, 0.0):.3f} >= {lac_threshold:.4f})",
             )
 
-        # Conformal Softmax-LAC Set Selection: accumulate until mass >= 1 - alpha
-        target_mass = 1.0 - eff_alpha
-        accumulated_set: list[str] = []
-        running_mass = 0.0
-
-        for tool_name, p in sorted_by_prob:
-            accumulated_set.append(tool_name)
-            running_mass += p
-            if running_mass >= target_mass or len(accumulated_set) >= top_k:
-                break
-
-        # Decision Mapping
-        set_size = len(accumulated_set)
-        if set_size == 1:
-            action = "EXECUTE"
-            selected = accumulated_set[0]
-            reason = f"Unambiguous singleton ({top_tool}, p={top_prob:.3f} >= {target_mass:.2f})"
-        elif 2 <= set_size <= 8:
-            action = "ASK"
-            selected = accumulated_set[0]
-            reason = f"Ambiguous prediction set size {set_size} under alpha={eff_alpha}"
-        else:
-            action = "ABSTAIN"
-            selected = None
-            reason = f"Set size {set_size} exceeds threshold"
-
+        # 3. If |S \ {"__abstain__"}| >= 2: return ASK with all candidate tools in S \ {"__abstain__"}
         return RouteResult(
-            action=action,
-            selected_tool=selected,
-            candidates=accumulated_set,
+            action="ASK",
+            selected_tool=s_tools[0],
+            candidates=s_tools,
             probabilities=probs,
             scores=scores_map,
             alpha=eff_alpha,
-            reason=reason,
+            q_hat=eff_q_hat,
+            reason=f"Ambiguous prediction set size {len(s_tools)} under q_hat={eff_q_hat:.4f} (threshold={lac_threshold:.4f})",
         )
 
     def _multi_tool_plan(self) -> list[str]:

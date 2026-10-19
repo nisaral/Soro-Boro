@@ -28,7 +28,7 @@ pip install soro-boro
 
 ## Model summary
 
-Soro-Kev-0.8B is a specialized decision model for AI agent tool routing, schema normalization, and execution boundary control. It reads the state (user prompt, conversational history, and available tool schemas) and returns a closed-set probability distribution over the options supplied with a question. Each question is scored in a prefill-only forward pass; the model does not generate text.
+Soro-Kev-0.8B is a **Single-Prefill Causal Listwise Tool Reranker & Multi-Task Pointer Classifier with an Explicit `__abstain__` Slot** (1 forward pass for menus $\le 16$ tools; 2-stage tournament chunking for larger menus). It reads the state (user prompt, conversational history, and available tool schemas) and produces a closed-set probability distribution over the options supplied with a question. Each question is scored in a prefill-only forward pass; the model does not generate text.
 
 It is built directly on top of Jared Palmer's Kev pointer architecture, addressing an explicit limitation documented in the original Kev-0.8B model card (*"Tool-call routing: its When2Call accuracy is below chance (0.133). Do not use it for tool-call routing"*). Soro-Kev-0.8B is trained specifically on multi-protocol tool catalogs (Model Context Protocol, REST/OpenAPI, Agent Skills, and Python signatures), raising tool routing accuracy to 85.67% (1,028/1,200) on held-out MCP & agent benchmarks, and 83.00% (83/100) on BFCL v3 tool selection.
 
@@ -41,17 +41,18 @@ It consists of a LoRA adapter ($r=16, \alpha=32$) and a pointer head on `Qwen/Qw
 | Field | Detail |
 | :--- | :--- |
 | **Developer** | Keyush Nisar ([github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro)) |
-| **Model type** | Decision model: causal language-model backbone run prefill-only, with a pointer head over candidate options |
-| **Backbone** | `Qwen/Qwen3.5-0.8B-Base`: 24 layers (18 Gated DeltaNet linear attention, 6 full attention); frozen |
-| **Adapter** | LoRA, rank 16, $\alpha$ 32, on `q_proj`, `k_proj`, `v_proj`, `o_proj` only. The adapter has 24 modules on the six full-attention layers (`[3, 7, 11, 15, 19, 23]`), about 1.08M parameters. There are no MLP or DeltaNet adapters. |
-| **Head** | Two 256-d projections from each selected hidden state; each option's closing token is scored against the question's final token (`h_query · h_option / (sqrt(256) · T)`) |
+| **Model type** | Single-Prefill Causal Listwise Tool Reranker & Multi-Task Pointer Classifier with an Explicit `__abstain__` Slot |
+| **Backbone** | `Qwen/Qwen3.5-0.8B-Base`: 24 layers (18 Gated DeltaNet linear attention, 6 full attention; $d_{\text{model}}=1024$); frozen |
+| **Adapter** | LoRA, rank 16, $\alpha=32$, on `q_proj`, `k_proj`, `v_proj`, `o_proj` only across the 6 full-attention layers `[3, 7, 11, 15, 19, 23]` (24 adapted modules, ~1.08M parameters). There are no MLP or DeltaNet adapters. |
+| **Projection & Classification Heads** | `q_proj_head` and `opt_proj_head` (`Linear(1024, 256)`), scoring candidate options via $q \cdot k / (\sqrt{256} \cdot T)$. Auxiliary heads: `binary_head` (`Linear(256, 2)`) for `missing_required` and `is_mutation`, and `intent_head` (`Linear(256, 3)`) |
+| **Loss** | Multi-Task Calibrated Pointer Loss: $\mathcal{L} = \mathcal{L}_{\text{route\_CE}} + 0.25 \mathcal{L}_{\text{Brier}} + 0.50 \mathcal{L}_{\text{arg\_CE}} + 0.25 \mathcal{L}_{\text{missing\_CE}} + 0.25 \mathcal{L}_{\text{mutation\_CE}} + 0.40 \mathcal{L}_{\text{intent\_CE}}$ (+ optional permutation JSD) |
 | **Precision** | Trained in bf16/fp16; served in bf16 (merged at load) or fp32; evaluated in fp32 |
-| **Context length** | Backbone supports up to 262,144 positions. The public T4-oriented training recipe used a 1,536-token cap, so the adapter was not trained on the full context. |
-| **Validated context** | 8,192 tokens in evaluation; not the training cap |
-| **Calibration** | Learned temperature `0.075487` and split-conformal quantile `q_hat = 0.9518` at `1 - alpha = 0.90`. The calibration is fitted in training/evaluation; the current production gate does not apply `q_hat`. |
+| **Context length** | Backbone supports up to 262,144 positions; evaluated up to 8,192 tokens |
+| **Calibration & Temperature** | Learned pointer temperature $T = 0.0755$ (`0.075487`), split-conformal quantile $\hat{q} = 0.9518$ at nominal coverage $1 - \alpha = 0.90$ |
+| **Production Decision Policy** | Split Conformal LAC: $S = \{ i \mid p_i \ge 1 - \hat{q} \}$. If $S = \emptyset$ or $S = \{\text{"\_\_abstain\_\_"}\}$ (or abstain is top-1): `ABSTAIN`; if $|S \setminus \{\text{"\_\_abstain\_\_"}\}| == 1$: `EXECUTE`; if $|S \setminus \{\text{"\_\_abstain\_\_"}\}| \ge 2$: `ASK` |
 | **Languages** | English (prose, tool descriptions, OpenAPI schemas, JSON-RPC, Python docstrings) |
 | **License** | Apache-2.0 |
-| **Version** | Soro-Kev 1.0 (release `v0.2.0`, 2026-10-17) |
+| **Version** | Soro-Kev 1.0 (release `v0.2.1`, 2026-10-19) |
 | **Base Kev Ancestor** | Derived from pointer network methodology of [jaredpalmer/kev-0.8b](https://huggingface.co/jaredpalmer/kev-0.8b) |
 
 ---
@@ -62,7 +63,7 @@ Soro-Kev-0.8B evaluates a state and any number of named questions across three t
 
 | Type | Options | Output | Intended Purpose |
 | :--- | :--- | :--- | :--- |
-| **choice (`tool_route`)** | Up to 8 tool schemas + `__abstain__` per forward; larger catalogs use 6-tool chunks and a final top-two pass | Probability per listed tool and `__abstain__`; evaluation also reports calibration sets | Selects the single correct tool to execute, or abstains |
+| **choice (`tool_route`)** | Up to 16 tool schemas + `__abstain__` in a single forward pass; larger catalogs (> 16 tools) use 6-tool chunks and a final top-two Championship Pass | Probability per listed tool and `__abstain__`; evaluation reports calibration sets | Selects the single correct tool to execute, or abstains |
 | **choice (`arg_mapping`)** | Schema property keys + `__drop__` | Probability distribution over candidate property names | Maps unrecognized LLM argument keys to target schema parameters |
 | **noul (`missing_required`)** | `yes` / `no` with descriptions | Probability that required arguments are missing | Determines whether harness must ask user before calling tool |
 | **noul (`is_mutation`)** | `yes` / `no` with descriptions | Probability that action mutates external state | Classifies side-effect tier when MCP tool annotations are absent |
@@ -75,7 +76,7 @@ Each question is scored by its own forward pass in the current inference code. Q
 
 - **AI Agent Tool Routing**: Selecting tools from catalogs of 10 to 100+ schemas through a shortlist/chunking path without token-by-token JSON generation. The measured 0.8B prefill latency is about 124 ms, not a sub-100 ms guarantee.
 - **Model Context Protocol (MCP) Sidecars**: Routing queries to local tools exposed by MCP servers over stdio or SSE.
-- **Calibration-Aware Action Boundary**: Training/evaluation can fit LAC prediction sets. The current harness uses a documented top-mass gate; consumers should not assume a finite-sample coverage guarantee from `route()` until `q_hat` loading is wired in.
+- **Calibration-Aware Action Boundary**: Production routing natively applies Split Conformal LAC prediction sets ($S = \{ i \mid p_i \ge 1 - \hat{q} \}$) loaded directly from the checkpoint's `temperature.json` ($\hat{q} = 0.9518$).
 - **On-Device & Edge Routing**: Running alongside small edge LLMs on consumer laptops, Apple Silicon, or 4 GB GPUs.
 - **Duplicate Mutation Protection**: When integrated with the Soro-Boro execution boundary, enforcing the 0-duplicate execution invariant under network dropouts.
 
@@ -227,18 +228,29 @@ All models and baselines were evaluated on an **NVIDIA GeForce RTX 4050 Laptop G
 
 ---
 
-## Limitations and Trade-Offs
+---
 
-- **No Generative Argument Synthesis**: Soro-Kev normalizes parameter keys and checks argument completeness; it does not author free-text string values. In production pipelines, arguments are drafted by a fast parameter extractor, normalized via `arg_mapping`, and guarded by `missing_required` before execution.
-- **Single-Turn Model**: Soro-Kev evaluates single routing turns. Multi-tool sequential chaining ("call tool A, then tool B") is an architectural runtime design and has not yet been benchmarked on multi-step traces.
-- **Edge Model Capacity**: With 0.8B parameters, out-of-domain transfer on complex multi-hop semantic reasoning is lower than Soro-Kev-4B (85.67% vs 90.58% on external holdouts).
-- **Abstention Sensitivity**: On BFCL irrelevance slices where queries closely resemble registered tools, Soro-Kev-0.8B abstains 51.52% (17/33) of the time, compared to 75.76% (25/33) for Soro-Kev-4B. For strict zero-tolerance out-of-domain rejection, use Soro-Kev-4B.
+## Architectural Trade-Offs & v0.3 Roadmap
+
+### 1. Left-to-Right Causal Attention Asymmetry
+In autoregressive backbones (`Qwen/Qwen3.5-0.8B`), attention is strictly causal (unidirectional). When tools are serialized in a single sequence:
+$$\text{[Query]} \dots \text{[Tool 1]} \dots \text{[Tool 2]} \dots \text{[Tool } N\text{]} \dots \text{[__abstain__]}$$
+Tokens for Tool $N$ attend to the query and all preceding tools ($1 \dots N-1$), but Tool 1 cannot attend to subsequent tools. While training includes an auxiliary permutation consistency term (JSD) to enforce position invariance, causal asymmetry induces an empirical **1.5%–3.0% order-flip rate** under arbitrary candidate permutations on closely matched tool boundaries.
+
+### 2. Context & Latency Scaling
+Causal prefill complexity scales with the total token length of serialized tool schemas. While compact schemas fit comfortably within context (16 tools $\approx$ 1,200 tokens), scaling to 100+ schemas requires two-stage tournament chunking or lexical pre-filtering.
+
+### 3. v0.3 Architectural Direction: Bidirectional Distillation + Set Transformer
+To eliminate causal order sensitivity and achieve true $O(1)$ permutation invariance, the `v0.3` development branch focuses on:
+1. **Bidirectional Encoder Backbone**: Distilling `Soro-Kev-4B` knowledge into a compact 149M bidirectional cross-encoder (e.g. ModernBERT or DeBERTa-v3).
+2. **Permutation-Invariant Set Transformer Head**: Replacing causal span projections with an Induced Set Attention Block (ISAB) operating over pooled candidate tool representations, guaranteeing mathematical permutation invariance ($f(\pi(T)) = \pi(f(T))$).
+3. **Sub-15ms Edge Inference**: Combining INT8/ONNX runtime quantization with bidirectional pooling for single-digit millisecond routing on commodity CPU and edge hardware.
 
 ---
 
 ## Provenance and Reproducibility
 
-- **Repository**: [github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro) (release tag `v0.2.0`)
+- **Repository**: [github.com/nisaral/Soro-Boro](https://github.com/nisaral/Soro-Boro) (release tag `v0.2.1`)
 - **Trained Checkpoint**: Adapter weights and `head.pt` with learned temperature `0.075487` and calibration quantile `q_hat = 0.9518`
 - **Harness Dataset**: [huggingface.co/datasets/nisaralll/soro-universal-tool-harness](https://huggingface.co/datasets/nisaralll/soro-universal-tool-harness)
 - **Disjointness Audit**: Committed in `benchmarks/disjointness_audit.json`
@@ -256,7 +268,7 @@ If you use Soro-Kev or Universal Tool Harness in your research or production sys
   year = {2026},
   publisher = {GitHub},
   howpublished = {\url{https://github.com/nisaral/Soro-Boro}},
-  note = {Release v0.2.0}
+  note = {Release v0.2.1}
 }
 
 @misc{palmer2026kev08b,

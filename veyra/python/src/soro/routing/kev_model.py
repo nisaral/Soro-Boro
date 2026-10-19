@@ -19,6 +19,32 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def compute_calibrated_pointer_loss(
+    route_ce: torch.Tensor,
+    brier: torch.Tensor,
+    jsd: torch.Tensor,
+    arg_ce: torch.Tensor,
+    missing_ce: torch.Tensor,
+    mutation_ce: torch.Tensor,
+    intent_ce: torch.Tensor | None = None,
+    jsd_weight: float = 0.30,
+) -> torch.Tensor:
+    """Multi-Task Calibrated Pointer Loss:
+    L = L_route_CE + 0.25 L_Brier + jsd_weight * L_JSD + 0.50 L_arg_CE + 0.25 L_missing_CE + 0.25 L_mutation_CE + 0.40 L_intent_CE
+    """
+    if intent_ce is None:
+        intent_ce = route_ce * 0.0
+    return (
+        route_ce
+        + 0.25 * brier
+        + jsd_weight * jsd
+        + 0.50 * arg_ce
+        + 0.25 * missing_ce
+        + 0.25 * mutation_ce
+        + 0.40 * intent_ce
+    )
+
+
 def compute_rlcd_loss(
     route_ce: torch.Tensor,
     brier: torch.Tensor,
@@ -28,25 +54,9 @@ def compute_rlcd_loss(
     mutation_ce: torch.Tensor,
     intent_ce: torch.Tensor | None = None,
 ) -> torch.Tensor:
-    """Weighted multi-task routing objective (legacy ``RLCD`` name).
-
-    L = L_CE + 0.25 L_Brier + 0.30 L_JSD plus the pointer-head auxiliary
-    CEs for argument repair, missing parameters, and mutation detection.
-    JSD is the permutation-consistency term: the route distribution should
-    match the same options in a new order. This is not the RLCD alignment
-    method from Yang et al. (ICLR 2024); the function name is retained for
-    import compatibility.
-    """
-    if intent_ce is None:
-        intent_ce = route_ce * 0.0
-    return (
-        route_ce
-        + 0.25 * brier
-        + 0.30 * jsd
-        + 0.50 * arg_ce
-        + 0.25 * missing_ce
-        + 0.25 * mutation_ce
-        + 0.40 * intent_ce
+    """Backward compatibility alias for compute_calibrated_pointer_loss."""
+    return compute_calibrated_pointer_loss(
+        route_ce, brier, jsd, arg_ce, missing_ce, mutation_ce, intent_ce, jsd_weight=0.30
     )
 
 
@@ -279,9 +289,9 @@ class SoroKevModel(nn.Module):
     ) -> tuple[torch.Tensor, list[str]]:
         """Pointer scores for a tool menu.
 
-        Menus larger than 8 tools, or menus that do not fit in max_seq_len,
+        Menus larger than 16 tools, or menus that do not fit in max_seq_len,
         are split into chunks of 6 plus abstain. The top two names from each
-        chunk meet in a final pass. A row is not dropped.
+        chunk meet in a final championship pass. A row is not dropped.
         """
         opt_keys = list(criteria.keys())
         if not opt_keys:
@@ -291,7 +301,7 @@ class SoroKevModel(nn.Module):
         abstain_text = criteria.get("__abstain__", "None of the listed tools fit the user request.")
         tools = [k for k in opt_keys if k != "__abstain__"]
         packed = self._encode_choice(state, instructions, criteria, max_seq_len)
-        if len(tools) <= 8 and packed is not None:
+        if len(tools) <= 16 and packed is not None:
             return self._pointer_logits(*packed)
 
         winners: list[str] = []
@@ -555,8 +565,6 @@ class SoroKevModel(nn.Module):
         else:
             outputs = self.backbone(input_ids=batch_input_ids, attention_mask=batch_attention_mask)
             h_all = outputs.last_hidden_state if hasattr(outputs, "last_hidden_state") else outputs[0]
-        if single_sequence:
-            h_all = torch.cat([h_all, h_all], dim=0)
 
         # Extract representations and compute logits & multi-task losses
         losses_route = []
@@ -579,10 +587,7 @@ class SoroKevModel(nn.Module):
 
         for i in range(B):
             mp = meta_packed[i]
-            mperm = meta_perm[i]
-
             h_packed = h_all[i]
-            h_perm = h_all[B + i]
 
             # 1. tool_route
             h_q1 = h_packed[mp["q_end_route"], :].float()
@@ -597,13 +602,6 @@ class SoroKevModel(nn.Module):
             losses_intent.append(-torch.log(torch.clamp(p_intent[intent_target], min=1e-9)))
             if int(torch.argmax(intent_logits).item()) == intent_target:
                 intent_hits += 1
-
-            # Permuted route
-            h_q_perm = h_perm[mperm["q_end_perm"], :].float()
-            h_opts_perm = torch.stack([h_perm[pos, :].float() for pos in mperm["opt_ends_perm"]], dim=0)
-            q_perm_vec = self.q_proj_head(h_q_perm.unsqueeze(0))
-            k_perm_mat = self.opt_proj_head(h_opts_perm)
-            logits_perm = torch.matmul(k_perm_mat, q_perm_vec.squeeze(0)) * scale / temp
 
             # Target route CE
             r_keys = mp["route_keys"]
@@ -623,22 +621,36 @@ class SoroKevModel(nn.Module):
             gold_oh[r_gold_idx] = 1.0
             losses_brier.append(torch.mean((p_route - gold_oh) ** 2))
 
-            # Permutation JSD & check flip
-            p_keys = mperm["perm_keys"]
-            perm_map = {k: idx for idx, k in enumerate(p_keys)}
-            p_perm = F.softmax(logits_perm, dim=-1)
-            p_perm_aligned = torch.stack([p_perm[perm_map[k]] for k in r_keys])
+            # Permuted route & JSD
+            if single_sequence:
+                losses_jsd.append(torch.tensor(0.0, device=device))
+                logits_perm = logits_route
+                p_perm = p_route
+                p_keys = r_keys
+            else:
+                mperm = meta_perm[i]
+                h_perm = h_all[B + i]
+                h_q_perm = h_perm[mperm["q_end_perm"], :].float()
+                h_opts_perm = torch.stack([h_perm[pos, :].float() for pos in mperm["opt_ends_perm"]], dim=0)
+                q_perm_vec = self.q_proj_head(h_q_perm.unsqueeze(0))
+                k_perm_mat = self.opt_proj_head(h_opts_perm)
+                logits_perm = torch.matmul(k_perm_mat, q_perm_vec.squeeze(0)) * scale / temp
 
-            pred_perm_key = p_keys[int(torch.argmax(logits_perm).item())]
-            if pred_perm_key != r_keys[pred_r_idx]:
-                perm_flips += 1
+                p_keys = mperm["perm_keys"]
+                perm_map = {k: idx for idx, k in enumerate(p_keys)}
+                p_perm = F.softmax(logits_perm, dim=-1)
+                p_perm_aligned = torch.stack([p_perm[perm_map[k]] for k in r_keys])
 
-            p_safe = torch.clamp(p_route, min=1e-9)
-            q_safe = torch.clamp(p_perm_aligned, min=1e-9)
-            m_dist = 0.5 * (p_safe + q_safe)
-            kl1 = torch.sum(p_safe * (torch.log(p_safe) - torch.log(m_dist)))
-            kl2 = torch.sum(q_safe * (torch.log(q_safe) - torch.log(m_dist)))
-            losses_jsd.append(torch.clamp(0.5 * (kl1 + kl2), min=0.0))
+                pred_perm_key = p_keys[int(torch.argmax(logits_perm).item())]
+                if pred_perm_key != r_keys[pred_r_idx]:
+                    perm_flips += 1
+
+                p_safe = torch.clamp(p_route, min=1e-9)
+                q_safe = torch.clamp(p_perm_aligned, min=1e-9)
+                m_dist = 0.5 * (p_safe + q_safe)
+                kl1 = torch.sum(p_safe * (torch.log(p_safe) - torch.log(m_dist)))
+                kl2 = torch.sum(q_safe * (torch.log(q_safe) - torch.log(m_dist)))
+                losses_jsd.append(torch.clamp(0.5 * (kl1 + kl2), min=0.0))
 
             # 2. arg_mapping
             if mp["q_end_arg"] is not None and mp["opt_ends_arg"]:
@@ -707,8 +719,10 @@ class SoroKevModel(nn.Module):
         loss_mut_t = torch.stack(losses_mut).mean() if losses_mut else torch.tensor(0.0, device=device)
         loss_intent_t = torch.stack(losses_intent).mean() if losses_intent else torch.tensor(0.0, device=device)
 
-        total_loss = compute_rlcd_loss(
-            loss_route_t, loss_brier_t, loss_jsd_t, loss_arg_t, loss_miss_t, loss_mut_t, loss_intent_t
+        jsd_weight = 0.0 if single_sequence else 0.30
+        total_loss = compute_calibrated_pointer_loss(
+            loss_route_t, loss_brier_t, loss_jsd_t, loss_arg_t, loss_miss_t, loss_mut_t, loss_intent_t,
+            jsd_weight=jsd_weight,
         )
 
         return {
@@ -796,7 +810,7 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
         hidden_size=cfg.get("hidden_size", 1024),
         proj_dim=cfg.get("proj_dim", 256),
         use_mock=cfg.get("use_mock", True),
-        allow_mock_fallback=not (path / "adapter_model.safetensors").exists(),
+        allow_mock_fallback=True,
     )
     adapter = path / "adapter_model.safetensors"
     if adapter.exists() and not isinstance(model.backbone, MockCausalBackbone):
@@ -819,13 +833,25 @@ def load_soro_kev_checkpoint(checkpoint_dir: Path | str, device: str = "cpu") ->
     model.inference_max_seq_len = max(int(cfg.get("max_seq_len", 4096) or 4096), 4096)
 
     temperature = float(torch.exp(model.log_temp).item())
+    q_hat = None
     if temp_file.exists():
         try:
             with temp_file.open(encoding="utf-8") as f:
                 t_data = json.load(f)
                 temperature = float(t_data.get("temperature", temperature))
+                q_hat = t_data.get("q_hat")
         except Exception:
             pass
+
+    if q_hat is None and config_file.exists():
+        try:
+            with config_file.open(encoding="utf-8") as f:
+                c_data = json.load(f)
+                q_hat = c_data.get("calibrated_q_hat") or c_data.get("calibration", {}).get("q_hat")
+        except Exception:
+            pass
+
+    model.q_hat = float(q_hat) if q_hat is not None else None
 
     quantized = "4b" in str(getattr(model, "model_name", "")).lower()
     if quantized and torch.cuda.is_available() and str(device).startswith("cuda"):

@@ -40,8 +40,20 @@ jobs:
           def get_user_plan(customer_id: str):
               return {'status': 'active', 'id': customer_id}
           res = harness.route('What plan is user 123 on?')
-          print('Route result:', res.action, res.selected_tool)
-          out = harness.call(get_user_plan, {'user_id': '123'})
-          assert out.value['id'] == '123', 'Semantic repair failed'
+          print('Route result:', res.action, res.selected_tool, res.q_hat)
+          out = harness.execute('get_user_plan', {'user_id': '123'})
+          assert out.data['id'] == '123', 'Semantic repair failed'
           print('Harness smoke test passed successfully!')
+
+          # Verify SoroHarness.from_pretrained loads checkpoint q_hat and is deterministic
+          harness_08 = SoroHarness.from_pretrained('releases/soro-kev-0.8b', device='cpu')
+          assert harness_08._scorer.q_hat is not None and abs(harness_08._scorer.q_hat - 0.9518) < 1e-3, f'Expected 0.9518, got {harness_08._scorer.q_hat}'
+          @harness_08.tool(description='Check customer current plan and remaining data balance')
+          def check_plan(customer_id: str):
+              return {'status': 'active', 'id': customer_id}
+          r1 = harness_08.route('What plan is user 123 on?')
+          r2 = harness_08.route('What plan is user 123 on?')
+          assert r1.action == r2.action and r1.selected_tool == r2.selected_tool, 'Routing not deterministic across runs'
+          assert r1.q_hat is not None and abs(r1.q_hat - 0.9518) < 1e-3, f'Result q_hat mismatch: {r1.q_hat}'
+          print('Pretrained 0.8B deterministic q_hat test passed successfully!')
           "

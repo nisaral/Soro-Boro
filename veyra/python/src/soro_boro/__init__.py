@@ -14,7 +14,7 @@ from soro_boro.lifecycle import (
 )
 from soro_boro.wal import WALRecord, WriteAheadLog
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __all__ = [
     "SoroBoundary",
     "TimeoutException",

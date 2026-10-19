@@ -33,7 +33,7 @@ from soro.export.trace_export import StructuredTraceExporter
 from soro.registry.tool_registry import ToolDefinition, ToolRegistry
 from soro.core.trajectory import TrajectoryRecord
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "SoroHarness",

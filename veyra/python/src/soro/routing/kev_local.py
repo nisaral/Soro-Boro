@@ -39,12 +39,16 @@ MUTATION_TERMS = {
 }
 
 
+import zlib
+
+
 def _hash_token(token: str, num_dims: int = 256) -> list[int]:
-    h = hash(token)
-    dims = [abs(h) % num_dims]
+    h = zlib.crc32(token.encode("utf-8"))
+    dims = [h % num_dims]
     if len(token) >= 3:
         for i in range(len(token) - 2):
-            dims.append(abs(hash(token[i : i + 3])) % num_dims)
+            sub_h = zlib.crc32(token[i : i + 3].encode("utf-8"))
+            dims.append(sub_h % num_dims)
     return dims
 
 
@@ -107,6 +111,7 @@ class LocalKevScorer:
         self.error: str | None = None
         self._neural_model: SoroKevModel | None = None
         self._temperature: float = 1.0
+        self._q_hat: float | None = None
         self._loaded = False
         self.last_intent: str | None = None
         self.last_raw_logits: dict[str, float] = {}
@@ -154,6 +159,20 @@ class LocalKevScorer:
                 model, temp = load_soro_kev_checkpoint(run_path, device=self.device)
                 self._neural_model = model
                 self._temperature = temp
+                self._q_hat = getattr(model, "q_hat", None)
+                if self._q_hat is None and (run_path / "temperature.json").exists():
+                    try:
+                        with (run_path / "temperature.json").open(encoding="utf-8") as f:
+                            self._q_hat = json.load(f).get("q_hat")
+                    except Exception:
+                        pass
+                if self._q_hat is None and (run_path / "config.json").exists():
+                    try:
+                        with (run_path / "config.json").open(encoding="utf-8") as f:
+                            c_data = json.load(f)
+                            self._q_hat = c_data.get("calibrated_q_hat") or c_data.get("calibration", {}).get("q_hat")
+                    except Exception:
+                        pass
                 return True
             except Exception as exc:
                 self.error = f"Failed to load neural checkpoint from {run_path}: {exc}"
@@ -179,6 +198,19 @@ class LocalKevScorer:
     @property
     def is_available(self) -> bool:
         return self.load()
+
+    @property
+    def is_neural(self) -> bool:
+        return self.load() and self._neural_model is not None
+
+    @property
+    def q_hat(self) -> float | None:
+        self.load()
+        if self._q_hat is not None:
+            return self._q_hat
+        if self._neural_model is not None and hasattr(self._neural_model, "q_hat"):
+            return getattr(self._neural_model, "q_hat", None)
+        return None
 
     @property
     def backend_name(self) -> str:
@@ -291,8 +323,8 @@ class LocalKevScorer:
                     max_score = max(scores.values()) if scores else 0.0
                     scores["__abstain__"] = max(0.20 - max_score, 0.01)
 
-                # Softmax over scores with temperature 0.20
-                temp = 0.20
+                # Softmax over scores with calibrated temperature (default ~0.075)
+                temp = self._temperature if (self._temperature and self._temperature < 0.5) else 0.075
                 mx = max(scores.values()) if scores else 0.0
                 exps = {k: math.exp((v - mx) / temp) for k, v in scores.items()}
                 total = sum(exps.values()) or 1.0

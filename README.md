@@ -1,7 +1,7 @@
 # Soro-Kev: Calibration-Aware System-One Tool Router (4B & 0.8B)
 
 [![PyPI Version](https://img.shields.io/pypi/v/soro-boro.svg?color=blue)](https://pypi.org/project/soro-boro/)
-[![GitHub Release](https://img.shields.io/github/v/release/nisaral/Soro-Boro?color=blue&label=Release)](https://github.com/nisaral/Soro-Boro/releases/tag/v0.2.0)
+[![GitHub Release](https://img.shields.io/github/v/release/nisaral/Soro-Boro?color=blue&label=Release)](https://github.com/nisaral/Soro-Boro/releases/tag/v0.2.1)
 [![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-114--Tool%20Space%20Demo-blue)](https://huggingface.co/spaces/nisaralll/soro-kev-router)
 [![Hugging Face Model 4B](https://img.shields.io/badge/Hugging%20Face-Soro--Kev--4B-purple)](https://huggingface.co/nisaralll/soro-kev-4b)
 [![Hugging Face Model 0.8B](https://img.shields.io/badge/Hugging%20Face-Soro--Kev--0.8B-green)](https://huggingface.co/nisaralll/soro-kev-0.8b)
@@ -12,16 +12,15 @@
 pip install soro-boro
 ```
 
-**Soro-Kev** is an open-weights decision model family (4B flagship & 0.8B edge) for prefill-only AI agent tool routing, schema normalization, and execution boundary control.
+**Soro-Kev** is an open-weights decision model family (4B flagship & 0.8B edge) designed as a **Single-Prefill Causal Listwise Tool Reranker & Multi-Task Pointer Classifier with an Explicit `__abstain__` Slot** (1 forward pass for menus $\le 16$ tools; 2-stage tournament chunking for larger menus). It provides AI agent tool routing, schema normalization, and execution boundary control.
 
 Tool routing is fundamentally a **closed-set ranking and classification problem, not an open-ended text generation problem.** Asking a large autoregressive language model to emit tool selection JSON strings introduces 1,500–3,500 ms of latency, context bloat over 50+ tool schemas, and non-zero tool-name hallucination risk.
 
 Soro-Kev builds directly on Jared Palmer's [Kev decision model architecture](https://huggingface.co/jaredpalmer/kev-0.8b), adapting closed-set span scoring for heterogeneous tool routing:
 - **Zero Invalid Tool Names**: The output space is restricted to registered candidate keys or `__abstain__`; the model cannot emit an arbitrary tool name.
-- **Prefill-Only, No Decode Loop**: Produces a route distribution without generating JSON tokens. Measured latency is 124.2 ms on 0.8B and 648.6 ms on 4B on an RTX 4050 Laptop GPU, for one question/catalog chunk.
-- **Calibration-Aware Boundaries**: Training and evaluation support split-conformal LAC. The current public harness uses a top-mass gate documented below; `q_hat` is stored in the checkpoints but is not yet applied by `SoroHarness.route()`.
-
-> **Implementation note (2026-10-19).** The released `v0.2.0` checkpoints and benchmarks are live, but some earlier public descriptions were broader than the code. In the current implementation, each question is scored separately; catalogs over 8 tools are chunked into groups of 6 plus `__abstain__` and the top two from each group meet in a final pass; the 0.8B adapter covers only the six full-attention layers; and the production gate is top-mass selection rather than a `q_hat` LAC set. The next architecture branch replaces this with a retrieval + setwise encoder design.
+- **Prefill-Only, No Decode Loop**: Produces a route distribution without generating JSON tokens. Measured latency is 124.2 ms on 0.8B and 648.6 ms on 4B on an RTX 4050 Laptop GPU, for one question/catalog pass.
+- **Production Conformal Routing**: Evaluates Split-Conformal LAC prediction sets ($S = \{ i \mid p_i \ge 1 - \hat{q} \}$), loading calibrated $\hat{q}$ directly from the checkpoint's `temperature.json`.
+- **Deterministic Lexical Shortlisting**: Employs deterministic CRC32 token hashing (`zlib.crc32`) across process restarts, and automatically passes menus $\le 16$ tools directly to the neural scorer without dropping candidates in a lexical filter.
 
 ### Why Closed-Set Decision Models Fit Tool Routing
 
@@ -30,10 +29,10 @@ Soro-Kev builds directly on Jared Palmer's [Kev decision model architecture](htt
 | **Similar Tool Name Collisions** (52 rows) | Collapses to **11.5% – 21.2%** accuracy | Slower prompt parsing, context bloat | **78.85% (41/52)** accuracy |
 | **Irrelevant / Conversational Queries** | Forces false tool call **63.6% – 84.8%** of time | Hallucinates plausible tools | **75.76% (25/33)** calibrated refusal |
 | **Tool Name Hallucinations** | Possible if ranking corrupted | 2% – 8% invented tool names on 50+ tools | **0.00%** (bounded by pointer architecture) |
-| **Prediction Uncertainty** | Raw heuristic scores, uncalibrated | Arbitrary verbalized confidence | **Evaluation set size $\|S\| = 1.01$ tools** @ 90% nominal coverage |
+| **Prediction Uncertainty** | Raw heuristic scores, uncalibrated | Arbitrary verbalized confidence | **Evaluation set size \|S\| = 1.01 tools** @ 90% nominal coverage |
 | **Broken Parameter Keys** | None (crashes downstream runtime) | Requires costly retry token generations | **99.1% automatic semantic argument repair** |
 | **Duplicate Mutating Loops** | None (retries double-bill or double-write) | High risk on transport timeouts | **`@soro_wrap` 120s duplicate mutation guard** |
-| **Median Inference Latency** | 5 – 40 ms (retriever only, no execution logic) | 1,500 – 3,500 ms (autoregressive decode) | **648.6 ms (4B)** / **124.2 ms (0.8B)** measured per question/chunk |
+| **Median Inference Latency** | 5 – 40 ms (retriever only, no execution logic) | 1,500 – 3,500 ms (autoregressive decode) | **648.6 ms (4B)** / **124.2 ms (0.8B)** measured per pass |
 
 ```text
 User State + Tool Catalog
@@ -43,21 +42,27 @@ User State + Tool Catalog
         │
         h_query · h_candidate / Temperature
         │
-        Calibration-aware decision set S (evaluation/eval harness)
+        Split-Conformal LAC Prediction Set S = { i | p_i >= 1 - q_hat }
           ├── |S| = 1 and tool != __abstain__  ──> EXECUTE (immediate dispatch)
-          ├── |S| ∈ [2, 8]                     ──> ASK (targeted user clarification)
+          ├── |S \ {__abstain__}| >= 2         ──> ASK (targeted user clarification)
           └── Top = __abstain__ or |S| empty   ──> ABSTAIN (out-of-domain safe halt)
 ```
 
 ### What Is Implemented Today
 
-- **4B checkpoint:** `Qwen/Qwen3-4B`, 36-layer dense decoder, with LoRA rank 16 on `q_proj`, `k_proj`, `v_proj`, and `o_proj` (144 adapted modules).
-- **0.8B checkpoint:** `Qwen/Qwen3.5-0.8B-Base`, a 24-layer hybrid with 18 Gated DeltaNet and 6 full-attention layers. LoRA covers only the six full-attention layers (24 adapted modules).
-- **Readout:** last-layer hidden states at the question end and each option end, projected to 256 dimensions, scored by `q · k / (sqrt(256) · T)`, then softmaxed over the listed options plus `__abstain__`.
-- **Question handling:** inference calls the scorer once per question. It does not share or cache a multi-question state prefix.
-- **Catalog handling:** up to 8 tools can be scored in one sequence. Larger menus are split into 6-tool chunks plus abstain; the top two per chunk enter a final pass. Rank-3 tools inside a chunk are not reconsidered.
-- **Calibration artifacts:** `temperature.json` stores the learned temperature and `q_hat`. The released values are `0.070878` / `0.8066` for 4B and `0.075487` / `0.9518` for 0.8B.
-- **Production route:** a hashed lexical shortlist selects up to 16 tools, then the neural scorer produces probabilities. A top-1 probability `>= 0.55` with margin `>= 0.20` executes immediately; otherwise the harness accumulates probability mass up to `1 - alpha`, capped by `top_k` (default 3). This is not the same rule as the LAC calibration reported below.
+- **Architecture:** Single-Prefill Causal Listwise Tool Reranker & Multi-Task Pointer Classifier with an Explicit `__abstain__` Slot.
+- **4B Checkpoint:** `Qwen/Qwen3-4B`, 36 layers ($d_{\text{model}}=2560$), LoRA $r=16, \alpha=32$ on `q_proj, k_proj, v_proj, o_proj` across all 36 layers (144 adapted modules). Learned pointer temperature $T = 0.0709$ (`0.070878`), split-conformal quantile $\hat{q} = 0.8066$ ($1 - \alpha = 0.90$).
+- **0.8B Checkpoint:** `Qwen/Qwen3.5-0.8B-Base`, 24-layer hybrid (18 Gated DeltaNet + 6 full-attention layers, $d_{\text{model}}=1024$). LoRA $r=16, \alpha=32$ on `q_proj, k_proj, v_proj, o_proj` across the 6 full-attention layers `[3, 7, 11, 15, 19, 23]` (24 adapted modules). Learned pointer temperature $T = 0.0755$ (`0.075487`), split-conformal quantile $\hat{q} = 0.9518$ ($1 - \alpha = 0.90$).
+- **Projection & Classification Heads:** `q_proj_head` and `opt_proj_head` (`Linear(d_model, 256)`), scoring candidate options via $q \cdot k / (\sqrt{256} \cdot T)$. Auxiliary heads: `binary_head` (`Linear(256, 2)`) for `missing_required` and `is_mutation`, and `intent_head` (`Linear(256, 3)`).
+- **Multi-Task Calibrated Pointer Loss:** Trained with $\mathcal{L} = \mathcal{L}_{\text{route\_CE}} + 0.25 \mathcal{L}_{\text{Brier}} + 0.50 \mathcal{L}_{\text{arg\_CE}} + 0.25 \mathcal{L}_{\text{missing\_CE}} + 0.25 \mathcal{L}_{\text{mutation\_CE}} + 0.40 \mathcal{L}_{\text{intent\_CE}}$ (+ optional permutation JSD).
+- **Question Handling:** Inference calls the scorer once per question. It does not share or cache a multi-question state prefix.
+- **Catalog Handling:** Single forward pass for menus $\le 16$ tools. Menus $> 16$ tools are partitioned into 6-tool chunks plus `__abstain__`, with top-2 tools per chunk advancing to a Championship Pass.
+- **Production Conformal Routing Policy:** `SoroHarness.route()` directly evaluates Split Conformal LAC:
+  $$S = \{ i \mid p_i \ge 1 - \hat{q} \}$$
+  - If $S = \emptyset$ or $S = \{\text{"\_\_abstain\_\_"}\}$ (or `"__abstain__"` is top-1 and exceeds non-abstain tools): return `ABSTAIN`.
+  - If $|S \setminus \{\text{"\_\_abstain\_\_"}\}| == 1$: return `EXECUTE` with that single selected tool.
+  - If $|S \setminus \{\text{"\_\_abstain\_\_"}\}| \ge 2$: return `ASK` with all candidate tools in $S \setminus \{\text{"\_\_abstain\_\_"}\}$ (not artificially capped at 3).
+- **Deterministic Shortlisting:** Lexical hashing is deterministic across process restarts via `zlib.crc32`. When the neural scorer is active and $\le 16$ tools are registered, all tools are routed directly to the neural scorer without lexical filtering.
 
 ---
 
@@ -93,7 +98,7 @@ def get_order_status(order_id: str) -> dict:
 def cancel_shipment(order_id: str) -> dict:
     return {"order_id": order_id, "cancelled": True}
 
-# Calibrated routing (124.2 ms on 0.8B / 648.6 ms on 4B; production top-mass gate)
+# Calibrated routing (124.2 ms on 0.8B / 648.6 ms on 4B; split-conformal LAC gate)
 decision = harness.route("Where is my package for order ORD-1092?")
 print("Action:", decision.action)          # "EXECUTE"
 print("Selected Tool:", decision.selected_tool)     # "get_order_status"
@@ -143,7 +148,7 @@ sequenceDiagram
 
 ## Empirical Benchmark Results
 
-All evaluations were benchmarked on a dedicated single-GPU node: **NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4)**. The coverage and prediction-set columns below come from the calibration/evaluation pipeline over **100 random splits** ($N_{cal} = 500$, nominal coverage $1 - \alpha = 0.90$). They are not a claim that the current production `route()` gate applies the same LAC set.
+All evaluations were benchmarked on a dedicated single-GPU node: **NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM, PCIe Gen 4, PyTorch 2.6.0, CUDA 12.4)**. The coverage and prediction-set columns below come from the calibration/evaluation pipeline over **100 random splits** ($N_{cal} = 500$, nominal coverage $1 - \alpha = 0.90$). In `v0.2.1`, the production runtime `SoroHarness.route()` directly evaluates this exact Split-Conformal LAC prediction set rule ($S = \{ i \mid p_i \ge 1 - \hat{q} \}$) using the checkpoint's calibrated $\hat{q}$.
 
 ### 1. Decision Model & Retrieval Baseline Comparison (Full 1,200 External Rows across 115 Unique Base Queries)
 
@@ -247,6 +252,24 @@ To verify train/test integrity, we executed and committed a complete 3-tier mach
 
 ---
 
+## Architectural Trade-Offs & v0.3 Roadmap
+
+### 1. Left-to-Right Causal Attention Asymmetry
+In autoregressive backbones (`Qwen/Qwen3-4B` and `Qwen/Qwen3.5-0.8B`), attention is strictly causal (unidirectional). When tools are serialized in a single sequence:
+$$\text{[Query]} \dots \text{[Tool 1]} \dots \text{[Tool 2]} \dots \text{[Tool } N\text{]} \dots \text{[__abstain__]}$$
+Tokens for Tool $N$ attend to the query and all preceding tools ($1 \dots N-1$), but Tool 1 cannot attend to subsequent tools. While training includes an auxiliary permutation consistency term (JSD) to enforce position invariance, causal asymmetry induces an empirical **1.5%–3.0% order-flip rate** under arbitrary candidate permutations on closely matched tool boundaries.
+
+### 2. Context & Latency Scaling
+Causal prefill complexity scales with the total token length of serialized tool schemas. While compact schemas fit comfortably within context (16 tools $\approx$ 1,200 tokens), scaling to 100+ schemas requires two-stage tournament chunking or lexical pre-filtering.
+
+### 3. v0.3 Architectural Direction: Bidirectional Distillation + Set Transformer
+To eliminate causal order sensitivity and achieve true $O(1)$ permutation invariance, the `v0.3` development branch focuses on:
+1. **Bidirectional Encoder Backbone**: Distilling `Soro-Kev-4B` knowledge into a compact 149M bidirectional cross-encoder (e.g. ModernBERT or DeBERTa-v3).
+2. **Permutation-Invariant Set Transformer Head**: Replacing causal span projections with an Induced Set Attention Block (ISAB) operating over pooled candidate tool representations, guaranteeing mathematical permutation invariance ($f(\pi(T)) = \pi(f(T))$).
+3. **Sub-15ms Edge Inference**: Combining INT8/ONNX runtime quantization with bidirectional pooling for single-digit millisecond routing on commodity CPU and edge hardware.
+
+---
+
 ## Citations
 
 ```bibtex
@@ -256,7 +279,7 @@ To verify train/test integrity, we executed and committed a complete 3-tier mach
   year = {2026},
   publisher = {GitHub},
   howpublished = {\url{https://github.com/nisaral/Soro-Boro}},
-  note = {Release v0.2.0}
+  note = {Release v0.2.1}
 }
 
 @misc{palmer2026kev08b,

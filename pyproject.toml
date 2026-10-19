@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "soro-boro"
-version = "0.2.0"
+version = "0.2.1"
 description = "Soro-Kev: Calibration-Aware System-One Tool Router (4B & 0.8B) on Qwen3 Decision Models"
 readme = "README.md"
 requires-python = ">=3.10"
