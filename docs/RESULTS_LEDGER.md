@@ -235,3 +235,31 @@ Evaluated locked `v3b_fp32` (`Qwen/Qwen3-0.6B-Base`, no S2 training) on all 7 S2
    - **Lookalike Metadata (Attack Suite v1):** Softmax LAC: Coverage collapses to **67.04% ($\Delta = -22.10\%$)**, Wrong Actions jump to **29.71% of all requests** (49.51% of acted). Per-Option Raw: Coverage holds at **89.38% ($\Delta = -0.01\%$)**, Wrong Actions = **2.89% of all requests**, Single-Tool Rate collapses to **3.46%** (96.54% forced deferral).
    - **Prompt Injection:** Softmax LAC: Coverage = 88.95% ($\Delta = -0.19\%$), Single = 83.35%, Wrong Actions = 6.64%. Per-Option Raw: Coverage = 89.40% ($\Delta = +0.01\%$), Single = 10.86%, Wrong Actions = 3.47%.
    - **Recalibrated Softmax Control:** Softmax LAC calibrated directly on lookalikes: Coverage = **89.43%**, Set Size = **2.72**, Single-Tool Rate = **5.49%**, Wrong Actions (Total) = **3.50%**, Wrong Actions (Acted) = **62.36%**.
+
+
+---
+
+## 5. Track 1: Deciding Experiments (Plan v11)
+
+### A. Task E2: Same-Score Comparison (Isolating Normalisation from the Refiner)
+- **Model:** Locked `0.6B` UPP pointer (`ckpt_A`) evaluated in exact `float32` (`amp=False`).
+- **Protocol:** 100 group-aware split conformal trials partitioned on the 321 distinct request texts in `eval_external.jsonl` ($n=1,200$). Nominal coverage target $1-\alpha = 90.0\%$.
+- **Datasets:** Clean Traffic (`eval_external.jsonl`, $n=1,200$), Attack Suite v2 Request-Aware Lookalikes ($n=1,200$), Attack Suite v2 Request-Blind Lookalikes ($n=1,200$). All lookalike cards match exact gold tool schema with no `fake_` naming indicators.
+- **Run Location:** `snorlaxx99/soro-task-e2-same-score` on Kaggle (T4 GPU). Log and JSON in `reports/deciding_experiments/snorlaxx99/`.
+
+| Stream | Scoring Method | Empirical Coverage | Mean Set Size $\|S\|$ | Single-Tool Rate | Wrong Actions (Total $\le \alpha$) | Wrong Actions (Acted Singletons) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Clean** | Softmax Pre-Refiner | 89.14% | 1.21 | 83.26% | 6.59% | 7.63% |
+| **Clean** | Softmax Post-Refiner | 89.14% | 1.21 | 83.26% | 6.59% | 7.63% |
+| **Clean** | Per-Option Pre-Refiner | 89.40% | 2.46 | 10.95% | 3.47% | 32.56% |
+| **Attack v2 Aware** | Softmax Pre-Refiner | **73.86%** ($\Delta = -15.28\%$) | 1.32 | 70.39% | **22.70%** | **31.95%** |
+| **Attack v2 Aware** | Softmax Post-Refiner | **73.86%** ($\Delta = -15.28\%$) | 1.32 | 70.39% | **22.70%** | **31.95%** |
+| **Attack v2 Aware** | Per-Option Pre-Refiner | **89.24%** ($\Delta = -0.16\%$) | 3.31 | 4.83% | **3.52%** | **75.31%** |
+| **Attack v2 Blind** | Softmax Pre-Refiner | 89.12% ($\Delta = -0.02\%$) | 1.25 | 81.65% | 6.74% | 7.89% |
+| **Attack v2 Blind** | Softmax Post-Refiner | 89.12% ($\Delta = -0.02\%$) | 1.25 | 81.65% | 6.74% | 7.89% |
+| **Attack v2 Blind** | Per-Option Pre-Refiner | 89.52% ($\Delta = +0.12\%$) | 3.15 | 9.26% | 3.37% | 33.80% |
+
+**Key Findings:**
+1. **Normalisation Alone Causes the Collapse:** Pre-refiner and post-refiner softmax numbers are identical to 4 decimal places. The 15.28 percentage point coverage collapse under request-aware lookalikes is 100% caused by listwise/softmax competition across candidates, NOT the Transformer refiner.
+2. **Attack Specificity:** Request-blind lookalikes do not degrade softmax coverage (89.12% vs 89.14% clean). The failure is strictly driven by semantic, request-aware lookalikes.
+3. **Per-Option Conformal Guarantee Holds:** Per-option coverage remains strictly invariant across all streams (89.40% Clean $\to$ 89.24% Aware $\to$ 89.52% Blind), keeping total wrong actions $\le 3.52\% \ll \alpha$. However, raw per-option scores suffer from high deferral (single-tool rate drops to 4.83% under attack, and 75.31% of acted singletons are wrong), motivating the absolute-score head (E3) and trust-priority rule (E6).

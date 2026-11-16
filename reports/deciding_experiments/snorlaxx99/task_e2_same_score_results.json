@@ -1,0 +1,85 @@
+{
+  "table": [
+    {
+      "stream": "clean",
+      "method": "softmax_pre_refiner",
+      "coverage": 0.8913908678220795,
+      "mean_set_size": 1.2142043508304718,
+      "single_tool_rate": 0.8326229081126354,
+      "wrong_action_total": 0.06585494625095288,
+      "wrong_action_acted": 0.07629786224699818
+    },
+    {
+      "stream": "clean",
+      "method": "softmax_post_refiner",
+      "coverage": 0.8913908678220795,
+      "mean_set_size": 1.2142043508304718,
+      "single_tool_rate": 0.8326229081126354,
+      "wrong_action_total": 0.06585494625095288,
+      "wrong_action_acted": 0.07629786224699818
+    },
+    {
+      "stream": "clean",
+      "method": "per_option_pre_refiner",
+      "coverage": 0.8939972782202962,
+      "mean_set_size": 2.4552038187206544,
+      "single_tool_rate": 0.1094892454422679,
+      "wrong_action_total": 0.034710577264825536,
+      "wrong_action_acted": 0.32557239339145716
+    },
+    {
+      "stream": "attack_v2_request_aware",
+      "method": "softmax_pre_refiner",
+      "coverage": 0.7386006327441639,
+      "mean_set_size": 1.3221998500450909,
+      "single_tool_rate": 0.7039363917116345,
+      "wrong_action_total": 0.22701779447150655,
+      "wrong_action_acted": 0.319537437204431
+    },
+    {
+      "stream": "attack_v2_request_aware",
+      "method": "softmax_post_refiner",
+      "coverage": 0.7386006327441639,
+      "mean_set_size": 1.3221998500450909,
+      "single_tool_rate": 0.7039363917116345,
+      "wrong_action_total": 0.22701779447150655,
+      "wrong_action_acted": 0.319537437204431
+    },
+    {
+      "stream": "attack_v2_request_aware",
+      "method": "per_option_pre_refiner",
+      "coverage": 0.8924092647643647,
+      "mean_set_size": 3.3050110335568825,
+      "single_tool_rate": 0.048298280535903064,
+      "wrong_action_total": 0.035191154139484065,
+      "wrong_action_acted": 0.7530877472474944
+    },
+    {
+      "stream": "attack_v2_request_blind",
+      "method": "softmax_pre_refiner",
+      "coverage": 0.891184265809715,
+      "mean_set_size": 1.2451179479988805,
+      "single_tool_rate": 0.8164732794973544,
+      "wrong_action_total": 0.0673786482118288,
+      "wrong_action_acted": 0.07885141159173242
+    },
+    {
+      "stream": "attack_v2_request_blind",
+      "method": "softmax_post_refiner",
+      "coverage": 0.891184265809715,
+      "mean_set_size": 1.2451179479988805,
+      "single_tool_rate": 0.8164732794973544,
+      "wrong_action_total": 0.0673786482118288,
+      "wrong_action_acted": 0.07885141159173242
+    },
+    {
+      "stream": "attack_v2_request_blind",
+      "method": "per_option_pre_refiner",
+      "coverage": 0.8952328673719627,
+      "mean_set_size": 3.1455329346132985,
+      "single_tool_rate": 0.09261805751509708,
+      "wrong_action_total": 0.03370271797140281,
+      "wrong_action_acted": 0.3380231433324365
+    }
+  ]
+}

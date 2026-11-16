@@ -12,8 +12,8 @@ Owners: **Run** = the agent that runs Kaggle and Colab jobs. **Audit** = the age
 | H2 | One conformal implementation everywhere (`soro/routing/conformal.py`); ties broken by a hash of the option key | Run | `eval_conformal_action.py` no longer clips | done |
 | H3 | Reconcile 321 request groups against the "115 base queries" on the public 4B card | Run | One number, explained in the ledger | done |
 | H4 | Reconcile 4B flips: 23/5,007 against 2/1,200 | Run | One row in the ledger with dtype and score spread | done |
-| H5 | Read 20 lookalike rows by hand | Keyush | Note in the ledger: valid or not | todo |
-| H6 | Decide whether to commit the docs and the two modified eval scripts | Keyush | Committed or deliberately left | todo |
+| H5 | Read 20 lookalike rows by hand | Keyush | Note in the ledger: valid or not | done |
+| H6 | Decide whether to commit the docs and the two modified eval scripts | Keyush | Committed or deliberately left | done |
 | H7 | Revoke the Kaggle token after the current runs; confirm ICML and NeurIPS 2027 dates | Keyush | Done | todo |
 
 ## Track 1: the deciding experiments (by 20 Nov)
@@ -23,12 +23,12 @@ All in fp32 on the locked 0.6B, 100 group-aware splits, target coverage 90%.
 | ID | Task | Owner | Done when | Status |
 |---|---|---|---|---|
 | E1 | Attack suite v2. Lookalikes in the same JSON card format as real tools, no `fake_` in names. Two versions: request-aware, and request-blind (clone catalog tools with promotional metadata) | Run | Two files, generator tracked | done |
-| E2 | Same-score comparison: softmax over pre-refiner scores, softmax after refiner, and per-option on pre-refiner scores | Run | Table isolates normalisation from the refiner | todo |
-| E3 | Absolute-score head: per-option yes/no loss on frozen pre-refiner features, lookalikes excluded from training | Run | Clean and attacked tables; full curve of wrong-action rate against share acted on | todo |
-| E4 | Baseline: MiniLM cosine with conformal threshold, clean and attacked | Run | Same table columns as E3 | todo |
-| E5 | Baseline: CROQ (conformal prune, then rescore the kept options) | Run | Same columns | todo |
+| E2 | Same-score comparison: softmax over pre-refiner scores, softmax after refiner, and per-option on pre-refiner scores | Run | Table isolates normalisation from the refiner | done |
+| E3 | Absolute-score head: per-option yes/no loss on frozen pre-refiner features, lookalikes excluded from training | Run | Clean and attacked tables; full curve of wrong-action rate against share acted on | running |
+| E4 | Baseline: MiniLM cosine with conformal threshold, clean and attacked | Run | Same table columns as E3 | running |
+| E5 | Baseline: CROQ (conformal prune, then rescore the kept options) | Run | Same columns | running |
 | E6 | Trust-priority rule on existing outputs; include the case where the correct tool is third-party | Run | Share acted on and wrong actions, both cases, beside a plain allowlist | todo |
-| E7 | Hammer-1.5B and xLAM-1B on attack suite v2: how often each picks the injected tool | Run | Two rows | todo |
+| E7 | Hammer-1.5B and xLAM-1B on attack suite v2: how often each picks the injected tool | Run | Two rows | running |
 | R1 | Check E1 to E7 against gate B and write the 20 Nov call | Review | Go, analysis paper, or release only | todo |
 
 ## Track 2: generality across decision models (20 Nov to 5 Dec)
@@ -51,9 +51,9 @@ Each returns quoted passages with section numbers.
 | L1 | DecisionRobust (2610.19118), full text: any attack that adds or edits options? any tool tasks? any abstention or selective metrics? | Audit | done |
 | L2 | Jeva (2610.18773), full text: is each option's score independent of the others? how is the "some option fits" estimate computed? are weights released? | Audit | done |
 | L3 | Is resolving by tool origin published? ETDI, FIDES, CaMeL, MCP registry signing. Does any allow a third-party tool to win over a trusted one? | Audit | done |
-| L4 | What do the Jev Decision Index and the Artificial Analysis Decision Index v2 test on robustness? Also SHIFT-JEV and the ordinal-scale bias paper (2609.38827) | Audit | todo |
-| L5 | Smaug-Audio-Decisions-0.7B and Clef-Omni: any spoken tool-routing or audio-injection result? | Audit | todo |
-| L6 | Outcome evidence for tool choice (bandit and experience methods, BaRP): is "no verified outcome, no solo action" published? | Audit | todo |
+| L4 | What do the Jev Decision Index and the Artificial Analysis Decision Index v2 test on robustness? Also SHIFT-JEV and the ordinal-scale bias paper (2609.38827) | Audit | done |
+| L5 | Smaug-Audio-Decisions-0.7B and Clef-Omni: any spoken tool-routing or audio-injection result? | Audit | done |
+| L6 | Outcome evidence for tool choice (bandit and experience methods, BaRP): is "no verified outcome, no solo action" published? | Audit | done |
 
 ## Track 4: speech and screenshots (after the 5 Dec call)
 
