@@ -1,0 +1,9 @@
+{
+  "recalibrated_softmax_lookalikes": {
+    "coverage": 0.8943112400784484,
+    "mean_set_size": 2.723656734650957,
+    "single_tool_rate": 0.05492140690100533,
+    "wrong_action_total": 0.03496458053641959,
+    "wrong_action_acted": 0.6236028568531219
+  }
+}

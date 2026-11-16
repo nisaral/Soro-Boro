@@ -209,3 +209,29 @@ Evaluated locked `v3b_fp32` (`Qwen/Qwen3-0.6B-Base`, no S2 training) on all 7 S2
    - **Delta:** **`-21.48 pts`** (Teacher is 21.5 pts worse than our model on tool selection!).
    - **Paired McNemar:** `60` rows correct in `v3b` only vs `2` correct in teacher only, **`p = 8.47e-16`**.
    - **Gate Decision:** **EXTERNAL 8B TEACHER SOFT DISTILLATION LOCKED OUT**. Soft distillation from the external 4-bit `Qwen/Qwen3-8B` teacher is strictly blocked due to its 77.04% tool degradation (-21.5 pts vs our model). However, distillation itself is NOT abandoned: under Track A2 / Plan V7, our own trained 4B model (`soro-4b`) will serve as the distillation teacher for student models (0.6B / 2B) once it passes its 90.6% gate.
+
+
+### D. Phase A Audit & Reconciliations (16 Nov 2026, Plan v11 Hygiene)
+
+1. **Phase A File Relocation & Tracking (Task H1):**
+   - Moved all Phase A generators and outputs out of `scratch/` into tracked directories:
+     - `data/attack_streams_v1/` (`eval_attractive_metadata.jsonl`, `eval_catalog_growth.jsonl`, `eval_prompt_injection.jsonl`).
+     - `reports/phase_a_evidence/` (`phase_a1_results.json`, `phase_a2_results.json`, `recalibration_results.json`, and all execution logs).
+   - Results recorded in the ledger below.
+
+2. **Phase A Reconciliations (Tasks H3, H4):**
+   - **H3 (321 Request Groups vs 115 Base Queries):** The public 4B card statement of "115 base queries" referred to root syntactic dialogue stems from the source benchmark. When expanded with natural parameter variants, conversation contexts, and multi-turn preambles, `eval_external.jsonl` contains exactly **321 distinct request texts** (168 appearing once, 153 appearing 2–19 times). All split conformal evaluations partition on the exact 321 request texts to prevent exchangeability leakage across folds.
+   - **H4 (4B Flips Reconciled: 23 / 5,207 vs 2 / 1,200):** The 4B backbone evaluation (`scratch/sorobee_4b_downloaded/v3b_full_eval.json`) recorded:
+     - `external` ($n=1,200$): **2 flips (0.1667%)**, with 0 flips on abstain rows.
+     - `selection` ($n=1,330$): 9 flips (0.6767%).
+     - `zeroshot` ($n=2,172$): 7 flips (0.3223%).
+     - `collisions` ($n=421$): 5 flips (1.1876%).
+     - `near_miss` ($n=84$): 0 flips (0.0000%).
+     - **Total across all splits:** **23 / 5,207 (0.4417%)**. The 2/1,200 figure was the `external` split subset; the 23/5,007 (or 5,207) figure was the comprehensive pooled total across all 5 evaluation splits.
+
+3. **Phase A Conformal Benchmark Ledger (100 Group-Aware Splits, Nominal $\alpha=0.10$):**
+   - **Clean Traffic:** Softmax LAC: Coverage = 89.14%, Set Size = 1.21, Single = 83.19%, Wrong Actions (Total) = 6.53%, Wrong Actions (Acted) = 7.58%. Per-Option Raw: Coverage = 89.39%, Set Size = 2.46, Single = 10.93%, Wrong Actions (Total) = 3.51%, Wrong Actions (Acted) = 32.87%. Margin-over-Abstain: Coverage = 90.42%, Set Size = 2.14, Single = 13.77%, Wrong Actions (Total) = 5.37%.
+   - **Catalog Growth:** Softmax LAC: Coverage = 88.06% ($\Delta = -1.08\%$), Single = 83.28%, Wrong Actions = 6.85%. Per-Option Raw: Coverage = 89.40% ($\Delta = +0.01\%$), Single = 9.69%, Wrong Actions = 3.10%.
+   - **Lookalike Metadata (Attack Suite v1):** Softmax LAC: Coverage collapses to **67.04% ($\Delta = -22.10\%$)**, Wrong Actions jump to **29.71% of all requests** (49.51% of acted). Per-Option Raw: Coverage holds at **89.38% ($\Delta = -0.01\%$)**, Wrong Actions = **2.89% of all requests**, Single-Tool Rate collapses to **3.46%** (96.54% forced deferral).
+   - **Prompt Injection:** Softmax LAC: Coverage = 88.95% ($\Delta = -0.19\%$), Single = 83.35%, Wrong Actions = 6.64%. Per-Option Raw: Coverage = 89.40% ($\Delta = +0.01\%$), Single = 10.86%, Wrong Actions = 3.47%.
+   - **Recalibrated Softmax Control:** Softmax LAC calibrated directly on lookalikes: Coverage = **89.43%**, Set Size = **2.72**, Single-Tool Rate = **5.49%**, Wrong Actions (Total) = **3.50%**, Wrong Actions (Acted) = **62.36%**.

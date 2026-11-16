@@ -290,6 +290,16 @@ def main() -> None:
                 shard_total=1,
             )
             scored_rows.extend(scored)
+            # Incremental persistence: flush each split immediately so long runs never lose completed splits
+            split_summary = summarize_by_split(scored)
+            (out_dir / f"scored_{name}.json").write_text(
+                json.dumps({"split": name, "rows": scored, "summary": split_summary}),
+                encoding="utf-8"
+            )
+            (out_dir / "s2_baseline_scored_rows_partial.json").write_text(
+                json.dumps({"rows": scored_rows}), encoding="utf-8"
+            )
+            print(f"[PERSIST] Saved {len(scored)} rows for split '{name}' to {out_dir / f'scored_{name}.json'}", flush=True)
 
         raw_summary = summarize_by_split(scored_rows)
         tuning = _select_thresholds(scored_rows, opt_texts_by_split)

@@ -1,0 +1,53 @@
+[{"stream_name":"stderr","time":6.225176926,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.225225091,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.225229469,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.22523216,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":6.77957725,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.779624085,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.779627883,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.779630436,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":12.444556722,"data":"Cloning into '/tmp/Soro-Boro'...\n"}
+,{"stream_name":"stderr","time":12.646929612,"data":"Cloning into '/tmp/Soro-Boro'...\n"}
+,{"stream_name":"stderr","time":12.646958174,"data":"\n"}
+,{"stream_name":"stderr","time":12.646961361,"data":"Cloning into '/tmp/Soro-Boro'...\n"}
+,{"stream_name":"stderr","time":30.333107751,"data":"Updating files:  51% (433/842)\rUpdating files:  52% (438/842)\rUpdating files:  53% (447/842)\rUpdating files:  54% (455/842)\rUpdating files:  55% (464/842)\rUpdating files:  56% (472/842)\rUpdating files:  57% (480/842)\rUpdating files:  58% (489/842)\rUpdating files:  59% (497/842)\rUpdating files:  60% (506/842)\rUpdating files:  61% (514/842)\rUpdating files:  62% (523/842)\rUpdating files:  63% (531/842)\rUpdating files:  64% (539/842)\rUpdating files:  65% (548/842)\rUpdating files:  66% (556/842)\rUpdating files:  67% (565/842)\rUpdating files:  68% (573/842)\rUpdating files:  69% (581/842)\rUpdating files:  70% (590/842)\rUpdating files:  71% (598/842)\rUpdating files:  72% (607/842)\rUpdating files:  73% (615/842)\rUpdating files:  74% (624/842)\rUpdating files:  75% (632/842)\rUpdating files:  76% (640/842)\rUpdating files:  77% (649/842)\rUpdating files:  78% (657/842)\rUpdating files:  79% (666/842)\rUpdating files:  80% (674/842)\rUpdating files:  81% (683/842)\rUpdating files:  82% (691/842)\rUpdating files:  83% (699/842)\rUpdating files:  84% (708/842)\rUpdating files:  85% (716/842)\rUpdating files:  86% (725/842)\rUpdating files:  87% (733/842)\rUpdating files:  88% (741/842)\rUpdating files:  89% (750/842)\rUpdating files:  90% (758/842)\rUpdating files:  91% (767/842)\rUpdating files:  92% (775/842)\rUpdating files:  93% (784/842)\rUpdating files:  94% (792/842)\rUpdating files:  95% (800/842)\rUpdating files:  96% (809/842)\rUpdating files:  97% (817/842)\rUpdating files:  98% (826/842)\rUpdating files:  99% (834/842)\rUpdating files: 100% (842/842)\rUpdating files: 100% (842/842), done.\n"}
+,{"stream_name":"stderr","time":30.50061625,"data":"Updating files:  51% (433/842)\rUpdating files:  52% (438/842)\rUpdating files:  53% (447/842)\rUpdating files:  54% (455/842)\rUpdating files:  55% (464/842)\rUpdating files:  56% (472/842)\rUpdating files:  57% (480/842)\rUpdating files:  58% (489/842)\rUpdating files:  59% (497/842)\rUpdating files:  60% (506/842)\rUpdating files:  61% (514/842)\rUpdating files:  62% (523/842)\rUpdating files:  63% (531/842)\rUpdating files:  64% (539/842)\rUpdating files:  65% (548/842)\rUpdating files:  66% (556/842)\rUpdating files:  67% (565/842)\rUpdating files:  68% (573/842)\rUpdating files:  69% (581/842)\rUpdating files:  70% (590/842)\rUpdating files:  71% (598/842)\rUpdating files:  72% (607/842)\rUpdating files:  73% (615/842)\rUpdating files:  74% (624/842)\rUpdating files:  75% (632/842)\rUpdating files:  76% (640/842)\rUpdating files:  77% (649/842)\rUpdating files:  78% (657/842)\rUpdating files:  79% (666/842)\rUpdating files:  80% (674/842)\rUpdating files:  81% (683/842)\rUpdating files:  82% (691/842)\rUpdating files:  83% (699/842)\rUpdating files:  84% (708/842)\rUpdating files:  85% (716/842)\rUpdating files:  86% (725/842)\rUpdating files:  87% (733/842)\rUpdating files:  88% (741/842)\rUpdating files:  89% (750/842)\rUpdating files:  90% (758/842)\rUpdating files:  91% (767/842)\rUpdating files:  92% (775/842)\rUpdating files:  93% (784/842)\rUpdating files:  94% (792/842)\rUpdating files:  95% (800/842)\rUpdating files:  96% (809/842)\rUpdating files:  97% (817/842)\rUpdating files:  98% (826/842)\rUpdating files:  99% (834/842)\rUpdating files: 100% (842/842)\rUpdating files: 100% (842/842), done.\n"}
+,{"stream_name":"stderr","time":30.500677394,"data":"\n"}
+,{"stream_name":"stderr","time":30.500682491,"data":"Updating files:  51% (433/842)\rUpdating files:  52% (438/842)\rUpdating files:  53% (447/842)\rUpdating files:  54% (455/842)\rUpdating files:  55% (464/842)\rUpdating files:  56% (472/842)\rUpdating files:  57% (480/842)\rUpdating files:  58% (489/842)\rUpdating files:  59% (497/842)\rUpdating files:  60% (506/842)\rUpdating files:  61% (514/842)\rUpdating files:  62% (523/842)\rUpdating files:  63% (531/842)\rUpdating files:  64% (539/842)\rUpdating files:  65% (548/842)\rUpdating files:  66% (556/842)\rUpdating files:  67% (565/842)\rUpdating files:  68% (573/842)\rUpdating files:  69% (581/842)\rUpdating files:  70% (590/842)\rUpdating files:  71% (598/842)\rUpdating files:  72% (607/842)\rUpdating files:  73% (615/842)\rUpdating files:  74% (624/842)\rUpdating files:  75% (632/842)\rUpdating files:  76% (640/842)\rUpdating files:  77% (649/842)\rUpdating files:  78% (657/842)\rUpdating files:  79% (666/842)\rUpdating files:  80% (674/842)\rUpdating files:  81% (683/842)\rUpdating files:  82% (691/842)\rUpdating files:  83% (699/842)\rUpdating files:  84% (708/842)\rUpdating files:  85% (716/842)\rUpdating files:  86% (725/842)\rUpdating files:  87% (733/842)\rUpdating files:  88% (741/842)\rUpdating files:  89% (750/842)\rUpdating files:  90% (758/842)\rUpdating files:  91% (767/842)\rUpdating files:  92% (775/842)\rUpdating files:  93% (784/842)\rUpdating files:  94% (792/842)\rUpdating files:  95% (800/842)\rUpdating files:  96% (809/842)\rUpdating files:  97% (817/842)\rUpdating files:  98% (826/842)\rUpdating files:  99% (834/842)\rUpdating files: 100% (842/842)\rUpdating files: 100% (842/842), done.\n"}
+,{"stream_name":"stdout","time":30.789233883,"data":"CUDA available: True\n"}
+,{"stream_name":"stdout","time":31.342511938,"data":"Selected checkpoint dir: /kaggle/input/datasets/snorlaxx99/soro-s1-locked-ckpt-a\n"}
+,{"stream_name":"stdout","time":31.343403959,"data":"Loading locked pointer via UPPModel.from_checkpoint in bfloat16...\n"}
+,{"stream_name":"stderr","time":52.20810342,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":52.208135863,"data":"\n"}
+,{"stream_name":"stderr","time":52.208141592,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":69.180372466,"data":"Model loaded successfully!\n"}
+,{"stream_name":"stdout","time":119.833445772,"data":"  [clean] 400/1200 scored (50.0s)\n"}
+,{"stream_name":"stdout","time":173.018959617,"data":"  [clean] 800/1200 scored (103.2s)\n"}
+,{"stream_name":"stdout","time":224.962118701,"data":"  [clean] 1200/1200 scored (155.2s)\n"}
+,{"stream_name":"stdout","time":358.504350991,"data":"  [catalog_growth] 400/1200 scored (133.4s)\n"}
+,{"stream_name":"stdout","time":493.944701894,"data":"  [catalog_growth] 800/1200 scored (268.8s)\n"}
+,{"stream_name":"stdout","time":629.658231076,"data":"  [catalog_growth] 1200/1200 scored (404.5s)\n"}
+,{"stream_name":"stdout","time":685.798066366,"data":"  [attractive_metadata] 400/1200 scored (56.1s)\n"}
+,{"stream_name":"stdout","time":742.621179795,"data":"  [attractive_metadata] 800/1200 scored (112.9s)\n"}
+,{"stream_name":"stdout","time":799.044552798,"data":"  [attractive_metadata] 1200/1200 scored (169.3s)\n"}
+,{"stream_name":"stdout","time":858.997249033,"data":"  [prompt_injection] 400/1200 scored (59.9s)\n"}
+,{"stream_name":"stdout","time":919.726251322,"data":"  [prompt_injection] 800/1200 scored (120.6s)\n"}
+,{"stream_name":"stdout","time":979.903595389,"data":"  [prompt_injection] 1200/1200 scored (180.8s)\n"}
+,{"stream_name":"stdout","time":980.087176682,"data":"\n"}
+,{"stream_name":"stdout","time":980.087206619,"data":"================== Running Reviewer Control: Recalibrated Softmax ==================\n"}
+,{"stream_name":"stdout","time":980.089030018,"data":"Recalibrated Softmax on Lookalikes (100 splits, alpha=0.10):\n"}
+,{"stream_name":"stdout","time":980.089053305,"data":"  Coverage: 89.43%\n"}
+,{"stream_name":"stdout","time":980.089059585,"data":"  Mean Set Size: 2.72\n"}
+,{"stream_name":"stdout","time":980.089064402,"data":"  Single-Tool Rate: 5.49%\n"}
+,{"stream_name":"stdout","time":980.089068588,"data":"  Wrong-Action Rate (All Requests): 3.50%\n"}
+,{"stream_name":"stdout","time":980.089072829,"data":"  Wrong-Action Rate (Acted): 62.36%\n"}
+,{"stream_name":"stdout","time":980.089077305,"data":"Results saved to /kaggle/working/recalibration_results.json\n"}
+,{"stream_name":"stderr","time":985.910478992,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":985.910525616,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":986.059310441,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":986.059343843,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":986.790769421,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":986.875989439,"data":"[NbConvertApp] Writing 105954 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":989.33711613,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":989.867629635,"data":"[NbConvertApp] Writing 390915 bytes to __results__.html\n"}
+]

@@ -58,8 +58,10 @@ def lac_quantile(scores: list[float], alpha: float) -> float:
         return 1.0
     s = sorted(float(x) for x in scores)
     n = len(s)
-    rank = min(n, max(1, math.ceil((n + 1) * (1.0 - alpha))))
-    return float(s[rank - 1])
+    k = math.ceil((n + 1) * (1.0 - alpha))
+    if k > n:
+        return float('inf')
+    return float(s[k - 1])
 
 
 def summarize_bucket(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -222,7 +224,8 @@ def set_as_action_predict(
             return ANSWER, []
 
     tool_probs = [(k, float(p)) for k, p in probs.items() if k not in SPECIAL]
-    tool_probs.sort(key=lambda kv: -kv[1])
+    import hashlib
+    tool_probs.sort(key=lambda kv: (-kv[1], hashlib.sha256(kv[0].encode()).hexdigest()))
     s_tool = [k for k, p in tool_probs if (1.0 - p) <= q_tool]
 
     if len(s_tool) == 0:

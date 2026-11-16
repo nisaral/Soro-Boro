@@ -1,0 +1,22 @@
+{
+  "task_a3_qwen_mask_spread": {
+    "max_spread": 2.923440456390381,
+    "mean_spread": 0.8452278399374336
+  },
+  "task_a1_group_conformal": {
+    "nominal_alpha": 0.1,
+    "num_splits": 100,
+    "softmax_lac": {
+      "coverage": 0.8913701776940813,
+      "mean_set_size": 1.2148906770730585,
+      "singleton_rate": 0.8318702204842942,
+      "wrong_action_rate": 0.06533403823243257
+    },
+    "per_option": {
+      "coverage": 0.8938898452797044,
+      "mean_set_size": 2.4583944573087253,
+      "singleton_rate": 0.10925222510195493,
+      "wrong_action_rate": 0.03505408004639774
+    }
+  }
+}

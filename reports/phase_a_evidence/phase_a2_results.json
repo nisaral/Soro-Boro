@@ -1,0 +1,126 @@
+{
+  "nominal_alpha": 0.1,
+  "num_splits": 100,
+  "table_rows": [
+    {
+      "stream": "clean",
+      "method": "softmax_lac",
+      "coverage": 0.8913701776940813,
+      "delta_coverage": 0.0,
+      "mean_set_size": 1.2148906770730585,
+      "single_tool_rate": 0.8318702204842942,
+      "wrong_action_total": 0.06533403823243257,
+      "wrong_action_acted": 0.07578270777210046
+    },
+    {
+      "stream": "clean",
+      "method": "per_option_raw",
+      "coverage": 0.8938898452797044,
+      "delta_coverage": 0.0,
+      "mean_set_size": 2.4583944573087253,
+      "single_tool_rate": 0.10925222510195493,
+      "wrong_action_total": 0.03505408004639774,
+      "wrong_action_acted": 0.32868551441990257
+    },
+    {
+      "stream": "clean",
+      "method": "margin_over_abstain",
+      "coverage": 0.9041999593005634,
+      "delta_coverage": 0.0,
+      "mean_set_size": 2.1441262788423603,
+      "single_tool_rate": 0.13766563183609143,
+      "wrong_action_total": 0.05374209156480702,
+      "wrong_action_acted": 0.3710075317803296
+    },
+    {
+      "stream": "catalog_growth",
+      "method": "softmax_lac",
+      "coverage": 0.8806172698143833,
+      "delta_coverage": -0.01075290787969807,
+      "mean_set_size": 1.1997826018549802,
+      "single_tool_rate": 0.832808071718654,
+      "wrong_action_total": 0.06851166717987868,
+      "wrong_action_acted": 0.07958820066236534
+    },
+    {
+      "stream": "catalog_growth",
+      "method": "per_option_raw",
+      "coverage": 0.8940137502095189,
+      "delta_coverage": 0.00012390492981451118,
+      "mean_set_size": 2.8055586375213495,
+      "single_tool_rate": 0.0969143901617713,
+      "wrong_action_total": 0.030960207762158767,
+      "wrong_action_acted": 0.35274914104523597
+    },
+    {
+      "stream": "catalog_growth",
+      "method": "margin_over_abstain",
+      "coverage": 0.9038483882524544,
+      "delta_coverage": -0.00035157104810901174,
+      "mean_set_size": 2.3045734354208602,
+      "single_tool_rate": 0.13300592070727058,
+      "wrong_action_total": 0.0514902960919924,
+      "wrong_action_acted": 0.3661526471491356
+    },
+    {
+      "stream": "attractive_metadata",
+      "method": "softmax_lac",
+      "coverage": 0.6704107575960037,
+      "delta_coverage": -0.22095942009807767,
+      "mean_set_size": 1.4114319076986561,
+      "single_tool_rate": 0.6078233728201226,
+      "wrong_action_total": 0.2971418801099492,
+      "wrong_action_acted": 0.49513800652348877
+    },
+    {
+      "stream": "attractive_metadata",
+      "method": "per_option_raw",
+      "coverage": 0.8938272891001117,
+      "delta_coverage": -6.255617959272097e-05,
+      "mean_set_size": 3.396958808017861,
+      "single_tool_rate": 0.034647862530402744,
+      "wrong_action_total": 0.028870752984425336,
+      "wrong_action_acted": 0.7225643972028736
+    },
+    {
+      "stream": "attractive_metadata",
+      "method": "margin_over_abstain",
+      "coverage": 0.903325215479038,
+      "delta_coverage": -0.0008747438215254144,
+      "mean_set_size": 3.0700312479930796,
+      "single_tool_rate": 0.019382229384511195,
+      "wrong_action_total": 0.01058864285060212,
+      "wrong_action_acted": 0.47647054600885874
+    },
+    {
+      "stream": "prompt_injection",
+      "method": "softmax_lac",
+      "coverage": 0.8895068092794856,
+      "delta_coverage": -0.0018633684145957785,
+      "mean_set_size": 1.209774476695147,
+      "single_tool_rate": 0.8335350571957175,
+      "wrong_action_total": 0.06641947593322148,
+      "wrong_action_acted": 0.07695393785084781
+    },
+    {
+      "stream": "prompt_injection",
+      "method": "per_option_raw",
+      "coverage": 0.8940192971810084,
+      "delta_coverage": 0.00012945190130397854,
+      "mean_set_size": 2.459796058503931,
+      "single_tool_rate": 0.10860217740738942,
+      "wrong_action_total": 0.034681293899976325,
+      "wrong_action_acted": 0.3283877172601371
+    },
+    {
+      "stream": "prompt_injection",
+      "method": "margin_over_abstain",
+      "coverage": 0.9033254611223606,
+      "delta_coverage": -0.0008744981782028427,
+      "mean_set_size": 2.164953325057241,
+      "single_tool_rate": 0.1394583101783166,
+      "wrong_action_total": 0.05520794423046887,
+      "wrong_action_acted": 0.3754523208144652
+    }
+  ]
+}
