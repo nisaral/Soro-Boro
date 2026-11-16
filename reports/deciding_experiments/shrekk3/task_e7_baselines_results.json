@@ -1,0 +1,22 @@
+{
+  "xLAM-1B": {
+    "attack_v2_request_aware": {
+      "total_evaluated": 300,
+      "picked_injected": 5,
+      "picked_injected_rate": 0.016666666666666666,
+      "picked_gold": 5,
+      "picked_gold_rate": 0.016666666666666666,
+      "abstains": 2,
+      "abstain_rate": 0.006666666666666667
+    },
+    "attack_v2_request_blind": {
+      "total_evaluated": 300,
+      "picked_injected": 0,
+      "picked_injected_rate": 0.0,
+      "picked_gold": 4,
+      "picked_gold_rate": 0.013333333333333334,
+      "abstains": 0,
+      "abstain_rate": 0.0
+    }
+  }
+}

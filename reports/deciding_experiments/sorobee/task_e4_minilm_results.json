@@ -1,0 +1,28 @@
+{
+  "table": [
+    {
+      "stream": "clean",
+      "coverage": 0.8968070453863751,
+      "mean_set_size": 3.1476055429404015,
+      "single_tool_rate": 0.06842738708382416,
+      "wrong_action_total": 0.029018313374150295,
+      "wrong_action_acted": 0.4290580321919412
+    },
+    {
+      "stream": "attack_v2_request_aware",
+      "coverage": 0.8968070453863751,
+      "mean_set_size": 4.07117943460216,
+      "single_tool_rate": 0.021266852466867103,
+      "wrong_action_total": 0.015239673917891208,
+      "wrong_action_acted": 0.7075393795106666
+    },
+    {
+      "stream": "attack_v2_request_blind",
+      "coverage": 0.8968070453863751,
+      "mean_set_size": 4.027311232543161,
+      "single_tool_rate": 0.037735652158333056,
+      "wrong_action_total": 0.024619963793779752,
+      "wrong_action_acted": 0.6463414259076505
+    }
+  ]
+}

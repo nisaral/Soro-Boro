@@ -1,0 +1,37 @@
+[{"stream_name":"stderr","time":6.394290707,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.394330315,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.394336753,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.394340745,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":6.962439455,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.962472009,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.962475704,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.962478286,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":12.908082394000001,"data":"CUDA available: True\n"}
+,{"stream_name":"stdout","time":40.052434882,"data":"Loading all-MiniLM-L6-v2 in float32...\n"}
+,{"stream_name":"stderr","time":40.287414446,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":40.287439142,"data":"\n"}
+,{"stream_name":"stderr","time":40.287444381,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":53.591367046,"data":"  [clean] 400/1200 scored (7.6s)\n"}
+,{"stream_name":"stdout","time":59.826187392,"data":"  [clean] 800/1200 scored (13.8s)\n"}
+,{"stream_name":"stdout","time":65.951632858,"data":"  [clean] 1200/1200 scored (19.9s)\n"}
+,{"stream_name":"stdout","time":72.548931762,"data":"  [attack_v2_request_aware] 400/1200 scored (6.2s)\n"}
+,{"stream_name":"stdout","time":78.764456774,"data":"  [attack_v2_request_aware] 800/1200 scored (12.4s)\n"}
+,{"stream_name":"stdout","time":84.900431231,"data":"  [attack_v2_request_aware] 1200/1200 scored (18.6s)\n"}
+,{"stream_name":"stdout","time":91.494091626,"data":"  [attack_v2_request_blind] 400/1200 scored (6.2s)\n"}
+,{"stream_name":"stdout","time":97.64117212,"data":"  [attack_v2_request_blind] 800/1200 scored (12.4s)\n"}
+,{"stream_name":"stdout","time":104.342513716,"data":"  [attack_v2_request_blind] 1200/1200 scored (18.5s)\n"}
+,{"stream_name":"stdout","time":104.343375254,"data":"\n"}
+,{"stream_name":"stdout","time":104.343395083,"data":"================== TASK E4 SUMMARY (MiniLM Cosine Baseline) ==================\n"}
+,{"stream_name":"stdout","time":104.344528694,"data":"  clean                     | Cov: 89.68% | |S|: 3.15 | Single: 6.84% | Wrong(Tot): 2.90% | Wrong(Act): 42.91%\n"}
+,{"stream_name":"stdout","time":104.34454793,"data":"  attack_v2_request_aware   | Cov: 89.68% | |S|: 4.07 | Single: 2.13% | Wrong(Tot): 1.52% | Wrong(Act): 70.75%\n"}
+,{"stream_name":"stdout","time":104.344554312,"data":"  attack_v2_request_blind   | Cov: 89.68% | |S|: 4.03 | Single: 3.77% | Wrong(Tot): 2.46% | Wrong(Act): 64.63%\n"}
+,{"stream_name":"stdout","time":104.344560214,"data":"Results saved to /kaggle/working/task_e4_minilm_results.json\n"}
+,{"stream_name":"stderr","time":109.723735242,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":109.723775974,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":109.871827928,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":109.871881022,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":110.606910121,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":110.701473259,"data":"[NbConvertApp] Writing 161760 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":113.229375407,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":113.760044365,"data":"[NbConvertApp] Writing 429252 bytes to __results__.html\n"}
+]
