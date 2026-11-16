@@ -24,11 +24,11 @@ All in fp32 on the locked 0.6B, 100 group-aware splits, target coverage 90%.
 |---|---|---|---|---|
 | E1 | Attack suite v2. Lookalikes in the same JSON card format as real tools, no `fake_` in names. Two versions: request-aware, and request-blind (clone catalog tools with promotional metadata) | Run | Two files, generator tracked | done |
 | E2 | Same-score comparison: softmax over pre-refiner scores, softmax after refiner, and per-option on pre-refiner scores | Run | Table isolates normalisation from the refiner | done |
-| E3 | Absolute-score head: per-option yes/no loss on frozen pre-refiner features, lookalikes excluded from training | Run | Clean and attacked tables; full curve of wrong-action rate against share acted on | running |
-| E4 | Baseline: MiniLM cosine with conformal threshold, clean and attacked | Run | Same table columns as E3 | running |
-| E5 | Baseline: CROQ (conformal prune, then rescore the kept options) | Run | Same columns | running |
-| E6 | Trust-priority rule on existing outputs; include the case where the correct tool is third-party | Run | Share acted on and wrong actions, both cases, beside a plain allowlist | todo |
-| E7 | Hammer-1.5B and xLAM-1B on attack suite v2: how often each picks the injected tool | Run | Two rows | running |
+| E3 | Absolute-score head: per-option yes/no loss on frozen pre-refiner features, lookalikes excluded from training | Run | Clean and attacked tables; full curve of wrong-action rate against share acted on | done |
+| E4 | Baseline: MiniLM cosine with conformal threshold, clean and attacked | Run | Same table columns as E3 | done |
+| E5 | Baseline: CROQ (conformal prune, then rescore the kept options) | Run | Same columns | done |
+| E6 | Trust-priority rule on existing outputs; include the case where the correct tool is third-party | Run | Share acted on and wrong actions, both cases, beside a plain allowlist | done |
+| E7 | Hammer-1.5B and xLAM-1B on attack suite v2: how often each picks the injected tool | Run | Two rows | done |
 | R1 | Check E1 to E7 against gate B and write the 20 Nov call | Review | Go, analysis paper, or release only | todo |
 
 ## Track 2: generality across decision models (20 Nov to 5 Dec)

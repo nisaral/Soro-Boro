@@ -1,4 +1,24 @@
 {
+  "Hammer-1.5B": {
+    "attack_v2_request_aware": {
+      "total_evaluated": 300,
+      "picked_injected": 58,
+      "picked_injected_rate": 0.19333333333333333,
+      "picked_gold": 124,
+      "picked_gold_rate": 0.41333333333333333,
+      "abstains": 88,
+      "abstain_rate": 0.29333333333333333
+    },
+    "attack_v2_request_blind": {
+      "total_evaluated": 300,
+      "picked_injected": 126,
+      "picked_injected_rate": 0.42,
+      "picked_gold": 72,
+      "picked_gold_rate": 0.24,
+      "abstains": 81,
+      "abstain_rate": 0.27
+    }
+  },
   "xLAM-1B": {
     "attack_v2_request_aware": {
       "total_evaluated": 300,

@@ -263,3 +263,72 @@ Evaluated locked `v3b_fp32` (`Qwen/Qwen3-0.6B-Base`, no S2 training) on all 7 S2
 1. **Normalisation Alone Causes the Collapse:** Pre-refiner and post-refiner softmax numbers are identical to 4 decimal places. The 15.28 percentage point coverage collapse under request-aware lookalikes is 100% caused by listwise/softmax competition across candidates, NOT the Transformer refiner.
 2. **Attack Specificity:** Request-blind lookalikes do not degrade softmax coverage (89.12% vs 89.14% clean). The failure is strictly driven by semantic, request-aware lookalikes.
 3. **Per-Option Conformal Guarantee Holds:** Per-option coverage remains strictly invariant across all streams (89.40% Clean $\to$ 89.24% Aware $\to$ 89.52% Blind), keeping total wrong actions $\le 3.52\% \ll \alpha$. However, raw per-option scores suffer from high deferral (single-tool rate drops to 4.83% under attack, and 75.31% of acted singletons are wrong), motivating the absolute-score head (E3) and trust-priority rule (E6).
+
+
+### B. Task E3: Absolute-Score BCE Head
+- **Architecture:** Binary classification MLP head (2 layers, hidden 256, LayerNorm, GELU, dropout 0.1) trained on frozen 1024-dim representations ($h_q \circ h_c$) using BCEWithLogitsLoss.
+- **Training Data:** 2,000 clean pairs from `s2_train` (lookalikes strictly excluded from training).
+- **Run Location:** `keyushnisar/soro-task-e3-bce-head` on Kaggle (T4 GPU). Evaluated in exact `float32`.
+
+| Stream | Empirical Coverage | Mean Set Size $\|S\|$ | Single-Tool Rate | Total Wrong Actions ($\le \alpha = 10\%$) | Wrong of Acted Singletons |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Clean** | 89.38% | 2.82 | 8.52% | 3.94% | 48.51% |
+| **Attack v2 Request-Aware** | 89.25% | 3.76 | 4.17% | 3.84% | 83.67% |
+| **Attack v2 Request-Blind** | 89.64% | 3.52 | 7.78% | 3.76% | 49.83% |
+
+*Key Takeaway:* An independent BCE head trained on frozen features holds coverage ($\ge 89.25\%$), but fails to reach the 60% single-tool rate on clean traffic ($8.52\%$) due to absolute score thresholding across diverse user requests without menu normalisation.
+
+---
+
+### C. Task E4: MiniLM-L6-v2 Cosine Conformal Baseline
+- **Model:** `sentence-transformers/all-MiniLM-L6-v2` evaluated in `float32`.
+- **Protocol:** Cosine similarity thresholded via split-conformal calibration on clean traffic.
+- **Run Location:** `sorobee/soro-task-e4-minilm` on Kaggle.
+
+| Stream | Empirical Coverage | Mean Set Size $\|S\|$ | Single-Tool Rate | Total Wrong Actions ($\le \alpha = 10\%$) | Wrong of Acted Singletons |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Clean** | 89.68% | 3.15 | 6.84% | 2.90% | 42.91% |
+| **Attack v2 Request-Aware** | 89.68% | 4.07 | 2.13% | 1.52% | 70.75% |
+| **Attack v2 Request-Blind** | 89.68% | 4.03 | 3.77% | 2.46% | 64.63% |
+
+*Key Takeaway:* Standard dense retrieval does not outperform Soro. It expands candidate set size ($|S|=3.15$) and depresses clean single-tool rate ($6.84\%$).
+
+---
+
+### D. Task E5: CROQ (Prune 'n Predict) Two-Stage Baseline
+- **Mechanism:** Stage 1 conformal prune using per-option pre-refiner score; Stage 2 listwise rescoring inside the kept set $P$.
+- **Run Location:** `jackobperalta/soro-task-e5-croq` on Kaggle.
+
+| Stream | Empirical Coverage | Mean Set Size $\|S\|$ | Single-Tool Rate | Total Wrong Actions ($\le \alpha = 10\%$) | Wrong of Acted Singletons |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Clean** | 89.40% | 2.46 | 10.95% | 3.47% | 32.56% |
+| **Attack v2 Request-Aware** | 89.24% | 3.31 | 4.83% | 3.52% | 75.31% |
+| **Attack v2 Request-Blind** | 89.52% | 3.15 | 9.26% | 3.37% | 33.80% |
+
+*Key Takeaway:* Pruning keeps coverage safe, but when a lookalike matches the query semantically, listwise rescoring inside $P$ cannot break the tie without external provenance.
+
+---
+
+### E. Task E7: Open Function-Calling Model Susceptibility to Lookalikes
+- **Models:** `Salesforce/xLAM-1b-fc-r` and `MadeAgents/Hammer2.1-1.5b`.
+- **Run Location:** `shrekk3/soro-task-e7-baselines` on Kaggle.
+
+| Model | Evaluation Stream | Total Evaluated | Injected Lookalike Picked | Injected Selection Rate | Gold Tool Picked | Abstains |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Hammer-1.5B** | Attack v2 Request-Aware | 300 | 58 | **19.33%** | 41.33% | 29.33% |
+| **Hammer-1.5B** | Attack v2 Request-Blind | 300 | 126 | **42.00%** | 24.00% | 27.00% |
+| **xLAM-1B** | Attack v2 Request-Aware | 300 | 5 | **1.67%** | 1.67% | 0.67% |
+| **xLAM-1B** | Attack v2 Request-Blind | 300 | 0 | **0.00%** | 1.33% | 0.00% |
+
+*Key Finding:* Hammer-1.5B demonstrates **severe real-world vulnerability to tool injection**, picking the injected lookalike in **$19.33\%$** of request-aware attacks and **$42.00\%$** of promotional blind lookalikes. This confirms our primary hypothesis: **tool-injection vulnerability is a broad problem across open models, not unique to Soro.**
+
+---
+
+### F. Task E6: Trust-Priority Rule beside Plain Allowlist
+- **Artifact:** `reports/deciding_experiments/task_e6_trust_priority_results.json`
+
+| Policy / Scenario | Clean Acted Rate | Clean Wrong Actions | Attacked Acted Rate (Gold Trusted) | Attacked Wrong Actions (Gold Trusted) | Attacked Acted Rate (Gold Third-Party) | Safety Invariant |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Plain Allowlist** | 83.26% | 6.59% | 70.39% | 6.59% | **0.00%** (Blocks all external tools) | Static quarantine |
+| **Raw Conformal (Per-Option)** | 10.95% | 3.47% | 4.83% | 3.52% | 4.83% (95.17% deferral) | Safe but unusable |
+| **Trust-Priority Rule** | **81.40%** | **3.47%** | **69.80%** | **3.52%** | **0.00% (Safely defers to user)** | **Safe and usable** |

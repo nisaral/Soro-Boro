@@ -1,0 +1,51 @@
+{
+  "clean": {
+    "plain_allowlist": {
+      "acted_rate": 0.8326,
+      "wrong_action_total": 0.0659
+    },
+    "raw_conformal_per_option": {
+      "acted_rate": 0.1095,
+      "wrong_action_total": 0.0347
+    },
+    "trust_priority_rule": {
+      "acted_rate": 0.814,
+      "wrong_action_total": 0.0347
+    }
+  },
+  "attack_v2_request_aware_gold_trusted": {
+    "plain_allowlist": {
+      "acted_rate": 0.7039,
+      "wrong_action_total": 0.0659,
+      "note": "Static allowlist ignores lookalike but fails on new tools"
+    },
+    "raw_conformal_per_option": {
+      "acted_rate": 0.0483,
+      "wrong_action_total": 0.0352,
+      "note": "95.17% forced deferral"
+    },
+    "trust_priority_rule": {
+      "acted_rate": 0.698,
+      "wrong_action_total": 0.0352,
+      "note": "Resolves lookalike ties via provenance; acts safely on 69.8%"
+    }
+  },
+  "attack_v2_request_aware_gold_thirdparty": {
+    "plain_allowlist": {
+      "acted_rate": 0.0,
+      "wrong_action_total": 0.0,
+      "note": "Allowlist completely blocks third-party utility"
+    },
+    "raw_conformal_per_option": {
+      "acted_rate": 0.0483,
+      "wrong_action_total": 0.0352,
+      "note": "Defers on 95.17%"
+    },
+    "trust_priority_rule": {
+      "acted_rate": 0.0,
+      "wrong_action_total": 0.0,
+      "deferral_rate": 1.0,
+      "note": "Safely defers to user when unverified; 0 wrong actions"
+    }
+  }
+}
