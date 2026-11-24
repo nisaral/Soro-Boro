@@ -241,10 +241,15 @@ class SoroKevModel(nn.Module):
                 backbone_dim = getattr(text_cfg, "hidden_size", None) or getattr(
                     getattr(text_cfg, "text_config", None), "hidden_size", hidden_size
                 )
+                is_mm = hasattr(base, "audio_tower") or hasattr(base, "vision_tower")
+                if is_mm:
+                    target_regex = r".*(language_model\..*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)|(audio_tower|vision_tower)\..*\.(q_proj|k_proj|v_proj|o_proj)\.linear)"
+                else:
+                    target_regex = r".*language_model.*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
                 lora_cfg = LoraConfig(
                     r=16,
                     lora_alpha=32,
-                    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+                    target_modules=target_regex,
                     lora_dropout=0.05,
                     bias="none",
                 )

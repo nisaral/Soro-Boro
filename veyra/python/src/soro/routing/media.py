@@ -60,7 +60,7 @@ class MediaEncoder:
         self.audio_token_id = getattr(cfg, "audio_token_id", None)
         self.image_token_id = getattr(cfg, "image_token_id", None)
         self.cache_size = cache_size
-        self._cache: OrderedDict[tuple[str, str], dict[str, Any]] = OrderedDict()
+        self._cache: OrderedDict[tuple[Any, ...], dict[str, Any]] = OrderedDict()
         for p in self.model.parameters():
             p.requires_grad_(False)
 
@@ -119,20 +119,54 @@ class MediaEncoder:
         return {"tokens": tokens, "embeds": emb.detach()}
 
     def encode(self, media: dict[str, Any] | None) -> dict[str, Any] | None:
-        """``{"audio": path}`` / ``{"image": path}`` -> tokens + embeds. Already-encoded dicts pass through."""
+        """``{"audio": path}`` / ``{"image": path}`` / ``{"audio": path, "image": path}``
+        -> tokens + embeds. Already-encoded dicts pass through.
+        Supports simultaneous audio + image inputs in one turn.
+        Returns tagged outputs: 'trusted_audio_tokens', 'untrusted_image_tokens'.
+        """
         if not media:
             return None
         if "embeds" in media:
             return media
-        kind = "audio" if media.get("audio") else ("image" if media.get("image") else None)
-        if kind is None:
+
+        has_audio = bool(media.get("audio"))
+        has_image = bool(media.get("image"))
+        if not has_audio and not has_image:
             return None
-        key = (kind, str(media[kind]))
-        if key in self._cache:
-            self._cache.move_to_end(key)
-            return self._cache[key]
-        enc = self.audio(media["audio"]) if kind == "audio" else self.image(media["image"])
-        self._cache[key] = enc
+
+        cache_key = (
+            str(media.get("audio")) if has_audio else None,
+            str(media.get("image")) if has_image else None,
+        )
+        if cache_key in self._cache:
+            self._cache.move_to_end(cache_key)
+            return self._cache[cache_key]
+
+        audio_enc = self.audio(media["audio"]) if has_audio else None
+        image_enc = self.image(media["image"]) if has_image else None
+
+        if audio_enc and image_enc:
+            combined_tokens = list(audio_enc["tokens"]) + list(image_enc["tokens"])
+            combined_embeds = torch.cat([audio_enc["embeds"], image_enc["embeds"]], dim=0)
+        elif audio_enc:
+            combined_tokens = list(audio_enc["tokens"])
+            combined_embeds = audio_enc["embeds"]
+        else:
+            combined_tokens = list(image_enc["tokens"])
+            combined_embeds = image_enc["embeds"]
+
+        res = {
+            "tokens": combined_tokens,
+            "embeds": combined_embeds.detach(),
+            "trusted_audio_tokens": list(audio_enc["tokens"]) if audio_enc else [],
+            "trusted_audio_embeds": audio_enc["embeds"].detach() if audio_enc else None,
+            "untrusted_image_tokens": list(image_enc["tokens"]) if image_enc else [],
+            "untrusted_image_embeds": image_enc["embeds"].detach() if image_enc else None,
+            "has_audio": has_audio,
+            "has_image": has_image,
+        }
+
+        self._cache[cache_key] = res
         if len(self._cache) > self.cache_size:
             self._cache.popitem(last=False)
-        return enc
+        return res

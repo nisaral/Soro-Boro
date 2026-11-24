@@ -102,6 +102,8 @@ class UPPConfig:
     option_isolation: bool = False  # in query_first: mask option-to-option attn & share start position
     cost_weight: float = 0.0  # S2 exact expected asymmetric action cost weight (0 = off)
     teacher_kl_weight: float = 0.0  # Soft-label KL weight against row["teacher"]["probs"] (0 = off)
+    canonical_sort: bool = True  # deterministically sort options by card hash before building prompt
+    trust_split: bool = True  # Stage 1 (trusted) candidate set P, Stage 2 (untrusted evidence) scored only inside P
 
     def name(self) -> str:
         parts = [self.layout, self.head]
@@ -782,14 +784,21 @@ class UPPModel(nn.Module):
             loss = loss + self.cfg.kl_weight * aux["kl"]
         return loss
 
-    @torch.no_grad()
-    def score(self, state: str, criteria: dict[str, str], budget: int | None = None,
-              media: Any = None) -> tuple[dict[str, float], dict[str, Any]]:
-        """Probabilities over ``criteria`` for one request, plus uncertainty and exit info.
+    @staticmethod
+    def _card_hash(k: str, text: str) -> str:
+        import hashlib
+        return hashlib.sha256(f"{k}:{text}".encode("utf-8")).hexdigest()
 
-        ``budget`` limits how many gists per option the request reads (Matryoshka models)."""
+    def _canonical_order(self, criteria: dict[str, str]) -> tuple[dict[str, str], list[str]]:
+        orig_keys = list(criteria.keys())
+        sorted_keys = sorted(orig_keys, key=lambda k: self._card_hash(k, criteria[k]))
+        sorted_criteria = {k: criteria[k] for k in sorted_keys}
+        return sorted_criteria, orig_keys
+
+    def _score_direct(self, state: str, criteria: dict[str, str], budget: int | None = None,
+                      resolved_media: Any = None) -> tuple[dict[str, float], dict[str, Any]]:
         device = self._device
-        pk = self._with_budget(self.build(state, criteria, media=self._resolve_media(media)), budget)
+        pk = self._with_budget(self.build(state, criteria, media=resolved_media), budget)
         embeds, mask, positions, tok_ids = self._batch([pk], device, self._mode())
         h, exit_hs, _ = self._hidden(embeds, mask, positions, ids=tok_ids)
         logits, aux = self._score(h[0], pk)
@@ -802,6 +811,92 @@ class UPPModel(nn.Module):
                 pe = F.softmax(lg, -1).float().cpu().tolist()
                 info["exits"].append({k: pe[i] for i, k in enumerate(pk["keys"])})
         return {k: p[i] for i, k in enumerate(pk["keys"])}, info
+
+    @torch.no_grad()
+    def score(self, state: str, criteria: dict[str, str], budget: int | None = None,
+              media: Any = None) -> tuple[dict[str, float], dict[str, Any]]:
+        """Probabilities over ``criteria`` for one request, plus uncertainty and exit info.
+        Supports deterministic canonical_sort and two-stage trust_split packing."""
+        orig_keys = list(criteria.keys())
+        if not orig_keys:
+            return {}, {"u": 1.0, "energy": 0.0}
+
+        # 1. Canonical sorting: sort candidate options by hash of card body
+        if self.cfg.canonical_sort:
+            curr_criteria, _ = self._canonical_order(criteria)
+        else:
+            curr_criteria = criteria
+
+        resolved = self._resolve_media(media)
+
+        # 2. Check if trust_split applies (media contains untrusted visual/tool evidence)
+        has_untrusted = (
+            resolved is not None
+            and isinstance(resolved, dict)
+            and (
+                bool(resolved.get("untrusted_image_tokens"))
+                or bool(resolved.get("has_image"))
+                or bool(resolved.get("untrusted"))
+            )
+        )
+
+        if self.cfg.trust_split and has_untrusted and len(curr_criteria) > 1:
+            # --- Stage 1: Trusted Request Only ---
+            # Isolate trusted request (pure text or text + trusted audio, zero untrusted image)
+            has_trusted_audio = bool(resolved.get("trusted_audio_tokens"))
+            if has_trusted_audio:
+                s1_media = {
+                    "tokens": resolved["trusted_audio_tokens"],
+                    "embeds": resolved["trusted_audio_embeds"],
+                }
+            else:
+                s1_media = None
+
+            s1_probs, s1_info = self._score_direct(state, curr_criteria, budget=budget, resolved_media=s1_media)
+
+            # Form protected candidate set P (cumulative mass >= 0.90 or top singleton)
+            sorted_s1 = sorted(s1_probs.items(), key=lambda kv: kv[1], reverse=True)
+            p_set: list[str] = []
+            cum_prob = 0.0
+            for k, prob in sorted_s1:
+                p_set.append(k)
+                cum_prob += prob
+                if cum_prob >= 0.90:
+                    break
+
+            # If singleton, Stage 1 is decisive. Untrusted media has zero opportunity to attack.
+            if len(p_set) <= 1:
+                final_probs = {k: s1_probs.get(k, 0.0) for k in orig_keys}
+                s1_info["protected_set"] = p_set
+                s1_info["stage"] = 1
+                return final_probs, s1_info
+
+            # --- Stage 2: Untrusted Evidence Refinement strictly within P ---
+            stage2_criteria = {k: curr_criteria[k] for k in p_set}
+            s2_probs, s2_info = self._score_direct(state, stage2_criteria, budget=budget, resolved_media=resolved)
+
+            # Untrusted evidence scores STRICTLY within P; tools outside P receive 0.0
+            mass_P = sum(s1_probs[k] for k in p_set)
+            final_probs = {}
+            for k in orig_keys:
+                if k in s2_probs:
+                    final_probs[k] = s2_probs[k] * mass_P
+                else:
+                    final_probs[k] = 0.0
+
+            # Normalize final_probs
+            tot = sum(final_probs.values())
+            if tot > 0:
+                final_probs = {k: v / tot for k, v in final_probs.items()}
+
+            s2_info["protected_set"] = p_set
+            s2_info["stage"] = 2
+            return final_probs, s2_info
+
+        # Standard direct evaluation (or text-only / trusted-only)
+        p_dict, info = self._score_direct(state, curr_criteria, budget=budget, resolved_media=resolved)
+        out_probs = {k: p_dict.get(k, 0.0) for k in orig_keys}
+        return out_probs, info
 
     @torch.no_grad()
     def batch_score(
