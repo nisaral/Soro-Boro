@@ -242,10 +242,13 @@ class SoroKevModel(nn.Module):
                     getattr(text_cfg, "text_config", None), "hidden_size", hidden_size
                 )
                 is_mm = hasattr(base, "audio_tower") or hasattr(base, "vision_tower")
+                has_lm_prefix = any("language_model" in n for n, _ in base.named_modules())
                 if is_mm:
                     target_regex = r".*(language_model\..*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)|(audio_tower|vision_tower)\..*\.(q_proj|k_proj|v_proj|o_proj)\.linear)"
-                else:
+                elif has_lm_prefix:
                     target_regex = r".*language_model.*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
+                else:
+                    target_regex = r".*(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
                 lora_cfg = LoraConfig(
                     r=16,
                     lora_alpha=32,
