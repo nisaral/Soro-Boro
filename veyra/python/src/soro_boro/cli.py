@@ -127,6 +127,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         except RouterLoadError as exc:
             ok = False
             lines.append(f"  model {args.model}: FAILED\n    " + str(exc).replace("\n", "\n    "))
+        if Path(args.model).is_dir() and (Path(args.model) / "head.pt").exists() and not (Path(args.model) / "head.safetensors").exists():
+            lines.append(f"  WARN  {args.model}: only pickle head.pt was found; head.safetensors is preferred (run: soro-boro convert-head {args.model})")
     print("\n".join(lines))
     return 0 if ok else 1
 

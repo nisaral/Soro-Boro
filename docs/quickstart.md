@@ -63,6 +63,6 @@ curl -s localhost:8765/route -d '{"query": "weather in Paris", "tools": [{"name"
 ```
 
 Add `--heuristic` to any command to run without weights. `soro-boro doctor --check-model` verifies the
-model loads.
+model loads. Checkpoint loading prefers `head.safetensors` over `head.pt` when both exist, and `soro-boro doctor --check-model` warns if only `head.pt` is present (`soro-boro convert-head <dir>`).
 
 Next: [examples/](../examples) · [API reference](API.md) · [FAQ](FAQ.md)
